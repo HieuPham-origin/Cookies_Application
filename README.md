@@ -1,2 +1,2 @@
 # Cookies_Application
-Building a cross-flatform app using Flutter Framework
+Building a cross-platform app using Flutter Framework
