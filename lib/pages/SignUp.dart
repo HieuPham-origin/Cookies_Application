@@ -4,8 +4,21 @@ import 'package:cookie_app/pages/SignIn.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   const SignUp({Key? key});
+
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  var _isObsecured;
+
+  @override
+  void initState() {
+    super.initState();
+    _isObsecured = true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +91,6 @@ class SignUp extends StatelessWidget {
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
                               child: TextField(
                                 style: GoogleFonts.inter(),
-                                obscureText: true,
                                 decoration: InputDecoration(
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -107,7 +119,7 @@ class SignUp extends StatelessWidget {
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
                               child: TextField(
                                 style: GoogleFonts.inter(),
-                                obscureText: true,
+                                obscureText: _isObsecured,
                                 decoration: InputDecoration(
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -120,6 +132,19 @@ class SignUp extends StatelessWidget {
                                     labelText: "Mật khẩu",
                                     labelStyle: TextStyle(
                                       color: Color(0xFF9A9A9A),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isObsecured
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: Color(0xFF9A9A9A),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isObsecured = !_isObsecured;
+                                        });
+                                      },
                                     )),
                               ),
                             ),
@@ -133,7 +158,7 @@ class SignUp extends StatelessWidget {
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
                               child: TextField(
                                 style: GoogleFonts.inter(),
-                                obscureText: true,
+                                obscureText: _isObsecured,
                                 decoration: InputDecoration(
                                     focusedBorder: OutlineInputBorder(
                                         borderSide: BorderSide(
@@ -146,6 +171,19 @@ class SignUp extends StatelessWidget {
                                     labelText: "Xác nhận mật khẩu",
                                     labelStyle: TextStyle(
                                       color: Color(0xFF9A9A9A),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isObsecured
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                        color: Color(0xFF9A9A9A),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isObsecured = !_isObsecured;
+                                        });
+                                      },
                                     )),
                               ),
                             ),
