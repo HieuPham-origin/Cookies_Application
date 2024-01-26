@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1004456404124",
+    "project_id": "cookieapp-46bb1",
+    "storage_bucket": "cookieapp-46bb1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1004456404124:android:58034ab7fc642d4c8bb959",
+        "android_client_info": {
+          "package_name": "com.example.cookie_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8mmC5D6Z-9cRCyGlarWCQMl71N2QiUzQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
