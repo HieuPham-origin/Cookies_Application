@@ -1,19 +1,26 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cookie_app/components/email_textfield.dart';
+import 'package:cookie_app/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'SignUp.dart';
+import '../components/password_textfield.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({Key? key});
+class SignUp extends StatefulWidget {
+  const SignUp({Key? key});
 
   @override
-  State<SignIn> createState() => _SignInState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _SignInState extends State<SignIn> {
+class _SignUpState extends State<SignUp> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
   var _isObsecured;
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +70,7 @@ class _SignInState extends State<SignIn> {
                     ),
                     Container(
                       width: 350,
-                      height: 500,
+                      height: 550,
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
@@ -75,7 +82,7 @@ class _SignInState extends State<SignIn> {
                             SizedBox(
                               height: 32,
                             ),
-                            Text("Đăng nhập",
+                            Text("Đăng ký",
                                 style: GoogleFonts.inter(
                                   textStyle: TextStyle(
                                       fontSize: 32,
@@ -87,93 +94,36 @@ class _SignInState extends State<SignIn> {
                             ),
 
                             //Email field
-                            Padding(
-                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                              child: TextField(
-                                style: GoogleFonts.inter(),
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            width: 2, color: Color(0xFFB99B6B)),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12))),
-                                    border: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                            color: Color(0xFFB99B6B),
-                                            width: 1.0),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12))),
-                                    labelText: "Email",
-                                    labelStyle: TextStyle(
-                                      color: Color(0xFF9A9A9A),
-                                    )),
-                              ),
-                            ),
+                            EmailTextField(
+                                controller: emailController,
+                                hintText: "Email",
+                                obscureText: false),
 
                             SizedBox(
                               height: 32,
                             ),
 
                             //Password field
-                            Padding(
-                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                              child: TextField(
-                                style: GoogleFonts.inter(),
-                                obscureText: _isObsecured,
-                                decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            width: 2, color: Color(0xFFB99B6B)),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12))),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(12))),
-                                    labelText: "Mật khẩu",
-                                    labelStyle: TextStyle(
-                                      color: Color(0xFF9A9A9A),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isObsecured
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                        color: Color(0xFF9A9A9A),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                            _isObsecured = !_isObsecured;
-                                        });
-                                      },
-                                    )
-                                  ),
-                              ),
-                            ),
+                            PasswordTextField(
+                                controller: passwordController,
+                                hintText: "Mật khẩu",
+                                obscure: _isObsecured),
 
                             SizedBox(
-                              height: 12,
+                              height: 32,
                             ),
 
-                            Align(
-                              alignment: Alignment.topRight,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                onPressed: () {},
-                                child: const Text('Quên mật khẩu ?',
-                                    style: TextStyle(
-                                      color: Color(0xFF9A9A9A),
-                                    )),
-                              ),
-                            ),
+                            //Confirm Password field
+                            PasswordTextField(
+                                controller: confirmPasswordController,
+                                hintText: "Xác nhận mật khẩu",
+                                obscure: _isObsecured),
 
                             SizedBox(
-                              height: 16,
+                              height: 32,
                             ),
 
+                            //Sign up button
                             Padding(
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
                               child: ElevatedButton(
@@ -186,7 +136,7 @@ class _SignInState extends State<SignIn> {
                                   ),
                                   onPressed: () {},
                                   child: Text(
-                                    "Đăng Nhập",
+                                    "Đăng ký",
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         color: Colors.white,
@@ -210,13 +160,9 @@ class _SignInState extends State<SignIn> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const SignUp()),
-                                  );
+                                  Navigator.pop(context);
                                 },
-                                child: const Text('Tạo tài khoản',
+                                child: const Text('Đã có tài khoản',
                                     style: TextStyle(
                                       color: Color(0xFF9A9A9A),
                                     )),
