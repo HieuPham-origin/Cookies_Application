@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class LibraryPage extends StatefulWidget {
+  const LibraryPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<LibraryPage> createState() => _LibraryPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text("Trang chủ",
+            child: Text("Thư viện",
                 style: GoogleFonts.inter(
                     textStyle: const TextStyle(
                   fontSize: 28,

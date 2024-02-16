@@ -1,4 +1,4 @@
-import 'package:cookie_app/pages/home_page.dart';
+import 'package:cookie_app/pages/Home.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +15,7 @@ class AuthPage extends StatelessWidget {
         builder: (context, snapshot) {
           // user is logged in
           if (snapshot.hasData) {
-            return HomePage();
+            return Home();
           }
 
           // user is NOT logged in

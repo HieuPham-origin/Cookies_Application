@@ -1,9 +1,12 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, prefer_typing_uninitialized_variables
 
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/pages/sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 import '../components/password_textfield.dart';
 
@@ -20,6 +23,55 @@ class _SignUpState extends State<SignUp> {
   final confirmPasswordController = TextEditingController();
 
   var _isObsecured;
+
+  void signUpUser() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Center(
+          child: SpinKitSquareCircle(
+            color: Color(0xFFB99B6B),
+          ),
+        );
+      },
+    );
+
+    try {
+      if (passwordController.text != confirmPasswordController.text) {
+        showErrorMessage("Passwords are not the same");
+      } else {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+      }
+
+      // pop the loading circle
+      Navigator.pop(context);
+      Navigator.pop(context, true);
+
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      if (e.code == 'invalid-credential') {
+        // show error to user
+        showErrorMessage("Email hoặc mật khẩu không chính xác!");
+      }
+    }
+  }
+
+  void showErrorMessage(String errorMessage) {
+    ToastService.showErrorToast(
+      context,
+      message: errorMessage,
+    );
+  }
+
+  void showSuccessMessage(String successMessage) {
+    ToastService.showSuccessToast(
+      context,
+      message: successMessage,
+    );
+  }
 
   @override
   void initState() {
@@ -80,7 +132,7 @@ class _SignUpState extends State<SignUp> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 32,
+                              height: 28,
                             ),
                             Text("Đăng ký",
                                 style: GoogleFonts.inter(
@@ -90,7 +142,7 @@ class _SignUpState extends State<SignUp> {
                                       color: Color(0xFFB99B6B)),
                                 )),
                             SizedBox(
-                              height: 32,
+                              height: 28,
                             ),
 
                             //Email field
@@ -100,7 +152,7 @@ class _SignUpState extends State<SignUp> {
                                 obscureText: false),
 
                             SizedBox(
-                              height: 32,
+                              height: 28,
                             ),
 
                             //Password field
@@ -110,7 +162,7 @@ class _SignUpState extends State<SignUp> {
                                 obscure: _isObsecured),
 
                             SizedBox(
-                              height: 32,
+                              height: 28,
                             ),
 
                             //Confirm Password field
@@ -120,7 +172,7 @@ class _SignUpState extends State<SignUp> {
                                 obscure: _isObsecured),
 
                             SizedBox(
-                              height: 32,
+                              height: 28,
                             ),
 
                             //Sign up button
@@ -134,7 +186,7 @@ class _SignUpState extends State<SignUp> {
                                     ),
                                     minimumSize: const Size.fromHeight(50),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: signUpUser,
                                   child: Text(
                                     "Đăng ký",
                                     style: GoogleFonts.inter(
@@ -153,19 +205,17 @@ class _SignUpState extends State<SignUp> {
 
                             Align(
                               alignment: Alignment.center,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                onPressed: () {
+                              child: GestureDetector(
+                                onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Text('Đã có tài khoản',
-                                    style: TextStyle(
-                                      color: Color(0xFF9A9A9A),
-                                    )),
+                                child: Text(
+                                  "Đã có tài khoản",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF9A9A9A),
+                                  ),
+                                ),
                               ),
                             ),
                           ],

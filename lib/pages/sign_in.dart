@@ -5,6 +5,8 @@ import 'package:cookie_app/components/password_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 import 'sign_up.dart';
 
@@ -31,8 +33,10 @@ class _SignInState extends State<SignIn> {
     showDialog(
       context: context,
       builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
+        return Center(
+          child: SpinKitSquareCircle(
+            color: Color(0xFFB99B6B),
+          ),
         );
       },
     );
@@ -46,54 +50,33 @@ class _SignInState extends State<SignIn> {
       // pop the loading circle
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
-      // WRONG EMAIL
       Navigator.pop(context);
-      if (e.code == 'invalid-email') {
+      if (e.code == 'invalid-credential') {
         // show error to user
-        wrongEmailMessage();
-      }
-
-      // WRONG PASSWORD
-      else if (e.code == 'invalid-credential') {
-        // show error to user
-        wrongPasswordMessage();
+        showErrorMessage("Email hoặc mật khẩu không chính xác !");
       }
     }
   }
 
-  void wrongEmailMessage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const AlertDialog(
-          backgroundColor: Colors.deepPurple,
-          title: Center(
-            child: Text(
-              'Incorrect Email',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-      },
+  void showErrorMessage(String message) {
+    ToastService.showErrorToast(
+      context,
+      message: message,
     );
   }
 
-  // wrong password message popup
-  void wrongPasswordMessage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const AlertDialog(
-          backgroundColor: Colors.deepPurple,
-          title: Center(
-            child: Text(
-              'Incorrect Password',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-      },
+  void showSuccessMessage(String message) {
+    ToastService.showSuccessToast(
+      context,
+      message: message,
     );
+  }
+
+  Future<void> signUpAndDisplayResult(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, '/signup');
+
+    if (!context.mounted) return;
+    if (result == true) showSuccessMessage("Đăng ký tài khoản thành công");
   }
 
   @override
@@ -183,7 +166,7 @@ class _SignInState extends State<SignIn> {
                                     fontSize: 16,
                                   ),
                                 ),
-                                onPressed: signInUser,
+                                onPressed: () {},
                                 child: const Text('Quên mật khẩu ?',
                                     style: TextStyle(
                                       color: Color(0xFF9A9A9A),
@@ -220,23 +203,15 @@ class _SignInState extends State<SignIn> {
                             ),
                             Align(
                               alignment: Alignment.center,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle: const TextStyle(
+                              child: GestureDetector(
+                                onTap: () => signUpAndDisplayResult(context),
+                                child: Text(
+                                  "Tạo tài khoản",
+                                  style: TextStyle(
                                     fontSize: 16,
+                                    color: Color(0xFF9A9A9A),
                                   ),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const SignUp()),
-                                  );
-                                },
-                                child: const Text('Tạo tài khoản',
-                                    style: TextStyle(
-                                      color: Color(0xFF9A9A9A),
-                                    )),
                               ),
                             ),
                           ],
