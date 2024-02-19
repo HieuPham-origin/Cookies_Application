@@ -24,27 +24,33 @@ class BottomNavBar extends StatelessWidget {
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.home),
+        icon: Icon(CupertinoIcons.house_alt),
         title: ("Trang Chủ"),
         activeColorPrimary: Color(0xFFB99B6B),
+        activeColorSecondary: CupertinoColors.black,
         inactiveColorPrimary: CupertinoColors.black,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.group),
+        icon: Icon(
+          CupertinoIcons.person_2,
+        ),
         title: ("Cộng Đồng"),
         activeColorPrimary: Color(0xFFB99B6B),
+        activeColorSecondary: CupertinoColors.black,
         inactiveColorPrimary: CupertinoColors.black,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(CupertinoIcons.folder),
         title: ("Thư Viện"),
         activeColorPrimary: Color(0xFFB99B6B),
+        activeColorSecondary: CupertinoColors.black,
         inactiveColorPrimary: CupertinoColors.black,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.settings),
+        icon: Icon(CupertinoIcons.gear_alt),
         title: ("Cài Đặt"),
         activeColorPrimary: Color(0xFFB99B6B),
+        activeColorSecondary: CupertinoColors.black,
         inactiveColorPrimary: CupertinoColors.black,
       ),
     ];

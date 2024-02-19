@@ -1,4 +1,5 @@
 import 'package:cookie_app/pages/auth_page.dart';
+import 'package:cookie_app/pages/settings_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/pages/sign_up.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signup' :(context) => SignUp(),
         '/signin' : (context) => SignIn(),
+        '/profile' : (context) => SettingPage(),
       },
     );
   }
