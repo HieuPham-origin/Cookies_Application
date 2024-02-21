@@ -132,7 +132,7 @@ class _SettingPageState extends State<SettingPage> {
                     InkWell(
                       onTap: () {},
                       customBorder: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: SettingOption(
                           title: "Thông báo",
@@ -141,7 +141,7 @@ class _SettingPageState extends State<SettingPage> {
                     InkWell(
                       onTap: () {},
                       customBorder: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: SettingOption(
                           title: "Ngôn ngữ", icon: CupertinoIcons.globe),
@@ -149,7 +149,7 @@ class _SettingPageState extends State<SettingPage> {
                     InkWell(
                       onTap: () {},
                       customBorder: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: SettingOption(
                           title: "Thông báo",
@@ -158,7 +158,7 @@ class _SettingPageState extends State<SettingPage> {
                     InkWell(
                       onTap: signUserOut,
                       customBorder: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: SettingOption(
                           title: "Đăng xuất", icon: Icons.exit_to_app),

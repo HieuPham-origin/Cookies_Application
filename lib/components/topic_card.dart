@@ -4,25 +4,31 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TopicItem extends StatelessWidget {
+class TopicCard extends StatefulWidget {
   final String topicName;
   final int numOfVocab;
+  final Function()? onTap;
 
-  const TopicItem(
-      {super.key, required this.topicName, required this.numOfVocab});
+  const TopicCard(
+      {super.key, required this.topicName, required this.numOfVocab, this.onTap});
 
+  @override
+  State<TopicCard> createState() => _TopicCardState();
+}
+
+class _TopicCardState extends State<TopicCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 4.0, right: 4.0, top: 4),
       child: Card(
         elevation: 2,
         surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(20.0),
         ),
         child: InkWell(
-          onTap: () {},
+          onTap: widget.onTap,
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -46,7 +52,7 @@ class TopicItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  topicName,
+                  widget.topicName,
                   style: GoogleFonts.inter(
                       textStyle: TextStyle(
                     fontSize: 18,
@@ -60,7 +66,7 @@ class TopicItem extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text('$numOfVocab từ',
+                  Text('${widget.numOfVocab} từ',
                       style: GoogleFonts.inter(
                         textStyle: TextStyle(
                           fontSize: 16,
