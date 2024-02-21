@@ -1,4 +1,5 @@
 import 'package:cookie_app/pages/auth_page.dart';
+import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/pages/settings_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/pages/sign_up.dart';
@@ -23,10 +24,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthPage(),
+      // initialRoute: '/signin',
+      // onGenerateRoute: (settings) {
+      //   switch (settings.name) {
+      //     case '/signup':
+      //       return MaterialPageRoute(builder: (context) => SignUp());
+      //     case '/signin':
+      //       return MaterialPageRoute(builder: (context) => SignIn());
+      //     case '/information':
+      //       return MaterialPageRoute(builder: (context) => InformationPage());
+      //   }
+      // },
       routes: {
         '/signup' :(context) => SignUp(),
         '/signin' : (context) => SignIn(),
         '/profile' : (context) => SettingPage(),
+        '/information' : (context) => InformationPage(),
       },
     );
   }
