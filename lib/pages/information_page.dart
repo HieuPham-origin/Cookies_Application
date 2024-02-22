@@ -1,3 +1,4 @@
+import 'package:cookie_app/components/edit_username_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/components/setting_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -65,6 +66,11 @@ class _InformationPageState extends State<InformationPage> {
                         children: [
                           EditEmailTextField(
                               controller: emailController, hintText: "Email"),
+                          EditUsernameTextField(
+                            controller: usernameController, hintText: "Tên"),
+                          EditPasswordTextField(
+                            controller: passwordController, hintText: "Mật khẩu"),
+                          
                         ],
                       ),
                     ),

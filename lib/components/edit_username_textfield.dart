@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class EditPasswordTextField extends StatefulWidget {
+class EditUsernameTextField extends StatefulWidget {
   final controller;
   final String hintText;
 
-  EditPasswordTextField({
-      super.key,
-      required this.controller,
-      required this.hintText
-    });
+  const EditUsernameTextField(
+      {super.key, required this.controller, required this.hintText});
 
   @override
-  State<EditPasswordTextField> createState() => _EditPasswordTextFieldState();
+  State<EditUsernameTextField> createState() => _EditUsernameTextFieldState();
 }
 
-class _EditPasswordTextFieldState extends State<EditPasswordTextField> {
-
-
-
+class _EditUsernameTextFieldState extends State<EditUsernameTextField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32),
       child: TextField(
         controller: widget.controller,
         style: GoogleFonts.inter(),
@@ -31,6 +25,7 @@ class _EditPasswordTextFieldState extends State<EditPasswordTextField> {
                 borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
                 borderRadius: BorderRadius.all(Radius.circular(12))),
             border: const OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFFB99B6B), width: 1.0),
                 borderRadius: BorderRadius.all(Radius.circular(12))),
             labelText: widget.hintText,
             labelStyle: const TextStyle(
