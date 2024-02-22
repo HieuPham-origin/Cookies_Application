@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:cookie_app/components/setting_options.dart';
+import 'package:cookie_app/pages/information_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +56,10 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: () => {
-                    // print(context)
+                  onTap: () //=> Navigator.pushNamed(context, '/information'),
+                  {
+                    Route route = MaterialPageRoute(builder: (context) => InformationPage());
+                      Navigator.push(context, route);
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
