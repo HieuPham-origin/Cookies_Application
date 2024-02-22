@@ -25,22 +25,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthPage(),
-      // initialRoute: '/signin',
-      // onGenerateRoute: (settings) {
-      //   switch (settings.name) {
-      //     case '/signup':
-      //       return MaterialPageRoute(builder: (context) => SignUp());
-      //     case '/signin':
-      //       return MaterialPageRoute(builder: (context) => SignIn());
-      //     case '/information':
-      //       return MaterialPageRoute(builder: (context) => InformationPage());
-      //   }
-      // },
       routes: {
-        '/signup' :(context) => SignUp(),
-        '/signin' : (context) => SignIn(),
-        '/profile' : (context) => SettingPage(),
-        '/information' : (context) => InformationPage(),
+        '/signup': (context) => SignUp(),
+        '/signin': (context) => SignIn(),
+        '/profile': (context) => SettingPage(),
+        '/information': (context) => InformationPage(),
       },
     );
   }

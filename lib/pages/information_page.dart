@@ -8,7 +8,7 @@ import 'package:toasty_box/toasty_box.dart';
 import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/edit_password_textfield.dart';
 
-class InformationPage extends StatefulWidget{
+class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
 
   @override
@@ -16,99 +16,104 @@ class InformationPage extends StatefulWidget{
 }
 
 class _InformationPageState extends State<InformationPage> {
-
   final user = FirebaseAuth.instance.currentUser!;
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
-  body: Column(
-    children: [
-      Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              "Thông tin 22",
-              style: GoogleFonts.inter(
-                textStyle: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      SizedBox(
-        height: 12,
-      ),
-      Expanded( // Wrap the Row with Expanded
-        child: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Container(
-            width: double.infinity,
-            height: 500,
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: 4,
-              surfaceTintColor: Colors.white,
-              child: InkWell(
-                onTap: () => ToastService.showToast(context, message: "clicked"),
-                customBorder: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.black,
-                        radius: 50,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage('assets/logo.png'),
-                        ),
-                      ),
-                    ),
-                    // Column(
-                    //   children: [
-                    //     EditEmailTextField(
-                    //       controller: emailController,
-                    //       hintText: "Email",
-                    //     ),
-                    //     SizedBox(
-                    //       height: 16,
-                    //     ),
-                    //     EditPasswordTextField(
-                    //       controller: passwordController,
-                    //       hintText: "Password",
-                    //     ),
-                    //     SizedBox(
-                    //       height: 16,
-                    //     ),
-                    //     TextField(
-                    //       controller: usernameController,
-                    //       obscureText: false,
-                    //     ),
-                    //   ],
-                    // ),
-                  ],
-                ),
-              ),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        leadingWidth: 24,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+            )),
+        title: Text(
+          "Thông tin",
+          style: GoogleFonts.inter(
+            textStyle: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
       ),
-    ],
-  ),
-);
+      body: Column(
+        children: [
+          SizedBox(
+            height: 72,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Card(
+                  surfaceTintColor: Colors.white,
+                  elevation: 5,
+                  child: Container(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 72, bottom: 32),
+                      child: Column(
+                        children: [
+                          EditEmailTextField(
+                              controller: emailController, hintText: "Email"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                FractionalTranslation(
+                  translation: Offset(0.0, -0.5),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 5,
+                              color: Colors.black12,
+                              spreadRadius: 5)
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 50.0,
+                            backgroundImage: AssetImage("assets/logo.png"),
+                          ),
+                          FractionalTranslation(
+                            translation: Offset(0.5, 1.3),
+                            child: RawMaterialButton(
+                              onPressed: () {},
+                              elevation: 2.0,
+                              fillColor: Color(0xFFF5F6F9),
+                              child: Icon(
+                                Icons.camera_alt_outlined,
+                                color: Colors.lightGreen,
+                              ),
+                              shape: CircleBorder(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

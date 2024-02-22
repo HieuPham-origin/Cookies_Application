@@ -19,6 +19,7 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
@@ -51,25 +52,15 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
           Flexible(
             flex: 1,
-            child: ListView(
+            child: ListView.builder(
               shrinkWrap: true,
-              children: [
-                TopicCard(
-                  onTap: () {},
-                  topicName: "Family Topic",
+              itemCount: 1,
+              itemBuilder: (BuildContext context, int index) {
+                return TopicCard(
+                  topicName: "Famimy",
                   numOfVocab: 10,
-                ),
-                TopicCard(
-                  onTap: () {},
-                  topicName: "Family Topic",
-                  numOfVocab: 10,
-                ),
-                TopicCard(
-                  onTap: () {},
-                  topicName: "Family Topic",
-                  numOfVocab: 10,
-                ),
-              ],
+                );
+              },
             ),
           ),
           SizedBox(
@@ -83,10 +74,11 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
           Flexible(
             flex: 1,
-            child: ListView(
+            child: ListView.builder(
               shrinkWrap: true,
-              children: [
-                VocabularyCard(
+              itemCount: 1,
+              itemBuilder: (BuildContext context, int index) {
+                return VocabularyCard(
                   onSpeakerPressed: () {},
                   onFavoritePressed: () {},
                   onSavePressed: () {},
@@ -96,30 +88,8 @@ class _LibraryPageState extends State<LibraryPage> {
                   definition: "bàn phím",
                   wordForm: "noun",
                   date: "6-9-2069",
-                ),
-                VocabularyCard(
-                  onSpeakerPressed: () {},
-                  onFavoritePressed: () {},
-                  onSavePressed: () {},
-                  onSharePressed: () {},
-                  word: "keyboard",
-                  phonetics: "phonetics",
-                  definition: "bàn phím",
-                  wordForm: "noun",
-                  date: "6-9-2069",
-                ),
-                VocabularyCard(
-                  onSpeakerPressed: () {},
-                  onFavoritePressed: () {},
-                  onSavePressed: () {},
-                  onSharePressed: () {},
-                  word: "keyboard",
-                  phonetics: "phonetics",
-                  definition: "bàn phím",
-                  wordForm: "noun",
-                  date: "6-9-2069",
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],

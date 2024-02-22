@@ -1,3 +1,4 @@
+import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,7 +13,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       body: Column(
+      resizeToAvoidBottomInset: false,
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
