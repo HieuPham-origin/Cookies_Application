@@ -55,8 +55,9 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: () =>
-                      ToastService.showToast(context, message: "clicked"),
+                  onTap: () => {
+                    // print(context)
+                  },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -90,7 +91,7 @@ class _SettingPageState extends State<SettingPage> {
                         backgroundColor: Colors.black,
                         radius: 50,
                         child: CircleAvatar(
-                          radius: 50,  
+                          radius: 50,
                           backgroundImage: AssetImage('assets/logo.png'),
                         ),
                       )
