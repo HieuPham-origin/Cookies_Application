@@ -1,3 +1,4 @@
+import 'package:cookie_app/pages/change_password.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -41,7 +42,10 @@ class _EditPasswordTextFieldState extends State<EditPasswordTextField> {
                 Icons.edit,
                 color: Colors.lightGreen,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Route route = MaterialPageRoute(builder: (context) => ChangePassword());
+                Navigator.push(context, route);
+              },
             )),
       ),
     );

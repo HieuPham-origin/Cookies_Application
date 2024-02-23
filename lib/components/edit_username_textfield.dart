@@ -1,6 +1,6 @@
+import 'package:cookie_app/pages/change_name.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 class EditUsernameTextField extends StatefulWidget {
   final controller;
   final String hintText;
@@ -36,7 +36,10 @@ class _EditUsernameTextFieldState extends State<EditUsernameTextField> {
                 Icons.edit,
                 color: Colors.lightGreen,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Route route = MaterialPageRoute(builder: (context) => ChangeName());
+                Navigator.push(context, route);
+              },
             )),
       ),
     );
