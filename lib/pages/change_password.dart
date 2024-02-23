@@ -9,14 +9,14 @@ import 'package:toasty_box/toasty_box.dart';
 import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/edit_password_textfield.dart';
 
-class ChangeName extends StatefulWidget {
-  const ChangeName({super.key});
+class ChangePassword extends StatefulWidget {
+  const ChangePassword({super.key});
 
   @override
-  State<ChangeName> createState() => _ChangeNamePageState();
+  State<ChangePassword> createState() => _ChangePasswordPageState();
 }
 
-class _ChangeNamePageState extends State<ChangeName> {
+class _ChangePasswordPageState extends State<ChangePassword> {
   final user = FirebaseAuth.instance.currentUser!;
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -65,7 +65,7 @@ class _ChangeNamePageState extends State<ChangeName> {
                       child: Column(
                         children: [
                           Text(
-                            "Đổi tên",
+                            "Đổi mật khẩu",
                             style: GoogleFonts.inter(
                               textStyle: const TextStyle(
                                 fontSize: 28,
@@ -74,22 +74,15 @@ class _ChangeNamePageState extends State<ChangeName> {
                             ),
                           ),
                           SizedBox(
-                            height: 8,
+                            height: 32,
                           ),
-                          Text(
-                            "Bạn có thể đổi thành tên khác",
-                            style: GoogleFonts.inter(
-                              textStyle: const TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFF9A9A9A)
-                              ),
-                            ),
-                          ),
+                          PasswordTextField(
+                            controller: passwordController, hintText: "Mật khẩu mới", obscure: true,),
                           SizedBox(
-                            height: 40,
+                            height: 32,
                           ),
-                          EditUsernameTextField(
-                            controller: usernameController, hintText: "Tên"),
+                          PasswordTextField(
+                            controller: passwordController, hintText: "Xác nhận mật khẩu mới", obscure: true,),
                           SizedBox(
                             height: 32,
                           ),
@@ -120,45 +113,45 @@ class _ChangeNamePageState extends State<ChangeName> {
                     ),
                   ),
                 ),
-                FractionalTranslation(
-                  translation: Offset(0.0, -0.5),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 5,
-                              color: Colors.black12,
-                              spreadRadius: 5)
-                        ],
-                      ),
-                      // child: Stack(
-                      //   children: [
-                      //     // CircleAvatar(
-                      //     //   radius: 50.0,
-                      //     //   backgroundImage: AssetImage("assets/logo.png"),
-                      //     // ),
-                      //     FractionalTranslation(
-                      //       translation: Offset(0.5, 1.3),
-                      //       child: RawMaterialButton(
-                      //         onPressed: () {},
-                      //         elevation: 2.0,
-                      //         fillColor: Color(0xFFF5F6F9),
-                      //         child: Icon(
-                      //           Icons.camera_alt_outlined,
-                      //           color: Colors.lightGreen,
-                      //         ),
-                      //         shape: CircleBorder(),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                    ),
-                  ),
-                ),
+                // FractionalTranslation(
+                //   translation: Offset(0.0, -0.5),
+                //   child: Align(
+                //     alignment: Alignment.topCenter,
+                //     child: Container(
+                //       decoration: BoxDecoration(
+                //         color: Colors.white,
+                //         shape: BoxShape.circle,
+                //         boxShadow: [
+                //           BoxShadow(
+                //               blurRadius: 5,
+                //               color: Colors.black12,
+                //               spreadRadius: 5)
+                //         ],
+                //       ),
+                //       // child: Stack(
+                //       //   children: [
+                //       //     // CircleAvatar(
+                //       //     //   radius: 50.0,
+                //       //     //   backgroundImage: AssetImage("assets/logo.png"),
+                //       //     // ),
+                //       //     FractionalTranslation(
+                //       //       translation: Offset(0.5, 1.3),
+                //       //       child: RawMaterialButton(
+                //       //         onPressed: () {},
+                //       //         elevation: 2.0,
+                //       //         fillColor: Color(0xFFF5F6F9),
+                //       //         child: Icon(
+                //       //           Icons.camera_alt_outlined,
+                //       //           color: Colors.lightGreen,
+                //       //         ),
+                //       //         shape: CircleBorder(),
+                //       //       ),
+                //       //     ),
+                //       //   ],
+                //       // ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
