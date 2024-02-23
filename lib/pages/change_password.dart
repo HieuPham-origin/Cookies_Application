@@ -51,107 +51,60 @@ class _ChangePasswordPageState extends State<ChangePassword> {
             height: 72,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12),
-            child: Stack(
-              alignment: Alignment.topCenter,
+            padding:
+                const EdgeInsets.only(top: 24, bottom: 64, left: 12, right: 12),
+            child: Column(
               children: [
-                Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 5,
-                  child: Container(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 24, bottom: 64),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Đổi mật khẩu",
-                            style: GoogleFonts.inter(
-                              textStyle: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 32,
-                          ),
-                          PasswordTextField(
-                            controller: passwordController, hintText: "Mật khẩu mới", obscure: true,),
-                          SizedBox(
-                            height: 32,
-                          ),
-                          PasswordTextField(
-                            controller: passwordController, hintText: "Xác nhận mật khẩu mới", obscure: true,),
-                          SizedBox(
-                            height: 32,
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFB99B6B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    minimumSize: const Size.fromHeight(50),
-                                  ),
-                                  onPressed: () {},
-                                  child: Text(
-                                    "Thay đổi",
-                                    style: GoogleFonts.inter(
-                                      textStyle: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-                        ],
-                      ),
+                Text(
+                  "Đổi mật khẩu",
+                  style: GoogleFonts.inter(
+                    textStyle: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                // FractionalTranslation(
-                //   translation: Offset(0.0, -0.5),
-                //   child: Align(
-                //     alignment: Alignment.topCenter,
-                //     child: Container(
-                //       decoration: BoxDecoration(
-                //         color: Colors.white,
-                //         shape: BoxShape.circle,
-                //         boxShadow: [
-                //           BoxShadow(
-                //               blurRadius: 5,
-                //               color: Colors.black12,
-                //               spreadRadius: 5)
-                //         ],
-                //       ),
-                //       // child: Stack(
-                //       //   children: [
-                //       //     // CircleAvatar(
-                //       //     //   radius: 50.0,
-                //       //     //   backgroundImage: AssetImage("assets/logo.png"),
-                //       //     // ),
-                //       //     FractionalTranslation(
-                //       //       translation: Offset(0.5, 1.3),
-                //       //       child: RawMaterialButton(
-                //       //         onPressed: () {},
-                //       //         elevation: 2.0,
-                //       //         fillColor: Color(0xFFF5F6F9),
-                //       //         child: Icon(
-                //       //           Icons.camera_alt_outlined,
-                //       //           color: Colors.lightGreen,
-                //       //         ),
-                //       //         shape: CircleBorder(),
-                //       //       ),
-                //       //     ),
-                //       //   ],
-                //       // ),
-                //     ),
-                //   ),
-                // ),
+                SizedBox(
+                  height: 32,
+                ),
+                PasswordTextField(
+                  controller: passwordController,
+                  hintText: "Mật khẩu mới",
+                  obscure: true,
+                ),
+                SizedBox(
+                  height: 32,
+                ),
+                PasswordTextField(
+                  controller: passwordController,
+                  hintText: "Xác nhận mật khẩu mới",
+                  obscure: true,
+                ),
+                SizedBox(
+                  height: 32,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFB99B6B),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: const Size.fromHeight(50),
+                      ),
+                      onPressed: () {},
+                      child: Text(
+                        "Thay đổi",
+                        style: GoogleFonts.inter(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      )),
+                ),
               ],
             ),
           ),
