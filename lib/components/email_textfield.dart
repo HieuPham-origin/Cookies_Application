@@ -7,11 +7,11 @@ class EmailTextField extends StatelessWidget {
   final bool obscureText;
 
   const EmailTextField({
-      super.key,
-      required this.controller,
-      required this.hintText,
-      required this.obscureText
-    });
+    super.key,
+    required this.controller,
+    required this.hintText,
+    required this.obscureText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,7 @@ class EmailTextField extends StatelessWidget {
                 borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
                 borderRadius: BorderRadius.all(Radius.circular(12))),
             border: const OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: Color(0xFFB99B6B), width: 1.0),
+                borderSide: BorderSide(color: Color(0xFFB99B6B), width: 1.0),
                 borderRadius: BorderRadius.all(Radius.circular(12))),
             labelText: hintText,
             labelStyle: const TextStyle(

@@ -57,7 +57,7 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: () //=> Navigator.pushNamed(context, '/information'),
+                  onTap: ()
                   {
                     Route route = MaterialPageRoute(builder: (context) => InformationPage());
                       Navigator.push(context, route);

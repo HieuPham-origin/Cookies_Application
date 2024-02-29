@@ -47,7 +47,7 @@ class _ChangePasswordPageState extends State<ChangePassword> {
       ),
       body: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 72,
           ),
           Padding(
