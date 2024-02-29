@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:cookie_app/components/setting_options.dart';
+import 'package:cookie_app/pages/information_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Row(
@@ -55,8 +57,11 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: () =>
-                      ToastService.showToast(context, message: "clicked"),
+                  onTap: ()
+                  {
+                    Route route = MaterialPageRoute(builder: (context) => InformationPage());
+                      Navigator.push(context, route);
+                  },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -90,7 +95,7 @@ class _SettingPageState extends State<SettingPage> {
                         backgroundColor: Colors.black,
                         radius: 50,
                         child: CircleAvatar(
-                          radius: 50,  
+                          radius: 50,
                           backgroundImage: AssetImage('assets/logo.png'),
                         ),
                       )

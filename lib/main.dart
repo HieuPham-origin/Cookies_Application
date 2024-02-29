@@ -1,4 +1,5 @@
 import 'package:cookie_app/pages/auth_page.dart';
+import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/pages/settings_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/pages/sign_up.dart';
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignUp(),
         '/signin': (context) => SignIn(),
         '/profile': (context) => SettingPage(),
+        '/information': (context) => InformationPage(),
       },
     );
   }
