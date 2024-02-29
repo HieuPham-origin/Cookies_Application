@@ -11,7 +11,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom]);
   runApp(const MyApp());
 }
 
@@ -24,9 +25,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: AuthPage(),
       routes: {
-        '/signup' :(context) => SignUp(),
-        '/signin' : (context) => SignIn(),
-        '/profile' : (context) => SettingPage(),
+        '/signup': (context) => SignUp(),
+        '/signin': (context) => SignIn(),
+        '/profile': (context) => SettingPage(),
       },
     );
   }
