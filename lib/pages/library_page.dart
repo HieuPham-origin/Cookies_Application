@@ -277,18 +277,13 @@ class _LibraryPageState extends State<LibraryPage> {
                               borderRadius: BorderRadius.circular(20),
                               color: Colors.red,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 24.0),
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                    size: 32,
-                                  ),
-                                ),
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 24.0),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                                size: 32,
+                              ),
                             ),
                           ),
                         ),
