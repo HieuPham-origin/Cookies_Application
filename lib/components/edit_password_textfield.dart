@@ -4,12 +4,16 @@ import 'package:google_fonts/google_fonts.dart';
 
 class EditPasswordTextField extends StatefulWidget {
   final controller;
+  final String secret;
   final String hintText;
+  bool obsucre;
 
   EditPasswordTextField({
       super.key,
       required this.controller,
-      required this.hintText
+      required this.secret,
+      required this.hintText,
+      required this.obsucre
     });
 
   @override
@@ -18,7 +22,12 @@ class EditPasswordTextField extends StatefulWidget {
 
 class _EditPasswordTextFieldState extends State<EditPasswordTextField> {
 
-
+  @override
+  void initState() {
+    
+    super.initState();
+    widget.controller.text = widget.secret;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +36,7 @@ class _EditPasswordTextFieldState extends State<EditPasswordTextField> {
       child: TextField(
         controller: widget.controller,
         style: GoogleFonts.inter(),
+        obscureText: widget.obsucre,
         decoration: InputDecoration(
             focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),

@@ -88,7 +88,7 @@ class _InformationPageState extends State<InformationPage> {
                           EditUsernameTextField(
                             controller: usernameController, content: displayName, hintText: "Nhập tên của bạn."),
                           EditPasswordTextField(
-                            controller: passwordController, hintText: "Mật khẩu"),
+                            controller: passwordController, secret: "00000000", hintText: "Mật khẩu", obsucre: true,),
                           
                         ],
                       ),

@@ -29,4 +29,20 @@ class UserService {
   Future<void> updateDisplayName(String newDisplayName) async {
     await user.updateDisplayName(newDisplayName);
   }
+
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    final cred = EmailAuthProvider.credential(
+        email: user.email!, 
+        password: currentPassword
+    );
+
+    user.reauthenticateWithCredential(cred).then((value) {
+      user.updatePassword(newPassword).then((_) {
+        print("Success");
+      }).catchError((error) {
+        print("Error");
+      });
+    }).catchError((err) {
+    
+    });}
 }
