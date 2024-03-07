@@ -44,13 +44,7 @@ class _EditEmailTextFieldState extends State<EditEmailTextField> {
           labelStyle: const TextStyle(
             color: Color(0xFF9A9A9A),
           ),
-          suffixIcon: IconButton(
-            icon: Icon(
-              Icons.edit,
-              color: Colors.lightGreen,
-            ),
-            onPressed: () {},
-          ),
+          
         ),
       ),
     );

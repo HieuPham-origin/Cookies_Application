@@ -13,10 +13,10 @@ class UserService {
 
       // UID specific to the provider
       uid = providerProfile.uid;
-      List<dynamic> info = uid.split('@');
+      // List<dynamic> info = uid.split('@');
       // Name, email address, and profile photo URL
       emailAddress = providerProfile.email;
-      name = info[0];
+      name = providerProfile.displayName;
       // final profilePhoto = providerProfile.photoURL;
     }
     return {
