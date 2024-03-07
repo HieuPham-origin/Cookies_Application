@@ -19,7 +19,7 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   // User user = ;
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
-  dynamic displayName;
+  String displayName ='';
   String email = '';
 
   @override
@@ -75,10 +75,13 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: ()
+                  onTap: ()async
                   {
                     Route route = MaterialPageRoute(builder: (context) => InformationPage());
-                      Navigator.push(context, route);
+                   final rollback = await   Navigator.push(context, route);
+                   setState(() {
+                     displayName = rollback;
+                   });
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

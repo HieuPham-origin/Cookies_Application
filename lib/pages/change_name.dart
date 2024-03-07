@@ -4,8 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cookie_app/services/UserService.dart';
 
 class ChangeName extends StatefulWidget {
-  const ChangeName({Key? key}) : super(key: key);
 
+  const ChangeName({Key? key, }) : super(key: key);
   @override
   State<ChangeName> createState() => _ChangeNamePageState();
 }
@@ -38,19 +38,21 @@ class _ChangeNamePageState extends State<ChangeName> {
   }
 
   Future<void> updateDisplayName() async {
-    final newDisplayName = usernameController.text;
+    dynamic newDisplayName = usernameController.text;
     await userService.updateDisplayName(newDisplayName);
     fetchUserInfo();
 
     // Show success notification
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Display name updated successfully'),
+        content: Text('Đổi tên thành công'),
       ),
     );
-
+    
     // Navigate back to information page
-    Navigator.pop(context);
+    Navigator.pop(context, newDisplayName);
+    
+
   }
 
   @override

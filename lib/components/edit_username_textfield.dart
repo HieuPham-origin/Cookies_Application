@@ -1,30 +1,30 @@
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-class EditUsernameTextField extends StatefulWidget {
-  final controller;
+class CustomTextField extends StatefulWidget {
+  final TextEditingController textEditingController;
   final String content;
   final String hintText;
-
-  const EditUsernameTextField(
-      {super.key, required this.controller, required this.content, required this.hintText});
+  final IconData? icon;
+  final Color? colorIcon;
+  final VoidCallback? onPressed;
+  const CustomTextField(
+      {super.key, required this.textEditingController, required this.content, required this.hintText, 
+      this.icon, this.colorIcon, this.onPressed});
 
   @override
-  State<EditUsernameTextField> createState() => _EditUsernameTextFieldState();
+  State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
-class _EditUsernameTextFieldState extends State<EditUsernameTextField> {
-  late TextEditingController _textEditingController;
+class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController(text: widget.content);
   }
 
   @override
   void dispose() {
-    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -33,7 +33,7 @@ class _EditUsernameTextFieldState extends State<EditUsernameTextField> {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32),
       child: TextField(
-        controller: _textEditingController,
+        controller: widget.textEditingController,
         style: GoogleFonts.inter(),
         decoration: InputDecoration(
           focusedBorder: const OutlineInputBorder(
@@ -49,14 +49,12 @@ class _EditUsernameTextFieldState extends State<EditUsernameTextField> {
             color: Color(0xFF9A9A9A),
           ),
           suffixIcon: IconButton(
-            icon: const Icon(
-              Icons.edit,
-              color: Colors.lightGreen,
+            icon: Icon(
+              widget.icon,
+              color: widget.colorIcon,
             ),
-            onPressed: () {
-              Route route = MaterialPageRoute(builder: (context) => ChangeName());
-              Navigator.push(context, route);
-            },
+            onPressed:
+              widget.onPressed
           ),
         ),
       ),
