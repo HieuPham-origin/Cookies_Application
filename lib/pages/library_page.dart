@@ -7,6 +7,7 @@ import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/model/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
+import 'package:cookie_app/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

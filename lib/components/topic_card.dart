@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cookie_app/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,10 @@ class TopicCard extends StatefulWidget {
   final Function()? onTap;
 
   const TopicCard(
-      {super.key, required this.topicName, required this.numOfVocab, this.onTap});
+      {super.key,
+      required this.topicName,
+      required this.numOfVocab,
+      this.onTap});
 
   @override
   State<TopicCard> createState() => _TopicCardState();
@@ -22,7 +26,7 @@ class _TopicCardState extends State<TopicCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 4.0, right: 4.0, top: 4),
       child: Card(
-        elevation: 2,
+        elevation: 0,
         surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
@@ -37,17 +41,28 @@ class _TopicCardState extends State<TopicCard> {
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 15, top: 10, bottom: 10),
                   child: Container(
-                    width: 48,
-                    height: 48,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFFFCF7E3),
+                      color: AppColors.creamy,
                     ),
-                    child: Icon(
-                      Icons.note_add_rounded,
-                      color: Colors.red,
+                    child: Center(
+                      child: Container(
+                        width: 25, // Adjusted width of the inner container
+                        height: 25, // Adjusted height of the inner container
+                        decoration: BoxDecoration(
+                          // Ensure the inner container is also a circle
+                          image: DecorationImage(
+                            image: AssetImage('assets/list.png'),
+                            fit: BoxFit
+                                .contain, // You can use different BoxFit values based on your requirement
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -55,26 +70,32 @@ class _TopicCardState extends State<TopicCard> {
                   widget.topicName,
                   style: GoogleFonts.inter(
                       textStyle: TextStyle(
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.red,
+                    color: AppColors.cookie,
                   )),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(right: 12),
               child: Row(
                 children: [
-                  Text('${widget.numOfVocab} từ',
-                      style: GoogleFonts.inter(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )),
-                  Icon(CupertinoIcons.chevron_right)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text('${widget.numOfVocab} từ',
+                        style: GoogleFonts.inter(
+                          textStyle: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.cookie,
+                          ),
+                        )),
+                  ),
+                  Icon(
+                    CupertinoIcons.chevron_right,
+                    color: AppColors.cookie,
+                    weight: 600.0,
+                  )
                 ],
               ),
             )
