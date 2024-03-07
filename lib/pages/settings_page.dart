@@ -2,6 +2,7 @@
 
 import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/information_page.dart';
+import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,24 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  final user = FirebaseAuth.instance.currentUser!;
+  // User user = ;
+  UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  dynamic displayName;
+  String email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    final userInfo = await userService.getUserInfo();
+    setState(() {
+      displayName = userInfo['displayName'];
+      email = userInfo['uid'];
+    });
+  }
 
   // sign user out method
   void signUserOut() {
@@ -73,7 +91,7 @@ class _SettingPageState extends State<SettingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Lâm Hoàng Hiếu",
+                            displayName,
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                               fontSize: 28,
@@ -84,7 +102,7 @@ class _SettingPageState extends State<SettingPage> {
                             height: 5,
                           ),
                           Text(
-                            "6969696@student.tdtu.edu.vn",
+                            email,
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                                     fontSize: 12, color: Color(0xFF9A9A9A))),

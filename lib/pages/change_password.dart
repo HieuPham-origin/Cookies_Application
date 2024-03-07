@@ -1,6 +1,7 @@
 import 'package:cookie_app/components/edit_username_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/components/setting_options.dart';
+import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +18,28 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePassword> {
-  final user = FirebaseAuth.instance.currentUser!;
+  UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
+  dynamic displayName;
+  String email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    final userInfo = await userService.getUserInfo();
+    setState(() {
+      displayName = userInfo['displayName'];
+      email = userInfo['uid'];
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

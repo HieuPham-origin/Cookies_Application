@@ -76,7 +76,7 @@ class _ChangeNamePageState extends State<ChangeName> {
                 height: 40,
               ),
               EditUsernameTextField(
-                  controller: usernameController, hintText: "Tên"),
+                  controller: usernameController, content: "", hintText: "Tên"),
               SizedBox(
                 height: 32,
               ),
