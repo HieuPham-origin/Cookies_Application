@@ -6,6 +6,7 @@ import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/model/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
+import 'package:cookie_app/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -172,19 +173,19 @@ class _LibraryPageState extends State<LibraryPage> {
           SpeedDialChild(child: Icon(Icons.abc), label: "Thêm từ vựng"),
         ],
       ),
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF0F0F0),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
             child: Text(
-              "Thư viện",
+              "Thư viện từ vựng",
               style: GoogleFonts.inter(
                 textStyle: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFB99B6B),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.coffee,
                 ),
               ),
             ),

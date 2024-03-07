@@ -49,7 +49,6 @@ class _SignUpState extends State<SignUp> {
       // pop the loading circle
       Navigator.pop(context);
       Navigator.pop(context, true);
-
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       if (e.code == 'invalid-credential') {
@@ -81,6 +80,8 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -104,126 +105,119 @@ class _SignUpState extends State<SignUp> {
               ],
             ),
             Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 180.0,
-                      width: 140.0,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                        image: AssetImage('assets/logo.png'),
-                        fit: BoxFit.fill,
-                      )),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: 350,
-                      height: 550,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 4,
-                        surfaceTintColor: Colors.white,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 28,
-                            ),
-                            Text("Đăng ký",
-                                style: GoogleFonts.inter(
-                                  textStyle: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFFB99B6B)),
-                                )),
-                            SizedBox(
-                              height: 28,
-                            ),
+              child: Column(
+                children: [
+                  Container(
+                    height: screenSize.height * 0.24,
+                    width: screenSize.width * 0.3,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                      image: AssetImage('assets/logo.png'),
+                      fit: BoxFit.contain,
+                    )),
+                  ),
+                  Container(
+                    width: screenSize.width * 0.88,
+                    height: screenSize.height * 0.7,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 4,
+                      surfaceTintColor: Colors.white,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text("Đăng ký",
+                              style: GoogleFonts.inter(
+                                textStyle: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFFB99B6B)),
+                              )),
+                          SizedBox(
+                            height: 20,
+                          ),
 
-                            //Email field
-                            EmailTextField(
-                                controller: emailController,
-                                hintText: "Email",
-                                obscureText: false),
+                          //Email field
+                          EmailTextField(
+                              controller: emailController,
+                              hintText: "Email",
+                              obscureText: false),
 
-                            SizedBox(
-                              height: 28,
-                            ),
+                          SizedBox(
+                            height: 20,
+                          ),
 
-                            //Password field
-                            PasswordTextField(
-                                controller: passwordController,
-                                hintText: "Mật khẩu",
-                                obscure: _isObsecured),
+                          //Password field
+                          PasswordTextField(
+                              controller: passwordController,
+                              hintText: "Mật khẩu",
+                              obscure: _isObsecured),
 
-                            SizedBox(
-                              height: 28,
-                            ),
+                          SizedBox(
+                            height: 20,
+                          ),
 
-                            //Confirm Password field
-                            PasswordTextField(
-                                controller: confirmPasswordController,
-                                hintText: "Xác nhận mật khẩu",
-                                obscure: _isObsecured),
+                          //Confirm Password field
+                          PasswordTextField(
+                              controller: confirmPasswordController,
+                              hintText: "Xác nhận mật khẩu",
+                              obscure: _isObsecured),
 
-                            SizedBox(
-                              height: 28,
-                            ),
+                          SizedBox(
+                            height: 50,
+                          ),
 
-                            //Sign up button
-                            Padding(
-                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFB99B6B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    minimumSize: const Size.fromHeight(50),
+                          //Sign up button
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFB99B6B),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  onPressed: signUpUser,
-                                  child: Text(
-                                    "Đăng ký",
-                                    style: GoogleFonts.inter(
-                                      textStyle: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  )),
-                            ),
-
-                            SizedBox(
-                              height: 20,
-                            ),
-
-                            Align(
-                              alignment: Alignment.center,
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
+                                  minimumSize: const Size.fromHeight(50),
+                                ),
+                                onPressed: signUpUser,
                                 child: Text(
-                                  "Đã có tài khoản",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFF9A9A9A),
+                                  "Đăng ký",
+                                  style: GoogleFonts.inter(
+                                    textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
+                                )),
+                          ),
+
+                          SizedBox(
+                            height: 20,
+                          ),
+
+                          Align(
+                            alignment: Alignment.center,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Đã có tài khoản",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF9A9A9A),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],

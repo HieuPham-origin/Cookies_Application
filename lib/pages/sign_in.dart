@@ -29,6 +29,8 @@ class _SignInState extends State<SignIn> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   void signInUser() async {
     showDialog(
       context: context,
@@ -81,6 +83,7 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -104,60 +107,56 @@ class _SignInState extends State<SignIn> {
               ],
             ),
             Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 180.0,
-                      width: 140.0,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                        image: AssetImage('assets/logo.png'),
-                        fit: BoxFit.fill,
-                      )),
-                    ),
-                    
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: 350,
-                      height: 500,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 4,
-                        surfaceTintColor: Colors.white,
+              child: Column(
+                children: [
+                  Container(
+                    height: screenSize.height * 0.24,
+                    width: screenSize.width * 0.3,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                      image: AssetImage('assets/logo.png'),
+                      fit: BoxFit.contain,
+                    )),
+                  ),
+                  Container(
+                    width: screenSize.width * 0.88,
+                    height: screenSize.height * 0.6,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 4,
+                      surfaceTintColor: Colors.white,
+                      child: Form(
+                        key: _formKey,
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 32,
+                              height: 20,
                             ),
                             Text("Đăng nhập",
                                 style: GoogleFonts.inter(
                                   textStyle: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w500,
                                       color: Color(0xFFB99B6B)),
                                 )),
                             SizedBox(
-                              height: 32,
+                              height: 20,
                             ),
                             EmailTextField(
                                 controller: emailController,
                                 hintText: "Email",
                                 obscureText: false),
                             SizedBox(
-                              height: 32,
+                              height: 20,
                             ),
                             PasswordTextField(
                                 controller: passwordController,
                                 hintText: "Nhập mật khẩu",
                                 obscure: _isObsecured),
                             SizedBox(
-                              height: 12,
+                              height: 10,
                             ),
                             Align(
                               alignment: Alignment.topRight,
@@ -175,7 +174,7 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             SizedBox(
-                              height: 16,
+                              height: 10,
                             ),
                             Padding(
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
@@ -187,13 +186,17 @@ class _SignInState extends State<SignIn> {
                                     ),
                                     minimumSize: const Size.fromHeight(50),
                                   ),
-                                  onPressed: signInUser,
+                                  onPressed: () => {
+                                        if (!_formKey.currentState!.validate())
+                                          signInUser()
+                                        else
+                                          _formKey.currentState!.save()
+                                      },
                                   child: Text(
                                     "Đăng Nhập",
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w600,
                                         fontSize: 16,
                                       ),
                                     ),
@@ -219,8 +222,8 @@ class _SignInState extends State<SignIn> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
