@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/title_widget.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:toasty_box/toasty_box.dart';
 
 class LibraryPage extends StatefulWidget {
@@ -32,7 +34,7 @@ class _LibraryPageState extends State<LibraryPage> {
     super.initState();
   }
 
-  void _showModalBottomSheet(BuildContext context) {
+  void _showAddTopicModalBottomSheet(BuildContext context) {
     topicController.clear();
     showModalBottomSheet(
         context: context,
@@ -120,7 +122,7 @@ class _LibraryPageState extends State<LibraryPage> {
 
                                   try {
                                     await topicService.addTopic(topic);
-                                    ToastService.showToast(context,
+                                    ToastService.showSuccessToast(context,
                                         message: "Add topic thành công");
                                     Navigator.pop(context);
                                   } catch (e) {
@@ -155,11 +157,80 @@ class _LibraryPageState extends State<LibraryPage> {
             ));
   }
 
+  void showTopicDetail(BuildContext context, Map<String, dynamic> data) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: ((context) => DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.8,
+            builder: (builder, scrollController) => SingleChildScrollView(
+              controller: scrollController,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 7,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.lightGreen),
+                    ),
+                    Stack(
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 56.0,
+                          child: Center(
+                              child: Text(
+                            data['topicName'],
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 5,
+                          child: IconButton(
+                            icon: Icon(Icons.close, size: 28),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      appBar: AppBar(
+        backgroundColor: Color(0xFFF5F5F5),
+        surfaceTintColor: Color(0xFFF5F5F5),
+        title: Center(
+          child: Text(
+            "Thư viện",
+            style: GoogleFonts.inter(
+              textStyle: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFB99B6B),
+              ),
+            ),
+          ),
+        ),
+      ),
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
         backgroundColor: Colors.greenAccent,
@@ -168,59 +239,107 @@ class _LibraryPageState extends State<LibraryPage> {
           SpeedDialChild(
             child: Icon(Icons.topic),
             label: "Thêm topic",
-            onTap: () => _showModalBottomSheet(context),
+            onTap: () => _showAddTopicModalBottomSheet(context),
           ),
           SpeedDialChild(child: Icon(Icons.abc), label: "Thêm từ vựng"),
         ],
       ),
-      backgroundColor: Color(0xFFF0F0F0),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              "Thư viện từ vựng",
-              style: GoogleFonts.inter(
-                textStyle: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.coffee,
-                ),
-              ),
+      backgroundColor: Color(0xFFF5F5F5),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TitleWidget(
+              title: "Topics",
             ),
-          ),
-          TitleWidget(
-            title: "Topics",
-          ),
-          Flexible(
-            flex: 1,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: 1,
-              itemBuilder: (BuildContext context, int index) {
-                return TopicCard(
-                  onTap: () {},
-                  topicName: "Famimy",
-                  numOfVocab: 10,
-                );
+            StreamBuilder<QuerySnapshot>(
+              stream: topicService.getAllTopics(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List topics = snapshot.data!.docs;
+                  return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: topics.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot document = topics[index];
+                      String docID = document.id;
+                      Map<String, dynamic> data =
+                          document.data() as Map<String, dynamic>;
+
+                      //Topic's attributes
+                      String topicTitle = data['topicName'];
+
+                      return Dismissible(
+                        background: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.red,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 24.0),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ),
+                          ),
+                        ),
+                        key: ValueKey(docID),
+                        confirmDismiss: (direction) async {
+                          final result = await QuickAlert.show(
+                            context: context,
+                            text: "Bạn có thật sự muốn xóa topic này không ?",
+                            type: QuickAlertType.confirm,
+                            showCancelBtn: true,
+                            confirmBtnText: "Có",
+                            cancelBtnText: "Không",
+                            confirmBtnColor: Colors.red,
+                            onConfirmBtnTap: () async {
+                              try {
+                                await topicService.deleteTopic(docID);
+
+                                ToastService.showSuccessToast(context,
+                                    message: "Xóa topic thành công");
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop('dialog');
+                              } catch (e) {
+                                print("Error deleting topic: $e");
+                              }
+                            },
+                          );
+
+                          return result;
+                        },
+                        child: TopicCard(
+                          onTap: () => showTopicDetail(context, data),
+                          topicName: topicTitle,
+                          numOfVocab: 1,
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return Center(child: Text("No Topics Found"));
+                }
               },
             ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TitleWidget(
-            title: "Từ vựng",
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Flexible(
-            flex: 1,
-            child: ListView.builder(
+            SizedBox(
+              height: 50,
+            ),
+            TitleWidget(
+              title: "Từ vựng",
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ListView.builder(
               shrinkWrap: true,
-              itemCount: 1,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: 2,
               itemBuilder: (BuildContext context, int index) {
                 return VocabularyCard(
                   onSpeakerPressed: () {},
@@ -235,8 +354,8 @@ class _LibraryPageState extends State<LibraryPage> {
                 );
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

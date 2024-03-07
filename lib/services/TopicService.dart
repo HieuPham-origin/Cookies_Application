@@ -13,4 +13,22 @@ class TopicService {
       'userEmail': topic.userEmail,
     });
   }
+
+  Stream<QuerySnapshot> getAllTopics() {
+    final topicStream = topics.snapshots();
+    return topicStream;
+  }
+
+  Future<void> updateTopic(String topicId, Topic newTopic) async {
+    await topics.doc(topicId).update({
+      'topicName': newTopic.topicName,
+      'isPublic': newTopic.isPublic,
+      'userId': newTopic.userId,
+      'userEmail': newTopic.userEmail,
+    });
+  }
+
+  Future<void> deleteTopic(String topicId) async {
+    await topics.doc(topicId).delete();
+  }
 }

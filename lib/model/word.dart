@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Word {
   final String word;
   final String definition;
@@ -26,4 +28,21 @@ class Word {
       required this.topicId,
       required this.status,
       required this.userId});
+
+  factory Word.fromSnapshot(DocumentSnapshot snapshot) {
+    return Word(
+      word: snapshot['word'],
+      definition: snapshot['definition'],
+      phonetic: snapshot['phonetic'],
+      date: snapshot['date'],
+      image: snapshot['image'],
+      wordForm: snapshot['wordForm'],
+      example: snapshot['example'],
+      audio: snapshot['audio'],
+      isFav: snapshot['isFav'],
+      topicId: snapshot['topicId'],
+      status: snapshot['status'],
+      userId: snapshot['userId'],
+    );
+  }
 }
