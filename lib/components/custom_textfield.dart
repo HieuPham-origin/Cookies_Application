@@ -5,11 +5,15 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController textEditingController;
   final String content;
   final String hintText;
+  final bool obscured;
+  final bool isEnable;
   final IconData? icon;
   final Color? colorIcon;
   final VoidCallback? onPressed;
   const CustomTextField(
-      {super.key, required this.textEditingController, required this.content, required this.hintText, 
+      {super.key, required this.textEditingController, 
+      required this.content, required this.hintText, 
+      required this.obscured, required this.isEnable,
       this.icon, this.colorIcon, this.onPressed});
 
   @override
@@ -35,6 +39,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: TextField(
         controller: widget.textEditingController,
         style: GoogleFonts.inter(),
+        obscureText: widget.obscured,
+        enabled: widget.isEnable,
         decoration: InputDecoration(
           focusedBorder: const OutlineInputBorder(
             borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
@@ -56,6 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             onPressed:
               widget.onPressed
           ),
+          
         ),
       ),
     );

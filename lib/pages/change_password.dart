@@ -2,7 +2,9 @@ import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -34,6 +36,56 @@ class _ChangePasswordPageState extends State<ChangePassword> {
       email = userInfo['uid'];
     });
   }
+
+  Future<void> updateDisplayName() async {
+    String currentPassword = passwordController.text;
+    String newPassword = newPasswordController.text;
+    String confirmNewPassword = confirmNewPasswordController.text;
+    
+    if (newPassword != confirmNewPassword){
+      showErrorMessage("Mật khẩu mới không khớp nhau");
+    }else{
+      try {
+        // showDialog(
+        //   context: context,
+        //   builder: (context) {
+        //     return Center(
+        //       child: SpinKitSquareCircle(
+        //         color: Color(0xFFB99B6B),
+        //       ),
+        //     );
+        //   },
+        // );
+        String err_msg = await userService.changePassword(currentPassword, newPassword);
+        if (err_msg.isEmpty){
+          fetchUserInfo();
+          showSuccessMessage('Đổi mật khẩu thành công');
+          // Navigate back to information page
+          Navigator.pop(context, newPassword);
+        }else{
+          showErrorMessage(err_msg);
+        }
+        
+      } catch(err){
+        showErrorMessage("Có lỗi xảy ra");
+      }
+    }
+  }
+
+  void showErrorMessage(String message) {
+    ToastService.showErrorToast(
+      context,
+      message: message,
+    );
+  }
+
+  void showSuccessMessage(String message) {
+    ToastService.showSuccessToast(
+      context,
+      message: message,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,22 +165,7 @@ class _ChangePasswordPageState extends State<ChangePassword> {
                         ),
                         minimumSize: const Size.fromHeight(50),
                       ),
-                      onPressed: () async {
-                        String currentPassword = passwordController.text;
-                        String newPassword = newPasswordController.text;
-                        String confirmNewPassword = confirmNewPasswordController.text;
-                        if (newPassword != confirmNewPassword){
-                          print("error");
-                        }else{
-
-                          try {
-                            await userService.changePassword(currentPassword, newPassword);
-                            // Password changed successfully, do something
-                          } catch (error) {
-                            // Handle the error or show an appropriate message
-                          }
-                        }
-                      },
+                      onPressed: updateDisplayName,
                       child: Text(
                         "Thay đổi",
                         style: GoogleFonts.inter(

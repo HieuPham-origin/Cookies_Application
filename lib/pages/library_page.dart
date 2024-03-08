@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';

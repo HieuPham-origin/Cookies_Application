@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 class UserService {
   User user = FirebaseAuth.instance.currentUser!;
@@ -30,19 +31,21 @@ class UserService {
     await user.updateDisplayName(newDisplayName);
   }
 
-  Future<void> changePassword(String currentPassword, String newPassword) async {
+  Future<String> changePassword(String currentPassword, String newPassword) async {
     final cred = EmailAuthProvider.credential(
         email: user.email!, 
         password: currentPassword
     );
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(newPassword);
+      print("success");
+      return "";
+    } catch(err) {
+      print("Lỗi $err");
+      return "Mật khẩu hiện tại không đúng";
+    }
+  }
 
-    user.reauthenticateWithCredential(cred).then((value) {
-      user.updatePassword(newPassword).then((_) {
-        print("Success");
-      }).catchError((error) {
-        print("Error");
-      });
-    }).catchError((err) {
     
-    });}
 }

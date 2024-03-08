@@ -1,15 +1,14 @@
-import 'package:cookie_app/components/edit_username_textfield.dart';
+import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/change_name.dart';
+import 'package:cookie_app/pages/change_password.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:toasty_box/toasty_box.dart';
-import 'package:cookie_app/components/edit_email_textfield.dart';
-import 'package:cookie_app/components/edit_password_textfield.dart';
 
 class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
@@ -27,6 +26,7 @@ class _InformationPageState extends State<InformationPage> {
 
   String email ='';
   String displayName = '';
+  String password = '********';
 
   @override
   void initState() {
@@ -45,12 +45,21 @@ class _InformationPageState extends State<InformationPage> {
     });
   }
 
-  Future<void> clickToChangePage() async {
+  Future<void> clickToChangeNamePage() async {
     Route route = MaterialPageRoute(builder: (context) => ChangeName());
     final rollback = await Navigator.push(context, route);
     setState(() {
       displayName = rollback;
       usernameController.text = rollback;
+    });
+  }
+
+  Future<void> clickToChangePasswordPage() async {
+    Route route = MaterialPageRoute(builder: (context) => ChangePassword());
+    final rollback = await Navigator.push(context, route);
+    setState(() {
+      password = rollback;
+      passwordController.text = rollback;
     });
   }
 
@@ -97,16 +106,20 @@ class _InformationPageState extends State<InformationPage> {
                       child: Column(
                         children: [
                           CustomTextField(
-                              textEditingController: emailController, content: email, hintText: "Email",icon: Icons.edit, colorIcon: Colors.green, 
-                            onPressed: clickToChangePage,),
-                            CustomTextField(
+                            textEditingController: emailController, content: email, hintText: "Email", 
+                            obscured: false, isEnable: false, 
+                            onPressed: clickToChangeNamePage,),
+                          CustomTextField(
                             textEditingController: usernameController, content: displayName, hintText: "Nhập tên của bạn.", 
-                            icon: Icons.edit, colorIcon: Colors.green, 
-                            onPressed: clickToChangePage,
+                            obscured: false, isEnable : true,
+                            icon: Icons.edit, colorIcon: Colors.lightGreen, 
+                            onPressed: clickToChangeNamePage,
                             ),
-                          EditPasswordTextField(
-                            controller: passwordController, secret: "00000000", hintText: "Mật khẩu", obsucre: true,),
-                          
+                          CustomTextField(textEditingController: passwordController, content: password,
+                           hintText: "Mật khẩu", obscured: true,
+                            isEnable: true,
+                           icon: Icons.edit, colorIcon: Colors.lightGreen,
+                           onPressed: clickToChangePasswordPage,)
                         ],
                       ),
                     ),
