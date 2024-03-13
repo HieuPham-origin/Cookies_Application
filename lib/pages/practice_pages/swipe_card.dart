@@ -47,7 +47,7 @@ class _SwipeCardState extends State<SwipeCard> {
                 cardBuilder: (BuildContext context, int index) {
                   return Container(
                     alignment: Alignment.center,
-                    child: const Text(index.toString()),
+                    child: const Text(""),
                     color: Colors.blue,
                   );
                 },

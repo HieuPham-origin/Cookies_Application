@@ -26,6 +26,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         style: GoogleFonts.inter(),
         obscureText: widget.obscure,
         decoration: InputDecoration(
+          constraints: const BoxConstraints(maxHeight: 60),
           focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
               borderRadius: BorderRadius.all(Radius.circular(12))),

@@ -17,11 +17,14 @@ class EmailTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-      child: TextField(
+      child: TextFormField(
+        onSaved: (value) => controller.text = value!,
+        validator: EmailValidator.validate,
         controller: controller,
         style: GoogleFonts.inter(),
         obscureText: obscureText,
         decoration: InputDecoration(
+            constraints: BoxConstraints(maxHeight: 60),
             focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
                 borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -34,5 +37,18 @@ class EmailTextField extends StatelessWidget {
             )),
       ),
     );
+  }
+}
+
+class EmailValidator {
+  //validate Email
+  static String? validate(String? value) {
+    if (value!.isEmpty) {
+      return 'Email is required';
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Email is invalid';
+    }
+    return null;
   }
 }

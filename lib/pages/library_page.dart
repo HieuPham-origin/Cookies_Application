@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
@@ -8,6 +7,7 @@ import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/model/topic.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
+import 'package:cookie_app/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
