@@ -46,6 +46,9 @@ dependencies:
   wolt_modal_sheet: ^0.4.1
   cloud_firestore: ^4.15.5
   quickalert: ^1.0.2
+  linear_progress_bar: ^1.1.1
+  percent_indicator: ^4.2.3
+  appinio_swiper: ^2.1.0
 
 dev_dependencies:
   flutter_test:
