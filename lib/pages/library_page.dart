@@ -253,7 +253,7 @@ class _LibraryPageState extends State<LibraryPage> {
               onTap: () {
                 Route route =
                     MaterialPageRoute(builder: (context) => SwipeCard());
-                Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => new SwipeCard()));
+                Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => SwipeCard()));
               },
             ),
           ],

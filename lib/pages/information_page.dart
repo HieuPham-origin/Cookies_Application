@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/components/setting_options.dart';
@@ -19,14 +21,14 @@ class InformationPage extends StatefulWidget {
 
 class _InformationPageState extends State<InformationPage> {
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
-  
+
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
-  String email ='';
+  String email = '';
   String displayName = '';
-  String password = '********';
+  String password = '';
 
   @override
   void initState() {
@@ -37,11 +39,11 @@ class _InformationPageState extends State<InformationPage> {
   Future<void> fetchUserInfo() async {
     final userInfo = await userService.getUserInfo();
     setState(() {
-    
       email = userInfo["emailAddress"];
       displayName = userInfo["displayName"];
       usernameController.text = displayName;
       emailController.text = email;
+      passwordController.text = "password";
     });
   }
 
@@ -71,7 +73,7 @@ class _InformationPageState extends State<InformationPage> {
         leadingWidth: 24,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context,displayName);
+              Navigator.pop(context, displayName);
             },
             icon: Icon(
               Icons.arrow_back_ios,
@@ -106,20 +108,33 @@ class _InformationPageState extends State<InformationPage> {
                       child: Column(
                         children: [
                           CustomTextField(
-                            textEditingController: emailController, content: email, hintText: "Email", 
-                            obscured: false, isEnable: false, 
-                            onPressed: clickToChangeNamePage,),
-                          CustomTextField(
-                            textEditingController: usernameController, content: displayName, hintText: "Nhập tên của bạn.", 
-                            obscured: false, isEnable : true,
-                            icon: Icons.edit, colorIcon: Colors.lightGreen, 
+                            textEditingController: emailController,
+                            content: email,
+                            hintText: "Email",
+                            obscured: false,
+                            isEnable: false,
                             onPressed: clickToChangeNamePage,
-                            ),
-                          CustomTextField(textEditingController: passwordController, content: password,
-                           hintText: "Mật khẩu", obscured: true,
+                          ),
+                          CustomTextField(
+                            textEditingController: usernameController,
+                            content: displayName,
+                            hintText: "Nhập tên của bạn.",
+                            obscured: false,
                             isEnable: true,
-                           icon: Icons.edit, colorIcon: Colors.lightGreen,
-                           onPressed: clickToChangePasswordPage,)
+                            icon: Icons.edit,
+                            colorIcon: Colors.lightGreen,
+                            onPressed: clickToChangeNamePage,
+                          ),
+                          CustomTextField(
+                            textEditingController: passwordController,
+                            content: password,
+                            hintText: "Mật khẩu",
+                            obscured: true,
+                            isEnable: true,
+                            icon: Icons.edit,
+                            colorIcon: Colors.lightGreen,
+                            onPressed: clickToChangePasswordPage,
+                          )
                         ],
                       ),
                     ),
