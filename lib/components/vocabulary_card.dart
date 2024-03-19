@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cookie_app/theme/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,14 +38,14 @@ class _VocabularyCardState extends State<VocabularyCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, top: 2),
       child: Card(
-        elevation: 2,
+        elevation: 0,
         surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Padding(
           padding:
-              const EdgeInsets.only(left: 14, top: 8, right: 14, bottom: 8),
+              const EdgeInsets.only(left: 20, top: 0, right: 10, bottom: 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -55,26 +56,26 @@ class _VocabularyCardState extends State<VocabularyCard> {
                   Text(widget.word,
                       style: GoogleFonts.inter(
                           textStyle: TextStyle(
-                              color: Colors.red,
+                              color: AppColors.cookie,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18))),
-                  SizedBox(height: 5),
+                              fontSize: 16))),
                   Text('${widget.wordForm} /${widget.phonetics}/',
                       style: GoogleFonts.inter(
                           textStyle: TextStyle(
                               color: Color(0xFF9A9A9A),
                               fontWeight: FontWeight.w400,
                               fontStyle: FontStyle.italic,
-                              fontSize: 13))),
-                  SizedBox(height: 5),
-                  Text(widget.definition,
-                      style: GoogleFonts.inter(
-                          textStyle: TextStyle(fontSize: 16))),
-                  SizedBox(height: 5),
+                              fontSize: 12))),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1, bottom: 1),
+                    child: Text(widget.definition,
+                        style: GoogleFonts.inter(
+                            textStyle: TextStyle(fontSize: 14))),
+                  ),
                   Text(widget.date,
                       style: GoogleFonts.inter(
                           textStyle: TextStyle(
-                              fontSize: 16, color: Color(0xFFB59F55)))),
+                              fontSize: 12, color: Color(0xFFB59F55)))),
                 ],
               ),
 
@@ -86,11 +87,11 @@ class _VocabularyCardState extends State<VocabularyCard> {
                       onPressed: widget.onSpeakerPressed,
                       icon: Icon(
                         Icons.volume_up,
-                        color: Colors.red,
-                        size: 32,
+                        color: AppColors.cookie,
+                        size: 24,
                       )),
                   SizedBox(
-                    height: 25,
+                    height: 10,
                   ),
                   Row(
                     children: [
@@ -99,21 +100,21 @@ class _VocabularyCardState extends State<VocabularyCard> {
                           icon: Icon(
                             CupertinoIcons.heart_solid,
                             color: Colors.grey,
-                            size: 30,
+                            size: 24,
                           )),
                       IconButton(
                           onPressed: widget.onSavePressed,
                           icon: Icon(
                             CupertinoIcons.bookmark_fill,
                             color: Colors.grey,
-                            size: 28,
+                            size: 24,
                           )),
                       IconButton(
                           onPressed: widget.onSharePressed,
                           icon: Icon(
                             CupertinoIcons.share,
                             color: Colors.grey,
-                            size: 30,
+                            size: 24,
                           ))
                     ],
                   )
