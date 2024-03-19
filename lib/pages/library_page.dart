@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/components/edit_email_textfield.dart';
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/single_choice.dart';
 
@@ -11,6 +10,7 @@ import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/model/topic.dart';
+import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -71,124 +71,122 @@ class _LibraryPageState extends State<LibraryPage> {
     topicController.clear();
 
     showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        isScrollControlled: true,
-        backgroundColor: Colors.white,
-        builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 0.7,
-              builder: (context, scrollController) => SingleChildScrollView(
-                controller: scrollController,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 7,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.lightGreen),
-                      ),
-                      Stack(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 56.0,
-                            child: Center(
-                                child: Text(
-                              "Thêm Topic",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 5,
-                            child: IconButton(
-                              icon: Icon(Icons.close, size: 28),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 24,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          controller: topicController,
-                          onChanged: (value) {
-                            setState(() {
-                              _btnActive = value.isNotEmpty ? true : false;
-                            });
-                          },
-                          autofocus: true,
-                          style: GoogleFonts.inter(),
-                          decoration: InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.lightGreen),
-                              ),
-                              label: Text("Tên Topic"),
-                              floatingLabelStyle: TextStyle(
-                                color: Colors.lightGreen,
-                              )),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          onPressed: _btnActive == true
-                              ? () async {
-                                  Topic topic = Topic(
-                                      topicName: topicController.text,
-                                      isPublic: false,
-                                      userId: user.uid,
-                                      userEmail: user.email);
-
-                                  try {
-                                    await topicService.addTopic(topic);
-                                    ToastService.showSuccessToast(context,
-                                        message: "Add topic thành công");
-                                    Navigator.pop(context);
-                                  } catch (e) {
-                                    print('Failed to add topic: $e');
-                                    // Optionally, show an error toast or dialog
-                                  }
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFB99B6B),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            minimumSize: const Size.fromHeight(50),
-                          ),
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        builder: (context, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 7,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.lightGreen),
+                ),
+                Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 56.0,
+                      child: Center(
                           child: Text(
-                            "Thêm",
-                            style: GoogleFonts.inter(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
+                        "Thêm Topic",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                      )
-                    ],
+                      )),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 5,
+                      child: IconButton(
+                        icon: Icon(Icons.close, size: 28),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 24,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: topicController,
+                    onChanged: (value) {
+                      setState(() {
+                        _btnActive = value.isNotEmpty ? true : false;
+                      });
+                    },
+                    autofocus: true,
+                    style: GoogleFonts.inter(),
+                    decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.lightGreen),
+                        ),
+                        label: Text("Tên Topic"),
+                        floatingLabelStyle: TextStyle(
+                          color: Colors.lightGreen,
+                        )),
                   ),
                 ),
-              ),
-            ));
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: _btnActive == true
+                        ? () async {
+                            Topic topic = Topic(
+                                topicName: topicController.text,
+                                isPublic: false,
+                                userId: user.uid,
+                                userEmail: user.email);
+
+                            try {
+                              await topicService.addTopic(topic);
+                              ToastService.showSuccessToast(context,
+                                  message: "Add topic thành công");
+                              Navigator.pop(context);
+                            } catch (e) {
+                              print('Failed to add topic: $e');
+                              // Optionally, show an error toast or dialog
+                            }
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFB99B6B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size.fromHeight(50),
+                    ),
+                    child: Text(
+                      "Thêm Topic",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void showTopicDetail(BuildContext context, Map<String, dynamic> data) {
