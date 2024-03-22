@@ -59,7 +59,7 @@ class _VocabularyCardState extends State<VocabularyCard> {
                               color: AppColors.cookie,
                               fontWeight: FontWeight.bold,
                               fontSize: 16))),
-                  Text('${widget.wordForm} /${widget.phonetics}/',
+                  Text('${widget.wordForm} ${widget.phonetics}',
                       style: GoogleFonts.inter(
                           textStyle: TextStyle(
                               color: Color(0xFF9A9A9A),

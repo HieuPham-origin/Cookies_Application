@@ -10,9 +10,9 @@ class Word {
   final String example;
   final String audio;
   final bool isFav;
-  final int topicId;
+  final String topicId;
 
-  final bool status;
+  final int status;
   final String userId;
 
   Word(

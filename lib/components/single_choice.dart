@@ -1,10 +1,12 @@
 import 'package:cookie_app/model/word.dart';
 import 'package:flutter/material.dart';
 
-enum WordForm { noun, verb, adjective, adverb }
+enum WordForm { noun, verb, adj, adv }
 
 class SingleChoice extends StatefulWidget {
-  const SingleChoice({super.key});
+  final Function(WordForm) onSelectionChanged;
+  const SingleChoice({Key? key, required this.onSelectionChanged})
+      : super(key: key);
 
   @override
   State<SingleChoice> createState() => _SingleChoiceState();
@@ -33,11 +35,11 @@ class _SingleChoiceState extends State<SingleChoice> {
           label: Text('Verb'),
         ),
         ButtonSegment<WordForm>(
-          value: WordForm.adjective,
+          value: WordForm.adj,
           label: Text('Adj'),
         ),
         ButtonSegment<WordForm>(
-          value: WordForm.adverb,
+          value: WordForm.adv,
           label: Text('Adv'),
         ),
       ],
@@ -48,6 +50,7 @@ class _SingleChoiceState extends State<SingleChoice> {
           // selected at one time, so its value is always the first
           // item in the selected set.
           wordForm = newSelection.first;
+          widget.onSelectionChanged(wordForm);
         });
       },
     );

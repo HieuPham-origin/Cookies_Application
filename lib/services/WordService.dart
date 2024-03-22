@@ -3,7 +3,7 @@ import 'package:cookie_app/model/word.dart';
 
 class WordService {
   final CollectionReference words =
-      FirebaseFirestore.instance.collection('word');
+      FirebaseFirestore.instance.collection('words');
 
   Future<void> addWord(Word word) async {
     await words.add({
@@ -20,6 +20,11 @@ class WordService {
       'status': word.status,
       'userId': word.userId,
     });
+  }
+
+  Stream<QuerySnapshot> getAllWords() {
+    final wordStream = words.snapshots();
+    return wordStream;
   }
 
   Future<Word?> getWordById(String id) async {

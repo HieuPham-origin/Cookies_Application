@@ -10,5 +10,6 @@ class AppColors {
   static const Color creamy = Color.fromARGB(255, 254, 245, 231);
   static const Color black_opacity = Color(0x80000000);
   static const Color background = Color(0xFFF0F0F0);
+  static const Color header_background = Color(0x00f7f7f7);
   const AppColors();
 }
