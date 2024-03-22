@@ -4,7 +4,8 @@ import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
-import 'package:cookie_app/model/topic.dart';
+import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/theme/colors.dart';
@@ -251,9 +252,8 @@ class _LibraryPageState extends State<LibraryPage> {
               child: Icon(Icons.abc),
               label: "Flash card",
               onTap: () {
-                Route route =
-                    MaterialPageRoute(builder: (context) => SwipeCard());
-                Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => SwipeCard()));
+                Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(builder: (context) => QuizScreen()));
               },
             ),
           ],

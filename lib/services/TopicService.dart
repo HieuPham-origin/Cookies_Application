@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/model/topic.dart';
+import 'package:cookie_app/models/topic.dart';
 
 class TopicService {
   final CollectionReference topics =
@@ -31,4 +31,6 @@ class TopicService {
   Future<void> deleteTopic(String topicId) async {
     await topics.doc(topicId).delete();
   }
+
+  
 }

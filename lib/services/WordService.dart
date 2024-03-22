@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/model/word.dart';
+import 'package:cookie_app/models/word.dart';
 
 class WordService {
   final CollectionReference words =
