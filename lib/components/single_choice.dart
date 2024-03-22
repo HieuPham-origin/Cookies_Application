@@ -1,4 +1,4 @@
-import 'package:cookie_app/model/word.dart';
+import 'package:cookie_app/models/word.dart';
 import 'package:flutter/material.dart';
 
 enum WordForm { noun, verb, adj, adv }

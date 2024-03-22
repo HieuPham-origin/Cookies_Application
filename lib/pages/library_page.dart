@@ -572,34 +572,81 @@ class _LibraryPageState extends State<LibraryPage> {
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 24.0),
-        child: SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
-          backgroundColor: Colors.greenAccent,
-          overlayOpacity: 0.4,
-          children: [
-            SpeedDialChild(
-              child: Icon(Icons.topic),
-              label: "Thêm topic",
-              onTap: () => _showAddTopicModalBottomSheet(context),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        spacing: 3,
+        openCloseDial: isDialOpen,
+        buttonSize: Size.fromRadius(30),
+        childPadding: const EdgeInsets.all(5),
+        spaceBetweenChildren: 4,
+        backgroundColor: AppColors.black_opacity,
+        foregroundColor: Colors.white,
+        switchLabelPosition: false,
+        renderOverlay: true,
+        elevation: 8,
+        overlayColor: Colors.black45,
+        overlayOpacity: 0.3,
+        useRotationAnimation: true,
+        direction: SpeedDialDirection.up,
+        animationCurve: Curves.elasticInOut,
+        children: [
+          SpeedDialChild(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
             ),
-            SpeedDialChild(
-              child: Icon(Icons.abc),
-              label: "Thêm từ vựng",
+            child: Icon(Icons.topic, color: AppColors.cookie),
+            label: "Thêm topic",
+            labelWidget: Container(
+              margin: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 4), // Adjust padding as needed
+              decoration: BoxDecoration(
+                color: Colors.white, // Background color of the label
+                borderRadius: BorderRadius.circular(30),
+
+                // Optionally, add a border or shadow
+              ),
+              child: Text(
+                "Thêm topic",
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: AppColors.cookie,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
             ),
-            SpeedDialChild(
-              child: Icon(Icons.abc),
-              label: "Flash card",
-              onTap: () {
-                Route route =
-                    MaterialPageRoute(builder: (context) => SwipeCard());
-                Navigator.of(context, rootNavigator: true)
-                    .push(MaterialPageRoute(builder: (context) => SwipeCard()));
-              },
-            ),
-          ],
-        ),
+            onTap: () => _showAddTopicModalBottomSheet(context),
+          ),
+          SpeedDialChild(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Icon(Icons.abc, color: AppColors.cookie),
+              labelWidget: Container(
+                margin: EdgeInsets.only(right: 10),
+                padding: EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4), // Adjust padding as needed
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color of the label
+                  borderRadius: BorderRadius.circular(30),
+
+                  // Optionally, add a border or shadow
+                ),
+                child: Text(
+                  "Thêm từ vựng",
+                  style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      color: AppColors.cookie,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () => _showAddVocabModalBottomSheet(context)),
+        ],
       ),
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
