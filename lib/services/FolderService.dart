@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/model/folder.dart';
+import 'package:cookie_app/models/folder.dart';
 
 class FolderService {
   final CollectionReference folders =

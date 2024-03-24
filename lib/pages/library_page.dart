@@ -11,8 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
-import 'package:cookie_app/model/topic.dart';
-import 'package:cookie_app/model/word.dart';
+import 'package:cookie_app/models/topic.dart';
+
+import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';

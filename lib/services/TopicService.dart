@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cookie_app/model/topic.dart';
-import 'package:cookie_app/model/word.dart';
+import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/models/word.dart';
 
 class TopicService {
   final CollectionReference topics =

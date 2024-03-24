@@ -78,7 +78,7 @@ class _SettingPageState extends State<SettingPage> {
                   onTap: ()async
                   {
                     Route route = MaterialPageRoute(builder: (context) => InformationPage());
-                   final rollback = await   Navigator.push(context, route);
+                   final rollback = await Navigator.push(context, route);
                    setState(() {
                      displayName = rollback;
                    });
