@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:toasty_box/toasty_box.dart';
+import 'package:flutter/services.dart';
 
 import 'sign_up.dart';
 
@@ -79,6 +80,11 @@ class _SignInState extends State<SignIn> {
 
     if (!context.mounted) return;
     if (result == true) showSuccessMessage("Đăng ký tài khoản thành công");
+  }
+
+  void showStatusBar() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
   }
 
   @override
@@ -191,7 +197,8 @@ class _SignInState extends State<SignIn> {
                                         //   signInUser()
                                         // else
                                         //   _formKey.currentState!.save()
-                                        signInUser()
+                                        signInUser(),
+                                        showStatusBar()
                                       },
                                   child: Text(
                                     "Đăng Nhập",

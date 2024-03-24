@@ -5,7 +5,8 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/email_textfield.dart';
-import 'package:cookie_app/components/single_choice.dart';
+import 'package:cookie_app/components/custome_segment_button.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
@@ -70,7 +71,10 @@ class _LibraryPageState extends State<LibraryPage> {
   final wordService = WordService();
   final audioPlayer = AudioPlayer();
   ValueNotifier<bool> isDialOpen = ValueNotifier<bool>(false);
-
+  final FocusNode wordFocus = FocusNode();
+  bool isError = false;
+// ValueNotifier<String> wordHintTextNotifier = ValueNotifier<String>('');
+  String wordHintText = "";
   @override
   void initState() {
     super.initState();
@@ -145,11 +149,11 @@ class _LibraryPageState extends State<LibraryPage> {
                     style: GoogleFonts.inter(),
                     decoration: InputDecoration(
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.lightGreen),
+                        borderSide: BorderSide(color: AppColors.cookie),
                       ),
                       label: Text("Tên Topic"),
                       floatingLabelStyle: TextStyle(
-                        color: Colors.lightGreen,
+                        color: AppColors.cookie,
                       ),
                     ),
                   ),
@@ -321,6 +325,11 @@ class _LibraryPageState extends State<LibraryPage> {
   }
 
   void _showAddVocabModalBottomSheet(BuildContext context) {
+    wordController.clear();
+    definitionController.clear();
+    _image = null;
+    wordHintText = "";
+
     showModalBottomSheet(
         isScrollControlled: true,
         enableDrag: true,
@@ -354,201 +363,367 @@ class _LibraryPageState extends State<LibraryPage> {
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text(
-                                "Hủy",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.cookie,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  setModalState(() {
+                                    _image = null;
+                                  });
+                                },
+                                child: Text(
+                                  "Hủy",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.cookie,
+                                  ),
                                 ),
                               ),
                               Text(
-                                "Thêm từ vựng",
+                                "Tạo từ vựng",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.cookie,
                                 ),
                               ),
-                              Text(
-                                "Tiếp",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.cookie,
+                              InkWell(
+                                onTap: () async {
+                                  if (wordController.text.isEmpty) {
+                                    setModalState(() {
+                                      wordHintText =
+                                          "Từ vựng không được để trống";
+                                    });
+
+                                    return;
+                                  }
+
+                                  Word word = Word(
+                                    word: wordController.text,
+                                    definition: definitionController.text,
+                                    phonetic: await getPhoneticValues(
+                                        wordController.text),
+                                    date: getCurrentDate(),
+                                    image: _image!.path,
+                                    wordForm:
+                                        wordForm == "" ? "noun" : wordForm,
+                                    example:
+                                        await getExample(wordController.text),
+                                    audio:
+                                        'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
+                                    isFav: false,
+                                    topicId: "",
+                                    status: 0,
+                                    userId: user.uid,
+                                  );
+
+                                  try {
+                                    await WordService().addWord(word);
+                                    ToastService.showSuccessToast(context,
+                                        message: "Add từ vựng thành công");
+                                    Navigator.pop(context);
+                                  } catch (e) {
+                                    print('Failed to add word: $e');
+                                    // Optionally, show an error toast or dialog
+                                  }
+                                },
+                                child: Text(
+                                  "Tiếp",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.cookie,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Positioned(
-                          right: 0,
-                          top: 5,
-                          child: IconButton(
-                            icon: Icon(Icons.close, size: 28),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              setModalState(() {
-                                _image = null;
-                              });
-                            },
-                          ),
-                        ),
                       ],
                     ),
-                    SizedBox(
-                      height: 24,
-                    ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: wordController,
-                        onChanged: (value) {
-                          setState(() {
-                            _btnActive = value.isNotEmpty ? true : false;
-                          });
-                        },
-                        autofocus: true,
-                        style: GoogleFonts.inter(),
-                        decoration: InputDecoration(
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.lightGreen),
+                      padding:
+                          const EdgeInsets.only(left: 20, right: 20, top: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: wordController,
+                            autofocus: true,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
                             ),
-                            label: Text("Từ vựng"),
-                            floatingLabelStyle: TextStyle(
-                              color: Colors.lightGreen,
-                            )),
+                            decoration: InputDecoration(
+                              hintText: wordHintText,
+                              hintStyle: TextStyle(
+                                color: AppColors.red,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              contentPadding: EdgeInsets.only(bottom: 0),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.cookie),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              "TỪ VỰNG",
+                              style: TextStyle(
+                                color: AppColors.grey_light,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        textAlign: TextAlign.left,
-                        controller: definitionController,
-                        onChanged: (value) {
-                          setState(() {
-                            _btnActive = value.isNotEmpty ? true : false;
-                          });
-                        },
-                        style: GoogleFonts.inter(),
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              //show camera option
-                              showModalBottomSheet(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(0))),
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height: 112,
-                                      child: Column(
-                                        children: [
-                                          ListTile(
-                                            leading: Icon(Icons.camera_alt),
-                                            title: Text("Chụp ảnh"),
-                                            onTap: () {
-                                              //open camera
-                                              _pickImageFromCamera(
-                                                  setModalState);
-                                            },
-                                          ),
-                                          ListTile(
-                                            leading: Icon(Icons.image),
-                                            title: Text("Chọn ảnh từ thư viện"),
-                                            onTap: () {
-                                              //open gallery
-                                              _pickImageFromLibrary(
-                                                  setModalState);
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, bottom: 20, top: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            textAlign: TextAlign.start,
+                            controller: definitionController,
+                            onChanged: (value) {
+                              setState(() {
+                                _btnActive = value.isNotEmpty ? true : false;
+                              });
                             },
-                            icon: Icon(Icons.camera_alt),
+                            style: GoogleFonts.inter(),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(bottom: 0),
+                              suffixIconConstraints:
+                                  BoxConstraints(maxHeight: 24, maxWidth: 24),
+                              suffixIcon: IconButton(
+                                padding: EdgeInsets.only(bottom: 0),
+                                onPressed: () {
+                                  //show camera option
+                                  showModalBottomSheet(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(0))),
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SizedBox(
+                                          height: 112,
+                                          child: Column(
+                                            children: [
+                                              ListTile(
+                                                leading: Icon(Icons.camera_alt),
+                                                title: Text("Chụp ảnh"),
+                                                onTap: () {
+                                                  //open camera
+                                                  _pickImageFromCamera(
+                                                      setModalState);
+                                                },
+                                              ),
+                                              ListTile(
+                                                leading: Icon(Icons.image),
+                                                title: Text(
+                                                    "Chọn ảnh từ thư viện"),
+                                                onTap: () {
+                                                  //open gallery
+                                                  _pickImageFromLibrary(
+                                                      setModalState);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      });
+                                },
+                                icon: Icon(Icons.camera_alt),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.cookie),
+                              ),
+                            ),
                           ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: AppColors.cookie),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4.0),
+                            child: Text(
+                              "ĐỊNH NGHĨA",
+                              style: TextStyle(
+                                color: AppColors.grey_light,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
-                          label: Text("Định nghĩa"),
-                          labelStyle: TextStyle(
-                            color: AppColors.cookie,
-                          ),
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide(color: AppColors.cookie),
-                          ),
-                          floatingLabelStyle: TextStyle(
-                            color: AppColors.cookie,
-                          ),
-                        ),
+                        ],
                       ),
                     ),
-                    SingleChoice(
+                    CustomeSegmentButton(
                       onSelectionChanged: handleSelectionChange,
                     ),
-                    Container(
-                        width: 200,
-                        height: 300,
-                        child: _image != null ? Image.file(_image!) : Text('')),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: _btnActive == true
-                            ? () async {
-                                Word word = Word(
-                                  word: wordController.text,
-                                  definition: definitionController.text,
-                                  phonetic: await getPhoneticValues(
-                                      wordController.text),
-                                  date: getCurrentDate(),
-                                  image: _image!.path,
-                                  wordForm: wordForm,
-                                  example:
-                                      await getExample(wordController.text),
-                                  audio:
-                                      'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
-                                  isFav: false,
-                                  topicId: "",
-                                  status: 0,
-                                  userId: user.uid,
-                                );
-
-                                try {
-                                  await WordService().addWord(word);
-                                  ToastService.showSuccessToast(context,
-                                      message: "Add từ vựng thành công");
-                                  Navigator.pop(context);
-                                } catch (e) {
-                                  print('Failed to add word: $e');
-                                  // Optionally, show an error toast or dialog
-                                }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFFB99B6B),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          minimumSize: const Size.fromHeight(50),
-                        ),
-                        child: Text(
-                          "Thêm",
-                          style: GoogleFonts.inter(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: 200,
+                      height: 250,
+                      child: _image != null ? Image.file(_image!) : Container(),
+                    ),
                   ],
                 ),
               );
             }));
+  }
+
+  void showTopicsModalBottomSheet(
+      BuildContext context,
+      String wordId,
+      String word,
+      String definition,
+      String phonetic,
+      String date,
+      String image,
+      String wordForm,
+      String example,
+      String audio,
+      bool isFav,
+      String topicId,
+      int status,
+      String userId) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        enableDrag: true,
+        useRootNavigator: true,
+        isDismissible: false,
+        context: context,
+        builder: (context) => DraggableScrollableSheet(
+              expand: false,
+              shouldCloseOnMinExtent: true,
+              initialChildSize: 0.95,
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(10),
+                        ),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.black.withOpacity(0.1),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              "Hủy",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.cookie,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "Thêm vào Topic",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.cookie,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {},
+                            child: Text(
+                              "Tạo mới",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.cookie,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: topicService.getTopicsByUserId(user.uid),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              List topics = snapshot.data!.docs;
+                              return ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: topics.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  DocumentSnapshot document = topics[index];
+                                  String docID = document.id;
+                                  Map<String, dynamic> data =
+                                      document.data() as Map<String, dynamic>;
+
+                                  //Topic's attributes
+                                  String topicTitle = data['topicName'];
+
+                                  return TopicCard(
+                                    onTap: () => {
+                                      addWordToTopic(() {
+                                        Navigator.of(context).pop();
+                                      },
+                                          docID,
+                                          wordId,
+                                          Word(
+                                            word: word,
+                                            definition: definition,
+                                            phonetic: phonetic,
+                                            date: date,
+                                            image: image,
+                                            wordForm: wordForm,
+                                            example: example,
+                                            audio: audio,
+                                            isFav: isFav,
+                                            topicId: docID,
+                                            status: status,
+                                            userId: userId,
+                                          )),
+                                    },
+                                    topicName: topicTitle,
+                                    numOfVocab: 1,
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text("No Topics Found"));
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ));
+  }
+
+  void addWordToTopic(void Function() popCallback, String topicId,
+      String wordId, Word word) async {
+    try {
+      await topicService.addWordToTopic(topicId, wordId, word);
+      await wordService.deleteWord(wordId);
+      // Check if the widget is still mounted before popping the context
+      if (mounted) {
+        popCallback();
+      }
+    } catch (e) {
+      print('Failed to add word to topic: $e');
+      // Optionally, show an error toast or dialog
+    }
   }
 
   @override
@@ -585,7 +760,7 @@ class _LibraryPageState extends State<LibraryPage> {
         renderOverlay: true,
         elevation: 8,
         overlayColor: Colors.black45,
-        overlayOpacity: 0.3,
+        overlayOpacity: 0.2,
         useRotationAnimation: true,
         direction: SpeedDialDirection.up,
         animationCurve: Curves.elasticInOut,
@@ -635,7 +810,7 @@ class _LibraryPageState extends State<LibraryPage> {
                   // Optionally, add a border or shadow
                 ),
                 child: Text(
-                  "Thêm từ vựng",
+                  "Tạo từ vựng",
                   style: GoogleFonts.inter(
                     textStyle: TextStyle(
                       color: AppColors.cookie,
@@ -656,7 +831,7 @@ class _LibraryPageState extends State<LibraryPage> {
               title: "Topics",
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: topicService.getAllTopics(),
+              stream: topicService.getTopicsByUserId(user.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List topics = snapshot.data!.docs;
@@ -737,7 +912,7 @@ class _LibraryPageState extends State<LibraryPage> {
               title: "Từ vựng",
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: wordService.getAllWords(),
+                stream: wordService.getWordsByUserId(user.uid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
@@ -747,22 +922,30 @@ class _LibraryPageState extends State<LibraryPage> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           DocumentSnapshot document = words[index];
-                          String docID = document.id;
+                          String wordId = document.id;
                           Map<String, dynamic> data =
                               document.data() as Map<String, dynamic>;
+
                           String word = data['word'];
                           String definition = data['definition'];
                           String phonetic = data['phonetic'];
                           String date = data['date'];
+                          String image = data['image'];
                           String wordForm = data['wordForm'];
+                          String example = data['example'];
                           String audio = data['audio'];
+                          bool isFav = data['isFav'];
+                          String topicId = data['topicId'];
+                          int status = data['status'];
+                          String userId = data['userId'];
+
                           return Dismissible(
                             background: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  color: Colors.red,
+                                  color: AppColors.red,
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 24.0),
@@ -774,7 +957,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                 ),
                               ),
                             ),
-                            key: ValueKey(docID),
+                            key: ValueKey(wordId),
                             child: VocabularyCard(
                               word: word,
                               phonetics: phonetic,
@@ -784,6 +967,23 @@ class _LibraryPageState extends State<LibraryPage> {
                               onSpeakerPressed: () async {
                                 await audioPlayer.stop();
                                 await audioPlayer.play(UrlSource(audio));
+                              },
+                              onSavePressed: () {
+                                showTopicsModalBottomSheet(
+                                    context,
+                                    wordId,
+                                    word,
+                                    definition,
+                                    phonetic,
+                                    date,
+                                    image,
+                                    wordForm,
+                                    example,
+                                    audio,
+                                    isFav,
+                                    topicId,
+                                    status,
+                                    userId);
                               },
                             ),
                             confirmDismiss: (direction) async {
@@ -798,7 +998,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                 confirmBtnColor: Colors.red,
                                 onConfirmBtnTap: () async {
                                   try {
-                                    await wordService.deleteWord(docID);
+                                    await wordService.deleteWord(wordId);
 
                                     ToastService.showSuccessToast(context,
                                         message: "Xóa $word thành công");

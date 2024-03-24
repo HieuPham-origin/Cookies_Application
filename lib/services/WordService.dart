@@ -27,9 +27,22 @@ class WordService {
     return wordStream;
   }
 
+  Stream<QuerySnapshot> getWordsByUserId(String userId) {
+    final wordStream = words.where('userId', isEqualTo: userId).snapshots();
+    return wordStream;
+  }
+
   Future<Word?> getWordById(String id) async {
     DocumentSnapshot snapshot = await words.doc(id).get();
     return snapshot.exists ? Word.fromSnapshot(snapshot) : null;
+  }
+
+  Future<Word?> getWordByUserId(String userId) async {
+    QuerySnapshot snapshot =
+        await words.where('userId', isEqualTo: userId).get();
+    return snapshot.docs.isNotEmpty
+        ? Word.fromSnapshot(snapshot.docs.first)
+        : null;
   }
 
   Future<void> updateWord(String id, Word newWord) async {
