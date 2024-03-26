@@ -39,6 +39,14 @@ class WordService {
     return snapshot.exists ? Word.fromSnapshot(snapshot) : null;
   }
 
+  Future<Word?> getWordByUserId(String userId) async {
+    QuerySnapshot snapshot =
+        await words.where('userId', isEqualTo: userId).get();
+    return snapshot.docs.isNotEmpty
+        ? Word.fromSnapshot(snapshot.docs.first)
+        : null;
+  }
+
   Future<void> updateWord(String id, Word newWord) async {
     await words.doc(id).update({
       'word': newWord.word,
