@@ -47,5 +47,8 @@ class UserService {
       print("Lỗi $err");
       return "Mật khẩu hiện tại không đúng";
     }
+  } 
+  Future<void> sendPasswordResetEmail(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
 }

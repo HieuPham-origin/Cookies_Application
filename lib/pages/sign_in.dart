@@ -2,6 +2,7 @@
 
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
+import 'package:cookie_app/pages/forgot_password.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -172,7 +173,9 @@ class _SignInState extends State<SignIn> {
                                     fontSize: 16,
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Forgot_Password()));
+                                },
                                 child: const Text('Quên mật khẩu ?',
                                     style: TextStyle(
                                       color: Color(0xFF9A9A9A),

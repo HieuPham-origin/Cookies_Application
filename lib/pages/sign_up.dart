@@ -38,22 +38,25 @@ class _SignUpState extends State<SignUp> {
 
     try {
       if (passwordController.text != confirmPasswordController.text) {
-        showErrorMessage("Passwords are not the same");
+        ToastService.showErrorToast(context,message:  "Passwords are not the same");
       } else {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
-      }
+        User? user = FirebaseAuth.instance.currentUser;
+        await user!.sendEmailVerification();
+        ToastService.showSuccessToast(context,message:  "Account created successfully. Please verify your email.");
 
-      // pop the loading circle
-      Navigator.pop(context);
+        // Navigate to the verification screen
+       Navigator.pop(context);
       Navigator.pop(context, true);
+      }
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
       if (e.code == 'invalid-credential') {
-        // show error to user
-        showErrorMessage("Email hoặc mật khẩu không chính xác!");
+        showErrorMessage( "Email hoặc mật khẩu không chính xác!");
+      } else {
+        showErrorMessage( "Error creating account: ${e.message}");
       }
     }
   }
