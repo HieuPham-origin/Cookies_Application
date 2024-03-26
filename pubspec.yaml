@@ -55,6 +55,7 @@ dependencies:
     flip_card: ^0.7.0
     intl: ^0.17.0
     audioplayers: 6.0.0
+    firebase_storage: ^11.6.10
 
 dev_dependencies:
     flutter_test:

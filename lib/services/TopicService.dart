@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/models/word.dart';
 
 class TopicService {
   final CollectionReference topics =
@@ -19,6 +20,11 @@ class TopicService {
     return topicStream;
   }
 
+  Stream<QuerySnapshot> getTopicsByUserId(String id) {
+    final topicStream = topics.where('userId', isEqualTo: id).snapshots();
+    return topicStream;
+  }
+
   Future<void> updateTopic(String topicId, Topic newTopic) async {
     await topics.doc(topicId).update({
       'topicName': newTopic.topicName,
@@ -28,9 +34,21 @@ class TopicService {
     });
   }
 
+  Future<List<Word>> getWordsForTopic(String topicId) async {
+    List<Word> wordsList = [];
+
+    DocumentReference topicRef = topics.doc(topicId);
+
+    QuerySnapshot wordsSnapshot = await topicRef.collection('words').get();
+    for (var wordDoc in wordsSnapshot.docs) {
+      Word word = Word.fromSnapshot(wordDoc);
+      wordsList.add(word);
+    }
+
+    return wordsList;
+  }
+
   Future<void> deleteTopic(String topicId) async {
     await topics.doc(topicId).delete();
   }
-
-  
 }

@@ -201,7 +201,8 @@ class _LibraryPageState extends State<LibraryPage> {
     );
   }
 
-  void showTopicDetail(BuildContext context, Map<String, dynamic> data) {
+  void showTopicDetail(
+      BuildContext context, Map<String, dynamic> data, String docID) {
     showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
@@ -241,6 +242,16 @@ class _LibraryPageState extends State<LibraryPage> {
                       ),
                     ],
                   ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SwipeCard(
+                          topidId: docID,
+                        ),
+                      ),
+                    ),
+                    child: Text("Flashcard"),
+                  )
                 ],
               ),
             ),
@@ -250,71 +261,8 @@ class _LibraryPageState extends State<LibraryPage> {
 
   String getCurrentDate() {
     DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd-MM-yyyy')
-        .format(now); // Use the 'DateFormat' class to format the date
+    String formattedDate = DateFormat('dd-MM-yyyy').format(now);
     return formattedDate;
-  }
-
-  Future<String> getPhoneticValues(String word) async {
-    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, then parse the JSON.
-      List<dynamic> jsonResponse = json.decode(response.body);
-
-      for (var item in jsonResponse) {
-        // Assuming each item might have a 'phonetics' list.
-        if (item.containsKey('phonetics') && item['phonetics'].isNotEmpty) {
-          for (var phonetic in item['phonetics']) {
-            // Check if 'text' exists in phonetic
-            if (phonetic.containsKey('text')) {
-              // Print the phonetic text
-              return phonetic['text'];
-            }
-          }
-        }
-      }
-      throw Exception('Phonetic text not found');
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load phonetic values');
-    }
-  }
-
-  Future<String> getExample(String word) async {
-    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, then parse the JSON.
-      List<dynamic> jsonResponse = json.decode(response.body);
-
-      for (var item in jsonResponse) {
-        // Assuming each item might have a 'meanings' list.
-        if (item.containsKey('meanings') && item['meanings'].isNotEmpty) {
-          for (var meaning in item['meanings']) {
-            // Check if 'definitions' exists in meaning
-            if (meaning.containsKey('definitions') &&
-                meaning['definitions'].isNotEmpty) {
-              for (var definition in meaning['definitions']) {
-                // Check if 'example' exists in definition
-                if (definition.containsKey('example')) {
-                  // Print the example
-                  print(definition['example']);
-                  return definition['example'];
-                }
-              }
-            }
-          }
-        }
-      }
-      throw Exception('Example not found');
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load example');
-    }
   }
 
   void handleSelectionChange(WordForm selectedForm) {
@@ -501,13 +449,13 @@ class _LibraryPageState extends State<LibraryPage> {
                                 Word word = Word(
                                   word: wordController.text,
                                   definition: definitionController.text,
-                                  phonetic: await getPhoneticValues(
-                                      wordController.text),
+                                  phonetic: await wordService
+                                      .getPhoneticValues(wordController.text),
                                   date: getCurrentDate(),
                                   image: _image!.path,
                                   wordForm: wordForm,
-                                  example:
-                                      await getExample(wordController.text),
+                                  example: await wordService
+                                      .getExample(wordController.text),
                                   audio:
                                       'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
                                   isFav: false,
@@ -657,7 +605,7 @@ class _LibraryPageState extends State<LibraryPage> {
               title: "Topics",
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: topicService.getAllTopics(),
+              stream: topicService.getTopicsByUserId(user.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List topics = snapshot.data!.docs;
@@ -719,7 +667,7 @@ class _LibraryPageState extends State<LibraryPage> {
                           return result;
                         },
                         child: TopicCard(
-                          onTap: () => showTopicDetail(context, data),
+                          onTap: () => showTopicDetail(context, data, docID),
                           topicName: topicTitle,
                           numOfVocab: 1,
                         ),
@@ -738,7 +686,7 @@ class _LibraryPageState extends State<LibraryPage> {
               title: "Từ vựng",
             ),
             StreamBuilder<QuerySnapshot>(
-                stream: wordService.getAllWords(),
+                stream: wordService.getWordsByUserId(user.uid),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
@@ -828,6 +776,8 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   void dispose() {
     topicController.dispose();
+    definitionController.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 }
