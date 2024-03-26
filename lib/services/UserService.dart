@@ -11,7 +11,6 @@ class UserService {
   Map<String, dynamic> getUserInfo() {
     dynamic uid, name, emailAddress;
     for (final providerProfile in user.providerData) {
-
       // UID specific to the provider
       uid = providerProfile.uid;
       // List<dynamic> info = uid.split('@');
@@ -31,17 +30,20 @@ class UserService {
     await user.updateDisplayName(newDisplayName);
   }
 
-  Future<String> changePassword(String currentPassword, String newPassword) async {
+  Future<void> updateProfilePicture(String image) async {
+    await user.updatePhotoURL(image);
+  }
+
+  Future<String> changePassword(
+      String currentPassword, String newPassword) async {
     final cred = EmailAuthProvider.credential(
-        email: user.email!, 
-        password: currentPassword
-    );
+        email: user.email!, password: currentPassword);
     try {
       await user.reauthenticateWithCredential(cred);
       await user.updatePassword(newPassword);
       print("success");
       return "";
-    } catch(err) {
+    } catch (err) {
       print("Lỗi $err");
       return "Mật khẩu hiện tại không đúng";
     }
@@ -49,5 +51,4 @@ class UserService {
   Future<void> sendPasswordResetEmail(String email) async {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
-    
 }

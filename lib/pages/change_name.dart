@@ -4,8 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cookie_app/services/UserService.dart';
 
 class ChangeName extends StatefulWidget {
-
-  const ChangeName({Key? key, }) : super(key: key);
+  const ChangeName({
+    Key? key,
+  }) : super(key: key);
   @override
   State<ChangeName> createState() => _ChangeNamePageState();
 }
@@ -48,11 +49,9 @@ class _ChangeNamePageState extends State<ChangeName> {
         content: Text('Đổi tên thành công'),
       ),
     );
-    
+
     // Navigate back to information page
     Navigator.pop(context, newDisplayName);
-    
-
   }
 
   @override
@@ -85,7 +84,7 @@ class _ChangeNamePageState extends State<ChangeName> {
             height: 72,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 64),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             child: Column(
               children: [
                 Text(
@@ -135,39 +134,29 @@ class _ChangeNamePageState extends State<ChangeName> {
                 SizedBox(
                   height: 32,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFB99B6B),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      minimumSize: const Size.fromHeight(50),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFB99B6B),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    onPressed: () {
-                      updateDisplayName();
-                    },
-                    child: Text(
-                      "Thay đổi",
-                      style: GoogleFonts.inter(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  onPressed: () {
+                    updateDisplayName();
+                  },
+                  child: Text(
+                    "Thay đổi",
+                    style: GoogleFonts.inter(
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
                       ),
                     ),
                   ),
                 ),
                 SizedBox(height: 16),
-                Text(
-                  "Display Name: $displayName",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ],
             ),
           ),
