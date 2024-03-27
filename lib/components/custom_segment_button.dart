@@ -1,38 +1,64 @@
-import 'package:cookie_app/theme/colors.dart';
+import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-enum WordForm { noun, verb, adj, adv }
+enum WordForm { verb, noun, adj, adv }
 
-class CustomeSegmentButton extends StatefulWidget {
+class CustomSegmentButton extends StatefulWidget {
   final Function(WordForm) onSelectionChanged;
+  String wordForm;
+  bool isDisabled;
 
-  const CustomeSegmentButton({super.key, required this.onSelectionChanged});
+  CustomSegmentButton(
+      {super.key,
+      required this.onSelectionChanged,
+      required this.wordForm,
+      required this.isDisabled});
 
   @override
-  State<CustomeSegmentButton> createState() => _CustomeSegmentButtonState();
+  State<CustomSegmentButton> createState() => _CustomSegmentButtonState();
 }
 
-class _CustomeSegmentButtonState extends State<CustomeSegmentButton> {
-  WordForm wordForm = WordForm.noun;
+class _CustomSegmentButtonState extends State<CustomSegmentButton> {
+  @override
+  void initState() {
+    super.initState();
+    switch (widget.wordForm) {
+      case 'verb':
+        sliding = 0;
+        break;
+      case 'noun':
+        sliding = 1;
+        break;
+      case 'adj':
+        sliding = 2;
+        break;
+      case 'adv':
+        sliding = 3;
+        break;
+    }
+  }
 
+  WordForm wordForm = WordForm.verb;
   int? sliding = 0;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SizedBox(
-        width: double.infinity,
+    return SizedBox(
+      width: double.infinity,
+      child: IgnorePointer(
+        ignoring: widget.isDisabled,
         child: CupertinoSlidingSegmentedControl(
+          thumbColor: AppColors.creamy,
           children: const <int, Widget>{
             0: Text(
-              'Noun',
+              'Verb',
               style: TextStyle(color: AppColors.cookie),
             ),
             1: Text(
-              'Verb',
+              'Noun',
               style: TextStyle(color: AppColors.cookie),
             ),
             2: Text(

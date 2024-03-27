@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cookie_app/theme/colors.dart';
+import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +17,7 @@ class VocabularyCard extends StatefulWidget {
   final Function()? onFavoritePressed;
   final Function()? onSavePressed;
   final Function()? onSharePressed;
+  final Function()? onTap;
 
   const VocabularyCard(
       {super.key,
@@ -28,7 +29,8 @@ class VocabularyCard extends StatefulWidget {
       this.onSpeakerPressed,
       this.onFavoritePressed,
       this.onSavePressed,
-      this.onSharePressed});
+      this.onSharePressed,
+      this.onTap});
 
   @override
   State<VocabularyCard> createState() => _VocabularyCardState();
@@ -45,50 +47,58 @@ class _VocabularyCardState extends State<VocabularyCard> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
-        child: Padding(
-          padding:
-              const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.vibrate();
+            widget.onTap!();
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 20, top: 0, right: 10, bottom: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.word,
+                        style: GoogleFonts.inter(
+                          textStyle: TextStyle(
+                              color: AppColors.cookie,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      widget.word,
+                      '${widget.wordForm} ${widget.phonetics}',
                       style: GoogleFonts.inter(
                         textStyle: TextStyle(
-                            color: AppColors.cookie,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16),
+                            color: Color(0xFF9A9A9A),
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12),
                       ),
                     ),
                     GestureDetector(
-                      onTap: widget.onSpeakerPressed,
                       child: Icon(
-                        CupertinoIcons.volume_up,
-                        color: AppColors.coffee,
-                        size: 24,
+                        CupertinoIcons.chevron_right,
+                        color: AppColors.cookie,
+                        size: 18,
                       ),
-                    )
+                    ),
                   ],
                 ),
-              ),
-              Text(
-                '${widget.wordForm} ${widget.phonetics}',
-                style: GoogleFonts.inter(
-                  textStyle: TextStyle(
-                      color: Color(0xFF9A9A9A),
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 12),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 1, bottom: 1),
-                child: widget.definition.isNotEmpty
+                widget.definition.isNotEmpty
                     ? Text(
                         widget.definition,
                         style: GoogleFonts.inter(
@@ -96,57 +106,58 @@ class _VocabularyCardState extends State<VocabularyCard> {
                         ),
                       )
                     : SizedBox(),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(widget.date,
-                      style: GoogleFonts.inter(
-                          textStyle: TextStyle(
-                              fontSize: 12, color: Color(0xFFB59F55)))),
-                  Row(
-                    children: [
-                      LikeButton(
-                        size: 24,
-                        bubblesColor: BubblesColor(
-                          dotPrimaryColor: AppColors.cookie,
-                          dotSecondaryColor: AppColors.red,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(widget.date,
+                        style: GoogleFonts.inter(
+                            textStyle: TextStyle(
+                                fontSize: 12, color: Color(0xFFB59F55)))),
+                    Row(
+                      children: [
+                        LikeButton(
+                          size: 24,
+                          bubblesColor: BubblesColor(
+                            dotPrimaryColor: AppColors.cookie,
+                            dotSecondaryColor: AppColors.red,
+                          ),
+                          likeBuilder: (bool isLiked) {
+                            return Icon(
+                              CupertinoIcons.heart_fill,
+                              color:
+                                  isLiked ? AppColors.red : AppColors.icon_grey,
+                              size: 24,
+                            );
+                          },
                         ),
-                        likeBuilder: (bool isLiked) {
-                          return Icon(
-                            CupertinoIcons.heart_fill,
-                            color: isLiked ? AppColors.red : Colors.grey,
+                        SizedBox(
+                          width: 20,
+                        ),
+                        GestureDetector(
+                          onTap: widget.onSavePressed,
+                          child: Icon(
+                            CupertinoIcons.bookmark_fill,
+                            color: AppColors.icon_grey,
                             size: 24,
-                          );
-                        },
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: widget.onSavePressed,
-                        child: Icon(
-                          CupertinoIcons.bookmark_fill,
-                          color: Colors.grey,
-                          size: 24,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      GestureDetector(
-                        onTap: widget.onSharePressed,
-                        child: Icon(
-                          CupertinoIcons.share,
-                          color: Colors.grey,
-                          size: 24,
+                        SizedBox(
+                          width: 20,
                         ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ],
+                        GestureDetector(
+                          onTap: widget.onSharePressed,
+                          child: Icon(
+                            CupertinoIcons.share_up,
+                            color: AppColors.icon_grey,
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
