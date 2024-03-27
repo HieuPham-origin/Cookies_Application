@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/word.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class WordService {
   final CollectionReference words =
@@ -64,5 +66,62 @@ class WordService {
 
   Future<void> deleteWord(String id) async {
     await words.doc(id).delete();
+  }
+
+  Future<String> getExample(String word) async {
+    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, then parse the JSON.
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      for (var item in jsonResponse) {
+        // Assuming each item might have a 'meanings' list.
+        if (item.containsKey('meanings') && item['meanings'].isNotEmpty) {
+          for (var meaning in item['meanings']) {
+            // Check if 'definitions' exists in meaning
+            if (meaning.containsKey('definitions') &&
+                meaning['definitions'].isNotEmpty) {
+              for (var definition in meaning['definitions']) {
+                if (definition.containsKey('example')) {
+                  // Print the example
+                  return definition['example'];
+                }
+              }
+            }
+          }
+        }
+      }
+      throw Exception('Example not found');
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load example');
+    }
+  }
+
+  Future<String> getPhoneticValues(String word) async {
+    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      for (var item in jsonResponse) {
+        // Assuming each item might have a 'phonetics' list.
+        if (item.containsKey('phonetics') && item['phonetics'].isNotEmpty) {
+          for (var phonetic in item['phonetics']) {
+            // Check if 'text' exists in phonetic
+            if (phonetic.containsKey('text')) {
+              // Print the phonetic text
+              return phonetic['text'];
+            }
+          }
+        }
+      }
+      throw Exception('Phonetic text not found');
+    } else {
+      throw Exception('Failed to load phonetic values');
+    }
   }
 }

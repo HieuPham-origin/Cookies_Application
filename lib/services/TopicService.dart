@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/models/word.dart';
+import 'package:http/http.dart' as http;
 
 class TopicService {
   final CollectionReference topics =
@@ -34,8 +37,84 @@ class TopicService {
     });
   }
 
+  Future<List<Word>> getWordsForTopic(String topicId) async {
+    List<Word> wordsList = [];
+
+    DocumentReference topicRef = topics.doc(topicId);
+
+    QuerySnapshot wordsSnapshot = await topicRef.collection('words').get();
+    for (var wordDoc in wordsSnapshot.docs) {
+      Word word = Word.fromSnapshot(wordDoc);
+      wordsList.add(word);
+    }
+
+    return wordsList;
+  }
+
   Future<void> deleteTopic(String topicId) async {
     await topics.doc(topicId).delete();
+  }
+
+  Future<String> getPhoneticValues(String word) async {
+    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, then parse the JSON.
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      for (var item in jsonResponse) {
+        // Assuming each item might have a 'phonetics' list.
+        if (item.containsKey('phonetics') && item['phonetics'].isNotEmpty) {
+          for (var phonetic in item['phonetics']) {
+            // Check if 'text' exists in phonetic
+            if (phonetic.containsKey('text')) {
+              // Print the phonetic text
+              return phonetic['text'];
+            }
+          }
+        }
+      }
+      throw Exception('Phonetic text not found');
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load phonetic values');
+    }
+  }
+
+  Future<String> getExample(String word) async {
+    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, then parse the JSON.
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      for (var item in jsonResponse) {
+        // Assuming each item might have a 'meanings' list.
+        if (item.containsKey('meanings') && item['meanings'].isNotEmpty) {
+          for (var meaning in item['meanings']) {
+            // Check if 'definitions' exists in meaning
+            if (meaning.containsKey('definitions') &&
+                meaning['definitions'].isNotEmpty) {
+              for (var definition in meaning['definitions']) {
+                // Check if 'example' exists in definition
+                if (definition.containsKey('example')) {
+                  // Print the example
+                  print(definition['example']);
+                  return definition['example'];
+                }
+              }
+            }
+          }
+        }
+      }
+      throw Exception('Example not found');
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load example');
+    }
   }
 
   addWordToTopic(String topicId, String wordId, Word word) {

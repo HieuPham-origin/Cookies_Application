@@ -1,58 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cookie_app/services/AuthService.dart';
 import 'package:cookie_app/services/UserService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ChangeName extends StatefulWidget {
-  const ChangeName({
-    Key? key,
-  }) : super(key: key);
+class Forgot_Password extends StatefulWidget {
+  const Forgot_Password({super.key});
+
   @override
-  State<ChangeName> createState() => _ChangeNamePageState();
+  State<Forgot_Password> createState() => _Forgot_PasswordPageState();
 }
 
-class _ChangeNamePageState extends State<ChangeName> {
-  final usernameController = TextEditingController();
-  late UserService userService;
-
-  dynamic displayName;
-
-  @override
-  void initState() {
-    super.initState();
-    final user = FirebaseAuth.instance.currentUser!;
-    userService = UserService(user);
-    fetchUserInfo();
-  }
-
-  @override
-  void dispose() {
-    usernameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> fetchUserInfo() async {
-    final userInfo = await userService.getUserInfo();
-    setState(() {
-      displayName = userInfo['displayName'];
-    });
-  }
-
-  Future<void> updateDisplayName() async {
-    dynamic newDisplayName = usernameController.text;
-    await userService.updateDisplayName(newDisplayName);
-    fetchUserInfo();
-
-    // Show success notification
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Đổi tên thành công'),
-      ),
-    );
-
-    // Navigate back to information page
-    Navigator.pop(context, newDisplayName);
-  }
+class _Forgot_PasswordPageState extends State<Forgot_Password> {
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +30,10 @@ class _ChangeNamePageState extends State<ChangeName> {
           ),
         ),
         title: Text(
-          "Thông tin",
+          "Quay lại",
           style: GoogleFonts.inter(
             textStyle: const TextStyle(
-              fontSize: 28,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -84,11 +45,11 @@ class _ChangeNamePageState extends State<ChangeName> {
             height: 72,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.only(top: 24, bottom: 64),
             child: Column(
               children: [
                 Text(
-                  "Đổi tên",
+                  "Quên mật khẩu",
                   style: GoogleFonts.inter(
                     textStyle: const TextStyle(
                       fontSize: 28,
@@ -100,7 +61,7 @@ class _ChangeNamePageState extends State<ChangeName> {
                   height: 8,
                 ),
                 Text(
-                  "Bạn có thể đổi thành tên khác",
+                  "Nhập email xác nhận",
                   style: GoogleFonts.inter(
                     textStyle: const TextStyle(
                       fontSize: 18,
@@ -112,9 +73,9 @@ class _ChangeNamePageState extends State<ChangeName> {
                   height: 40,
                 ),
                 TextField(
-                  controller: usernameController,
+                  controller: emailController,
                   decoration: InputDecoration(
-                    hintText: "Tên",
+                    hintText: "Nhập email",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -134,29 +95,34 @@ class _ChangeNamePageState extends State<ChangeName> {
                 SizedBox(
                   height: 32,
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB99B6B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Padding(
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFB99B6B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size.fromHeight(50),
                     ),
-                    minimumSize: const Size.fromHeight(50),
-                  ),
-                  onPressed: () {
-                    updateDisplayName();
-                  },
-                  child: Text(
-                    "Thay đổi",
-                    style: GoogleFonts.inter(
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                    onPressed: () async {
+                      // email
+                      AuthService authService = new AuthService();
+                      await authService.sendPasswordResetEmail(emailController.text);
+                      
+                    },
+                    child: Text(
+                      "Gửi",
+                      style: GoogleFonts.inter(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
               ],
             ),
           ),

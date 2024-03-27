@@ -1,5 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:ffi';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/components/setting_options.dart';
@@ -10,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:toasty_box/toasty_box.dart';
 
 class InformationPage extends StatefulWidget {
@@ -21,6 +26,7 @@ class InformationPage extends StatefulWidget {
 
 class _InformationPageState extends State<InformationPage> {
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  Uint8List? _image;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -62,6 +68,22 @@ class _InformationPageState extends State<InformationPage> {
     setState(() {
       password = rollback;
       passwordController.text = rollback;
+    });
+  }
+
+  Future _pickImageFromLibrary() async {
+    final ImagePicker _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (_file != null) {
+      return await _file.readAsBytes();
+    }
+  }
+
+  void selectImage() async {
+    Uint8List img = await _pickImageFromLibrary();
+    setState(() {
+      _image = img;
     });
   }
 
@@ -118,7 +140,7 @@ class _InformationPageState extends State<InformationPage> {
                           CustomTextField(
                             textEditingController: usernameController,
                             content: displayName,
-                            hintText: "Nhập tên của bạn.",
+                            hintText: "Tên hiển thị",
                             obscured: false,
                             isEnable: true,
                             icon: Icons.edit,
@@ -157,14 +179,20 @@ class _InformationPageState extends State<InformationPage> {
                       ),
                       child: Stack(
                         children: [
-                          CircleAvatar(
-                            radius: 50.0,
-                            backgroundImage: AssetImage("assets/logo.png"),
-                          ),
+                          _image != null
+                              ? CircleAvatar(
+                                  radius: 50.0,
+                                  backgroundImage: MemoryImage(_image!),
+                                )
+                              : CircleAvatar(
+                                  radius: 50.0,
+                                  backgroundImage:
+                                      AssetImage("assets/logo.png"),
+                                ),
                           FractionalTranslation(
                             translation: Offset(0.5, 1.3),
                             child: RawMaterialButton(
-                              onPressed: () {},
+                              onPressed: selectImage,
                               elevation: 2.0,
                               fillColor: Color(0xFFF5F6F9),
                               child: Icon(

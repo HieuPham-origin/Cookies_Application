@@ -30,6 +30,10 @@ class UserService {
     await user.updateDisplayName(newDisplayName);
   }
 
+  Future<void> updateProfilePicture(String image) async {
+    await user.updatePhotoURL(image);
+  }
+
   Future<String> changePassword(
       String currentPassword, String newPassword) async {
     final cred = EmailAuthProvider.credential(
@@ -43,5 +47,9 @@ class UserService {
       print("Lỗi $err");
       return "Mật khẩu hiện tại không đúng";
     }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
 }

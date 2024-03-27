@@ -11,6 +11,7 @@ import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/models/word.dart';
+import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
@@ -55,7 +56,8 @@ class _LibraryPageState extends State<LibraryPage> {
     super.initState();
   }
 
-  void showTopicDetail(BuildContext context, Map<String, dynamic> data) {
+  void showTopicDetail(
+      BuildContext context, Map<String, dynamic> data, String docID) {
     showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
@@ -95,6 +97,16 @@ class _LibraryPageState extends State<LibraryPage> {
                       ),
                     ],
                   ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SwipeCard(
+                          topidId: docID,
+                        ),
+                      ),
+                    ),
+                    child: Text("Flashcard"),
+                  )
                 ],
               ),
             ),
@@ -433,7 +445,7 @@ class _LibraryPageState extends State<LibraryPage> {
                           return result;
                         },
                         child: TopicCard(
-                          onTap: () => showTopicDetail(context, data),
+                          onTap: () => showTopicDetail(context, data, docID),
                           topicName: topicTitle,
                           numOfVocab: 1,
                         ),
@@ -585,6 +597,8 @@ class _LibraryPageState extends State<LibraryPage> {
   @override
   void dispose() {
     topicController.dispose();
+    definitionController.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 }

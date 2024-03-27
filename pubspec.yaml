@@ -55,8 +55,11 @@ dependencies:
     flip_card: ^0.7.0
     intl: ^0.17.0
     audioplayers: 6.0.0
+    firebase_storage: ^11.6.10
     custom_sliding_segmented_control: ^1.8.1
     like_button: ^2.0.5
+    material_dialogs: ^1.1.4
+    lottie: ^2.7.0
 
 dev_dependencies:
     flutter_test:
@@ -84,6 +87,7 @@ flutter:
     assets:
         - assets/logo.png
         - assets/list.png
+        - assets/card_finish.json
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware

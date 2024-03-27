@@ -19,7 +19,7 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   // User user = ;
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
-  String displayName ='';
+  String displayName = '';
   String email = '';
 
   @override
@@ -51,12 +51,15 @@ class _SettingPageState extends State<SettingPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text("Thông tin",
-                    style: GoogleFonts.inter(
-                        textStyle: const TextStyle(
+                child: Text(
+                  "Thông tin",
+                  style: GoogleFonts.inter(
+                    textStyle: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                    ))),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -75,13 +78,15 @@ class _SettingPageState extends State<SettingPage> {
                 elevation: 4,
                 surfaceTintColor: Colors.white,
                 child: InkWell(
-                  onTap: ()async
-                  {
-                    Route route = MaterialPageRoute(builder: (context) => InformationPage());
-                   final rollback = await Navigator.push(context, route);
-                   setState(() {
-                     displayName = rollback;
-                   });
+                  onTap: () async {
+                    Route route = MaterialPageRoute(
+                        builder: (context) => InformationPage());
+                    final rollback = await Navigator.push(context, route);
+                    setState(
+                      () {
+                        displayName = rollback;
+                      },
+                    );
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -94,7 +99,7 @@ class _SettingPageState extends State<SettingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            displayName,
+                            displayName.isEmpty ? "cookieuser" : displayName,
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                               fontSize: 28,
@@ -113,12 +118,8 @@ class _SettingPageState extends State<SettingPage> {
                         ],
                       ),
                       CircleAvatar(
-                        backgroundColor: Colors.black,
                         radius: 50,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage('assets/logo.png'),
-                        ),
+                        backgroundImage: AssetImage('assets/logo.png'),
                       )
                     ],
                   ),
