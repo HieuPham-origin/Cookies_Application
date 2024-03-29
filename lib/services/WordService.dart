@@ -56,11 +56,14 @@ class WordService {
       'image': newWord.image,
       'wordForm': newWord.wordForm,
       'example': newWord.example,
-      'audio': newWord.audio,
-      'isFav': newWord.isFav,
       'topicId': newWord.topicId,
       'status': newWord.status,
-      'userId': newWord.userId,
+    });
+  }
+
+  Future<void> updateFavorite(String id, bool isFav) async {
+    await words.doc(id).update({
+      'isFav': !isFav,
     });
   }
 

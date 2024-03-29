@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:toasty_box/toast_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:cookie_app/components/modal_bottom_sheet/image_option.dart';
 
 String getCurrentDate() {
   DateTime now = DateTime.now();
@@ -43,11 +44,11 @@ Future<String> getPhoneticValues(String word) async {
         }
       }
     }
-    throw Exception('Phonetic text not found');
+    return "";
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
-    throw Exception('Failed to load phonetic values');
+    return "";
   }
 }
 
@@ -69,7 +70,6 @@ Future<String> getExample(String word) async {
               // Check if 'example' exists in definition
               if (definition.containsKey('example')) {
                 // Print the example
-                print(definition['example']);
                 return definition['example'];
               }
             }
@@ -77,11 +77,11 @@ Future<String> getExample(String word) async {
         }
       }
     }
-    throw Exception('Example not found');
+    return "There is no example for this word";
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
-    throw Exception('Failed to load example');
+    return "There is no example for this word";
   }
 }
 
@@ -93,29 +93,13 @@ void showAddVocabModalBottomSheet(
     bool _btnActive,
     void setState(void Function() fn),
     String wordHintText,
-    File? _image,
+    File? image,
     String wordForm) {
   wordController.clear();
   definitionController.clear();
-  _image = null;
+  image = null;
   wordHintText = "";
-  Future pickImageFromLibrary(StateSetter setModalState) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
-    setModalState(() {
-      _image = File(pickedFile.path);
-    });
-  }
-
-  Future pickImageFromCamera(StateSetter setModalState) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedFile == null) return;
-    setModalState(() {
-      _image = File(pickedFile.path);
-    });
-  }
+  bool isLoading = false;
 
   void handleSelectionChange(WordForm selectedForm) {
     wordForm = selectedForm.toString().split('.').last;
@@ -142,7 +126,7 @@ void showAddVocabModalBottomSheet(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: AppColors.header_background,
-                        borderRadius: BorderRadius.vertical(
+                        borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(10),
                         ),
                         border: Border(
@@ -158,7 +142,7 @@ void showAddVocabModalBottomSheet(
                             onTap: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text(
+                            child: const Text(
                               "Hủy",
                               style: TextStyle(
                                 fontSize: 14,
@@ -167,7 +151,7 @@ void showAddVocabModalBottomSheet(
                               ),
                             ),
                           ),
-                          Text(
+                          const Text(
                             "Tạo từ vựng",
                             style: TextStyle(
                               fontSize: 16,
@@ -176,51 +160,82 @@ void showAddVocabModalBottomSheet(
                             ),
                           ),
                           InkWell(
-                            onTap: () async {
-                              if (wordController.text.isEmpty) {
+                              onTap: () async {
+                                if (wordController.text.isEmpty) {
+                                  setModalState(() {
+                                    wordHintText =
+                                        "Từ vựng không được để trống";
+                                  });
+
+                                  return;
+                                }
                                 setModalState(() {
-                                  wordHintText = "Từ vựng không được để trống";
+                                  isLoading = true;
                                 });
 
-                                return;
-                              }
+                                Word word = Word(
+                                  word: wordController.text,
+                                  definition: definitionController.text,
+                                  phonetic: await getPhoneticValues(
+                                      wordController.text),
+                                  date: getCurrentDate(),
+                                  image: image != null ? image!.path : "",
+                                  wordForm: wordForm == "" ? "verb" : wordForm,
+                                  example:
+                                      await getExample(wordController.text),
+                                  audio:
+                                      'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
+                                  isFav: false,
+                                  topicId: "",
+                                  status: 0,
+                                  userId: user.uid,
+                                );
 
-                              Word word = Word(
-                                word: wordController.text,
-                                definition: definitionController.text,
-                                phonetic: await getPhoneticValues(
-                                    wordController.text),
-                                date: getCurrentDate(),
-                                image: _image!.path,
-                                wordForm: wordForm == "" ? "verb" : wordForm,
-                                example: await getExample(wordController.text),
-                                audio:
-                                    'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
-                                isFav: false,
-                                topicId: "",
-                                status: 0,
-                                userId: user.uid,
-                              );
-
-                              try {
-                                await WordService().addWord(word);
-                                ToastService.showSuccessToast(context,
-                                    message: "Add từ vựng thành công");
-                                Navigator.pop(context);
-                              } catch (e) {
-                                print('Failed to add word: $e');
-                                // Optionally, show an error toast or dialog
-                              }
-                            },
-                            child: Text(
-                              "Tiếp",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.cookie,
-                              ),
-                            ),
-                          ),
+                                try {
+                                  await WordService().addWord(word);
+                                  ToastService.showSuccessToast(context,
+                                      message: "Add từ vựng thành công");
+                                  Navigator.pop(context);
+                                } catch (e) {
+                                  print('Failed to add word: $e');
+                                  // Optionally, show an error toast or dialog
+                                } finally {
+                                  // Reset loading state here, whether the operation succeeds or fails
+                                  setModalState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                width: Dimensions.width(context,
+                                    40), // Adjust width according to your needs
+                                height:
+                                    24, // Adjust height according to your needs
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Visibility(
+                                      visible: isLoading,
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                AppColors.cookie),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: !isLoading,
+                                      child: Text(
+                                        "Tiếp",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.cookie,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -235,24 +250,25 @@ void showAddVocabModalBottomSheet(
                               TextField(
                                 controller: wordController,
                                 autofocus: true,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontFamily: 'Inter',
                                 ),
                                 decoration: InputDecoration(
                                   hintText: wordHintText,
-                                  hintStyle: TextStyle(
+                                  hintStyle: const TextStyle(
                                     color: AppColors.red,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                  contentPadding: EdgeInsets.only(bottom: 0),
-                                  focusedBorder: UnderlineInputBorder(
+                                  contentPadding:
+                                      const EdgeInsets.only(bottom: 0),
+                                  focusedBorder: const UnderlineInputBorder(
                                     borderSide:
                                         BorderSide(color: AppColors.cookie),
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4.0),
                                 child: Text(
                                   "TỪ VỰNG",
                                   style: TextStyle(
@@ -272,59 +288,31 @@ void showAddVocabModalBottomSheet(
                                 controller: definitionController,
                                 style: GoogleFonts.inter(),
                                 decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(bottom: 0),
-                                  suffixIconConstraints: BoxConstraints(
+                                  contentPadding:
+                                      const EdgeInsets.only(bottom: 0),
+                                  suffixIconConstraints: const BoxConstraints(
                                       maxHeight: 24, maxWidth: 24),
                                   suffixIcon: IconButton(
-                                    padding: EdgeInsets.only(bottom: 0),
+                                    padding: const EdgeInsets.only(bottom: 0),
                                     onPressed: () {
-                                      //show camera option
-                                      showModalBottomSheet(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top: Radius.circular(0))),
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return SizedBox(
-                                              height: 112,
-                                              child: Column(
-                                                children: [
-                                                  ListTile(
-                                                    leading:
-                                                        Icon(Icons.camera_alt),
-                                                    title: Text("Chụp ảnh"),
-                                                    onTap: () {
-                                                      //open camera
-                                                      pickImageFromCamera(
-                                                          setModalState);
-                                                    },
-                                                  ),
-                                                  ListTile(
-                                                    leading: Icon(Icons.image),
-                                                    title: Text(
-                                                        "Chọn ảnh từ thư viện"),
-                                                    onTap: () {
-                                                      //open gallery
-                                                      pickImageFromLibrary(
-                                                          setModalState);
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          });
+                                      showImageOptionModalBottomSheet(
+                                          context, setModalState, image,
+                                          (File? newImage) {
+                                        setModalState(() {
+                                          image = newImage;
+                                        });
+                                      });
                                     },
-                                    icon: Icon(Icons.camera_alt),
+                                    icon: const Icon(Icons.camera_alt),
                                   ),
-                                  focusedBorder: UnderlineInputBorder(
+                                  focusedBorder: const UnderlineInputBorder(
                                     borderSide:
                                         BorderSide(color: AppColors.cookie),
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4.0),
                                 child: Text(
                                   "ĐỊNH NGHĨA",
                                   style: TextStyle(
@@ -336,7 +324,7 @@ void showAddVocabModalBottomSheet(
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           CustomSegmentButton(
@@ -344,15 +332,19 @@ void showAddVocabModalBottomSheet(
                             wordForm: wordForm,
                             isDisabled: false,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
-                          SizedBox(
-                            width: 200,
-                            height: 250,
-                            child: _image != null
-                                ? Image.file(_image!)
-                                : Container(),
+                          Container(
+                            width: Dimensions.width(context, 200),
+                            height: Dimensions.height(context, 250),
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(image ?? File("")),
+                                fit: BoxFit.contain,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ],
                       ),

@@ -13,8 +13,9 @@ class VocabularyCard extends StatefulWidget {
   final String definition;
   final String wordForm;
   final String date;
+  final bool isFav;
   final Function()? onSpeakerPressed;
-  final Function()? onFavoritePressed;
+  final Future<bool?> Function(bool)? onFavoritePressed;
   final Function()? onSavePressed;
   final Function()? onSharePressed;
   final Function()? onTap;
@@ -30,7 +31,8 @@ class VocabularyCard extends StatefulWidget {
       this.onFavoritePressed,
       this.onSavePressed,
       this.onSharePressed,
-      this.onTap});
+      this.onTap,
+      required this.isFav});
 
   @override
   State<VocabularyCard> createState() => _VocabularyCardState();
@@ -128,6 +130,13 @@ class _VocabularyCardState extends State<VocabularyCard> {
                                   isLiked ? AppColors.red : AppColors.icon_grey,
                               size: 24,
                             );
+                          },
+                          isLiked: widget.isFav,
+                          onTap: (isLiked) async {
+                            // Your custom logic here
+                            widget.onFavoritePressed!(isLiked);
+                            bool newLikeState = !isLiked;
+                            return newLikeState; // Return the new state
                           },
                         ),
                         SizedBox(

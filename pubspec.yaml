@@ -60,6 +60,8 @@ dependencies:
     like_button: ^2.0.5
     material_dialogs: ^1.1.4
     lottie: ^2.7.0
+    shimmer: ^3.0.0
+    custom_circular_progress: ^1.0.1
 
 dev_dependencies:
     flutter_test:

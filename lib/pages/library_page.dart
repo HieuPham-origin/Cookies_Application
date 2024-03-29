@@ -267,6 +267,10 @@ class _LibraryPageState extends State<LibraryPage> {
     }
   }
 
+  void preloadImage(BuildContext context, File image) {
+    precacheImage(FileImage(image), context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -512,13 +516,19 @@ class _LibraryPageState extends State<LibraryPage> {
                             key: ValueKey(wordId),
                             child: VocabularyCard(
                               word: word,
-                              phonetics: phonetic,
+                              phonetics:
+                                  phonetic != "" ? phonetic : "/transcription/",
                               definition: definition,
                               wordForm: wordForm,
                               date: date,
+                              isFav: isFav,
                               onSpeakerPressed: () async {
                                 await audioPlayer.stop();
                                 await audioPlayer.play(UrlSource(audio));
+                              },
+                              onFavoritePressed: (bool isFav) async {
+                                await wordService.updateFavorite(wordId, isFav);
+                                return !isFav;
                               },
                               onSavePressed: () {
                                 showTopicsModalBottomSheet(
@@ -540,6 +550,7 @@ class _LibraryPageState extends State<LibraryPage> {
                               onTap: () {
                                 showDetailVocabModalBottomSheet(
                                   context,
+                                  wordId,
                                   word,
                                   phonetic,
                                   definition,
