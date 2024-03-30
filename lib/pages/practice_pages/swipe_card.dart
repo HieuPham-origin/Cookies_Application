@@ -91,7 +91,7 @@ class _SwipeCardState extends State<SwipeCard> {
       setState(() {
         currentCard--;
       });
-      swiperController.unswipe(); // Adjust index as needed
+      swiperController.unswipe();
     }
   }
 
