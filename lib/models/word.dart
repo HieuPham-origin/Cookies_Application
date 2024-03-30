@@ -11,7 +11,6 @@ class Word {
   final String audio;
   final bool isFav;
   final String topicId;
-
   final int status;
   final String userId;
 

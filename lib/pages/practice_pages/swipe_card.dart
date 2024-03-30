@@ -4,7 +4,7 @@ import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/services/TopicService.dart';
-import 'package:cookie_app/theme/colors.dart';
+import 'package:cookie_app/utils/colors.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/cupertino.dart';

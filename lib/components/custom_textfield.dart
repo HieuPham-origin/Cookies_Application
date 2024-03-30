@@ -1,7 +1,8 @@
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-class CustomTextField extends StatefulWidget {
+
+class CustomTextField extends StatelessWidget {
   final TextEditingController textEditingController;
   final String content;
   final String hintText;
@@ -11,36 +12,25 @@ class CustomTextField extends StatefulWidget {
   final Color? colorIcon;
   final VoidCallback? onPressed;
   const CustomTextField(
-      {super.key, required this.textEditingController, 
-      required this.content, required this.hintText, 
-      required this.obscured, required this.isEnable,
-      this.icon, this.colorIcon, this.onPressed});
-
-  @override
-  State<CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<CustomTextField> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+      {super.key,
+      required this.textEditingController,
+      required this.content,
+      required this.hintText,
+      required this.obscured,
+      required this.isEnable,
+      this.icon,
+      this.colorIcon,
+      this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32),
       child: TextField(
-        controller: widget.textEditingController,
+        controller: textEditingController,
         style: GoogleFonts.inter(),
-        obscureText: widget.obscured,
-        enabled: widget.isEnable,
+        obscureText: obscured,
+        enabled: isEnable,
         decoration: InputDecoration(
           focusedBorder: const OutlineInputBorder(
             borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
@@ -50,19 +40,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
             borderSide: BorderSide(color: Color(0xFFB99B6B), width: 1.0),
             borderRadius: BorderRadius.all(Radius.circular(12)),
           ),
-          labelText: widget.hintText,
+          labelText: hintText,
           labelStyle: const TextStyle(
             color: Color(0xFF9A9A9A),
           ),
           suffixIcon: IconButton(
-            icon: Icon(
-              widget.icon,
-              color: widget.colorIcon,
-            ),
-            onPressed:
-              widget.onPressed
-          ),
-          
+              icon: Icon(
+                icon,
+                color: colorIcon,
+              ),
+              onPressed: onPressed),
         ),
       ),
     );
