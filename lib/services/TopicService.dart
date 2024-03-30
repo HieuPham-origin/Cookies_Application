@@ -37,6 +37,24 @@ class TopicService {
     });
   }
 
+  //count word in topic
+  Future<int> countWordsInTopic(String topicId) async {
+    int count = 0;
+    QuerySnapshot wordsSnapshot =
+        await topics.doc(topicId).collection('words').get();
+    count = wordsSnapshot.docs.length;
+    return count;
+  }
+
+  //count topic
+  Future<int> countTopics(String userId) async {
+    int count = 0;
+    QuerySnapshot topicsSnapshot =
+        await topics.where('userId', isEqualTo: userId).get();
+    count = topicsSnapshot.docs.length;
+    return count;
+  }
+
   Future<List<Word>> getWordsForTopic(String topicId) async {
     List<Word> wordsList = [];
 

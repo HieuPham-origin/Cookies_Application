@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class WordService {
   final CollectionReference words =
@@ -33,6 +34,14 @@ class WordService {
     final wordStream = words.where('userId', isEqualTo: userId).snapshots();
     return wordStream;
   }
+
+  // Stream<QuerySnapshot> getWordsByUserId(String userId) {
+  //   final wordStream = words
+  //       .where('userId', isEqualTo: userId)
+  //       .orderBy('date', descending: true) // Add this line
+  //       .snapshots();
+  //   return wordStream;
+  // }
 
   Future<Word?> getWordById(String id) async {
     DocumentSnapshot snapshot = await words.doc(id).get();
