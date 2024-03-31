@@ -7,7 +7,9 @@ import 'dart:developer';
 import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:cookie_app/pages/change_password.dart';
+import 'package:cookie_app/resources/store_data.dart';
 import 'package:cookie_app/services/UserService.dart';
+import 'package:cookie_app/utils/pick_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,6 +38,12 @@ class _InformationPageState extends State<InformationPage> {
   void initState() {
     super.initState();
     fetchUserInfo();
+    loadProfileImage();
+  }
+
+  void loadProfileImage() async {
+    _image = await userService.getProfileImage();
+    setState(() {});
   }
 
   Future<void> fetchUserInfo() async {
@@ -68,21 +76,17 @@ class _InformationPageState extends State<InformationPage> {
     });
   }
 
-  Future _pickImageFromLibrary() async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
-
-    if (_file != null) {
-      return await _file.readAsBytes();
-    }
-  }
-
   void selectImage() async {
-    Uint8List img = await _pickImageFromLibrary();
+    Uint8List img = await pickAvatar(ImageSource.gallery);
     setState(() {
       _image = img;
     });
+    await StoreData().saveData(file: img);
   }
+
+  // void saveAvatar() async{
+  //   String response = await StoreData().saveData(file: _image!);
+  // }
 
   @override
   Widget build(BuildContext context) {
