@@ -96,7 +96,7 @@ class _InformationPageState extends State<InformationPage> {
         leadingWidth: 24,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context, displayName);
+              Navigator.pop(context, [displayName, _image]);
             },
             icon: Icon(
               Icons.arrow_back_ios,
