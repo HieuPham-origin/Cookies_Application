@@ -10,12 +10,14 @@ class TopicService {
       FirebaseFirestore.instance.collection('topics');
 
   Future<void> addTopic(Topic topic) async {
-    await topics.add({
-      'topicName': topic.topicName,
-      'isPublic': topic.isPublic,
-      'userId': topic.userId,
-      'userEmail': topic.userEmail,
-    });
+    await topics.add(
+      {
+        'topicName': topic.topicName,
+        'isPublic': topic.isPublic,
+        'userId': topic.userId,
+        'userEmail': topic.userEmail,
+      },
+    );
   }
 
   Stream<QuerySnapshot> getAllTopics() {
