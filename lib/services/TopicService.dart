@@ -69,6 +69,12 @@ class TopicService {
     return wordsList;
   }
 
+  //get words for topic
+  Stream<QuerySnapshot> getWordsForTopicStream(String topicId) {
+    final wordStream = topics.doc(topicId).collection('words').snapshots();
+    return wordStream;
+  }
+
   Future<void> deleteTopic(String topicId) async {
     await topics.doc(topicId).delete();
   }

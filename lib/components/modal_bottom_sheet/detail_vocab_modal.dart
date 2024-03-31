@@ -20,20 +20,19 @@ import 'package:cookie_app/utils/demension.dart';
 import 'package:cookie_app/components/loading_skeleton.dart';
 
 void showDetailVocabModalBottomSheet(
-    BuildContext context,
-    String wordId,
-    String word,
-    String phonetic,
-    String definition,
-    File? image,
-    String audio,
-    String example,
-    User user,
-    TopicService topicService,
-    String wordForm,
-    void Function() onEditStateChanged
-    // Assuming this is a dependency
-    ) {
+  BuildContext context,
+  String wordId,
+  String word,
+  String phonetic,
+  String definition,
+  File? image,
+  String audio,
+  String example,
+  User user,
+  TopicService topicService,
+  String wordForm,
+  // Assuming this is a dependency
+) {
   void handleSelectionChange(WordForm selectedForm) {
     wordForm = selectedForm.toString().split('.').last;
   }
