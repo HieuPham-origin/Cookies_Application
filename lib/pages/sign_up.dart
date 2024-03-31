@@ -40,14 +40,15 @@ class _SignUpState extends State<SignUp> {
       if (passwordController.text != confirmPasswordController.text) {
         ToastService.showErrorToast(context,message:  "Passwords are not the same");
       } else {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-        User? user = FirebaseAuth.instance.currentUser;
-        await user!.sendEmailVerification();
-        ToastService.showSuccessToast(context,message:  "Account created successfully. Please verify your email.");
+        try{
 
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+        } on FirebaseAuthException catch(e){
+          print(e);
+        }
         // Navigate to the verification screen
        Navigator.pop(context);
       Navigator.pop(context, true);

@@ -11,6 +11,7 @@ import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/models/word.dart';
+import 'package:cookie_app/pages/detail_topic_page.dart';
 import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
@@ -20,7 +21,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:toasty_box/toasty_box.dart';
 
@@ -43,8 +44,6 @@ class _LibraryPageState extends State<LibraryPage> {
   final wordController = TextEditingController();
   final definitionController = TextEditingController();
   String wordForm = "";
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
   final wordService = WordService();
   final audioPlayer = AudioPlayer();
   ValueNotifier<bool> isDialOpen = ValueNotifier<bool>(false);
@@ -52,78 +51,12 @@ class _LibraryPageState extends State<LibraryPage> {
   bool isError = false;
 // ValueNotifier<String> wordHintTextNotifier = ValueNotifier<String>('');
   String wordHintText = "";
+  int numOfVocab = 0;
+  List<dynamic> topicsTemp = [];
+
   @override
   void initState() {
     super.initState();
-  }
-
-  void showTopicDetail(
-      BuildContext context, Map<String, dynamic> data, String docID) {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      enableDrag: false,
-      useRootNavigator: true,
-      context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: ((context) => FractionallySizedBox(
-            heightFactor: 0.95,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 56.0,
-                        child: Center(
-                            child: Text(
-                          data['topicName'],
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 5,
-                        child: IconButton(
-                          icon: Icon(Icons.close, size: 28),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => SwipeCard(
-                          topidId: docID,
-                        ),
-                      ),
-                    ),
-                    child: Text("Flashcard"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => QuizScreen(
-                          data: data,
-                          topicId: docID,
-                        ),
-                      ),
-                    ),
-                    child: Text("Quiz"),
-                  )
-                ],
-              ),
-            ),
-          )),
-    );
   }
 
   void showTopicsModalBottomSheet(
@@ -211,6 +144,7 @@ class _LibraryPageState extends State<LibraryPage> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               List topics = snapshot.data!.docs;
+                              topicsTemp = topics;
                               return ListView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: topics.length,
@@ -412,7 +346,6 @@ class _LibraryPageState extends State<LibraryPage> {
                       String docID = document.id;
                       Map<String, dynamic> data =
                           document.data() as Map<String, dynamic>;
-
                       //Topic's attributes
                       String topicTitle = data['topicName'];
 
@@ -461,7 +394,16 @@ class _LibraryPageState extends State<LibraryPage> {
                           return result;
                         },
                         child: TopicCard(
-                          onTap: () => showTopicDetail(context, data, docID),
+                          // onTap: () => showTopicDetail(context, data, docID),
+                          onTap: () async => {
+                            Navigator.of(context, rootNavigator: true)
+                                .push(PageTransition(
+                                    type: PageTransitionType.rightToLeft,
+                                    child: DetailTopic(
+                                      data: data,
+                                      docID: docID,
+                                    ))),
+                          },
                           topicName: topicTitle,
                           numOfVocab: 1,
                         ),
@@ -482,8 +424,16 @@ class _LibraryPageState extends State<LibraryPage> {
             StreamBuilder<QuerySnapshot>(
                 stream: wordService.getWordsByUserId(user.uid),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
+                    words.sort((a, b) {
+                      return b['date'].compareTo(a['date']);
+                    });
                     return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: words.length,

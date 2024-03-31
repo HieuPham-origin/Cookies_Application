@@ -96,7 +96,7 @@ void showDetailVocabModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    backgroundColor: const Color(0xfff0f0f0),
+    backgroundColor: AppColors.background,
     builder: (context) => SafeArea(
       child: DraggableScrollableSheet(
         expand: false,

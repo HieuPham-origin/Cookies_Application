@@ -1,21 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:ffi';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cookie_app/components/custom_textfield.dart';
-import 'package:cookie_app/components/password_textfield.dart';
-import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:cookie_app/pages/change_password.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:toasty_box/toasty_box.dart';
 
 class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
