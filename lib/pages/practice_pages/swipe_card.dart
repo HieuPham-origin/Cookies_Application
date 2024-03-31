@@ -70,8 +70,7 @@ class _SwipeCardState extends State<SwipeCard> {
           flipCardController.toggleCardWithoutAnimation();
           isFlipped = false;
         }
-        // log('The card was swiped to the : ${activity.direction}');
-        // log('previous index: $previousIndex, target index: $targetIndex');
+
         break;
       case Unswipe():
         log('A ${activity.direction.name} swipe was undone.');
@@ -91,7 +90,7 @@ class _SwipeCardState extends State<SwipeCard> {
       setState(() {
         currentCard--;
       });
-      swiperController.unswipe(); // Adjust index as needed
+      swiperController.unswipe();
     }
   }
 

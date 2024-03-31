@@ -12,6 +12,8 @@ import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/pages/detail_topic_page.dart';
+import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
+import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
