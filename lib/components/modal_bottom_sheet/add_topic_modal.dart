@@ -46,7 +46,7 @@ void showAddTopicModalBottomSheet(
                   Container(
                     width: double.infinity,
                     height: 56.0,
-                    child: Center(
+                    child: const Center(
                         child: Text(
                       "Thêm Topic",
                       style: TextStyle(
@@ -59,7 +59,7 @@ void showAddTopicModalBottomSheet(
                     right: 0,
                     top: 5,
                     child: IconButton(
-                      icon: Icon(Icons.close, size: 28),
+                      icon: const Icon(Icons.close, size: 28),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -67,7 +67,7 @@ void showAddTopicModalBottomSheet(
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               Padding(
@@ -81,7 +81,7 @@ void showAddTopicModalBottomSheet(
                   },
                   autofocus: true,
                   style: GoogleFonts.inter(),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: AppColors.cookie),
                     ),
@@ -114,13 +114,13 @@ void showAddTopicModalBottomSheet(
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB99B6B),
+                    backgroundColor: const Color(0xFFB99B6B),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     minimumSize: const Size.fromHeight(50),
                   ),
-                  child: Text(
+                  child: const Text(
                     "Thêm Topic",
                     style: TextStyle(
                       fontSize: 16,

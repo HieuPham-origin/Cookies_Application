@@ -90,8 +90,6 @@ void showAddVocabModalBottomSheet(
     TextEditingController wordController,
     TextEditingController definitionController,
     User user,
-    bool _btnActive,
-    void setState(void Function() fn),
     String wordHintText,
     File? image,
     String wordForm) {
@@ -114,8 +112,8 @@ void showAddVocabModalBottomSheet(
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
       backgroundColor: const Color(0xfffefffe),
-      builder: (context) => StatefulBuilder(builder: (BuildContext context,
-              StateSetter setModalState /*You can rename this!*/) {
+      builder: (context) => StatefulBuilder(builder:
+              (BuildContext context, void Function(void Function()) setState) {
             return SafeArea(
               child: DraggableScrollableSheet(
                 expand: false,
@@ -162,17 +160,24 @@ void showAddVocabModalBottomSheet(
                           InkWell(
                               onTap: () async {
                                 if (wordController.text.isEmpty) {
-                                  setModalState(() {
+                                  // setModalState(() {
+                                  //   wordHintText =
+                                  //       "Từ vựng không được để trống";
+                                  // });
+                                  setState(() {
                                     wordHintText =
                                         "Từ vựng không được để trống";
                                   });
 
                                   return;
                                 }
-                                setModalState(() {
+                                // setModalState(() {
+                                //   isLoading = true;
+                                // });
+
+                                setState(() {
                                   isLoading = true;
                                 });
-
                                 Word word = Word(
                                   word: wordController.text,
                                   definition: definitionController.text,
@@ -201,7 +206,10 @@ void showAddVocabModalBottomSheet(
                                   // Optionally, show an error toast or dialog
                                 } finally {
                                   // Reset loading state here, whether the operation succeeds or fails
-                                  setModalState(() {
+                                  // setModalState(() {
+                                  //   isLoading = false;
+                                  // });
+                                  setState(() {
                                     isLoading = false;
                                   });
                                 }
@@ -296,9 +304,12 @@ void showAddVocabModalBottomSheet(
                                     padding: const EdgeInsets.only(bottom: 0),
                                     onPressed: () {
                                       showImageOptionModalBottomSheet(
-                                          context, setModalState, image,
+                                          context, setState, image,
                                           (File? newImage) {
-                                        setModalState(() {
+                                        // setModalState(() {
+                                        //   image = newImage;
+                                        // });
+                                        setState(() {
                                           image = newImage;
                                         });
                                       });

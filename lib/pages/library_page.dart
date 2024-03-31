@@ -2,15 +2,14 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_topic_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_vocab_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/detail_vocab_modal.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
-import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/pages/detail_topic_page.dart';
 import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
@@ -52,169 +51,10 @@ class _LibraryPageState extends State<LibraryPage> {
 // ValueNotifier<String> wordHintTextNotifier = ValueNotifier<String>('');
   String wordHintText = "";
   int numOfVocab = 0;
-  List<dynamic> topicsTemp = [];
 
   @override
   void initState() {
     super.initState();
-  }
-
-  void showTopicsModalBottomSheet(
-      BuildContext context,
-      String wordId,
-      String word,
-      String definition,
-      String phonetic,
-      String date,
-      String image,
-      String wordForm,
-      String example,
-      String audio,
-      bool isFav,
-      String topicId,
-      int status,
-      String userId) {
-    showModalBottomSheet(
-        isScrollControlled: true,
-        enableDrag: true,
-        useRootNavigator: true,
-        isDismissible: false,
-        context: context,
-        builder: (context) => DraggableScrollableSheet(
-              expand: false,
-              shouldCloseOnMinExtent: true,
-              initialChildSize: 0.95,
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
-                return Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black.withOpacity(0.1),
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              "Hủy",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.cookie,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            "Thêm vào Topic",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.cookie,
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () async {},
-                            child: Text(
-                              "Tạo mới",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.cookie,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: topicService.getTopicsByUserId(user.uid),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              List topics = snapshot.data!.docs;
-                              topicsTemp = topics;
-                              return ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: topics.length,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshot document = topics[index];
-                                  String docID = document.id;
-                                  Map<String, dynamic> data =
-                                      document.data() as Map<String, dynamic>;
-
-                                  //Topic's attributes
-                                  String topicTitle = data['topicName'];
-
-                                  return TopicCard(
-                                    onTap: () => {
-                                      addWordToTopic(() {
-                                        Navigator.of(context).pop();
-                                      },
-                                          docID,
-                                          wordId,
-                                          Word(
-                                            word: word,
-                                            definition: definition,
-                                            phonetic: phonetic,
-                                            date: date,
-                                            image: image,
-                                            wordForm: wordForm,
-                                            example: example,
-                                            audio: audio,
-                                            isFav: isFav,
-                                            topicId: docID,
-                                            status: status,
-                                            userId: userId,
-                                          )),
-                                    },
-                                    topicName: topicTitle,
-                                    numOfVocab: 1,
-                                  );
-                                },
-                              );
-                            } else {
-                              return Center(child: Text("No Topics Found"));
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ));
-  }
-
-  void addWordToTopic(void Function() popCallback, String topicId,
-      String wordId, Word word) async {
-    try {
-      await topicService.addWordToTopic(topicId, wordId, word);
-      await wordService.deleteWord(wordId);
-      // Check if the widget is still mounted before popping the context
-      if (mounted) {
-        popCallback();
-      }
-    } catch (e) {
-      print('Failed to add word to topic: $e');
-      // Optionally, show an error toast or dialog
-    }
-  }
-
-  void preloadImage(BuildContext context, File image) {
-    precacheImage(FileImage(image), context);
   }
 
   @override
@@ -281,16 +121,8 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               ),
             ),
-            onTap: () => showAddVocabModalBottomSheet(
-                context,
-                wordController,
-                definitionController,
-                user,
-                _btnActive,
-                setState,
-                wordHintText,
-                _image,
-                wordForm),
+            onTap: () => showAddVocabModalBottomSheet(context, wordController,
+                definitionController, user, wordHintText, _image, wordForm),
           ),
           SpeedDialChild(
             backgroundColor: Colors.white,
@@ -484,6 +316,7 @@ class _LibraryPageState extends State<LibraryPage> {
                               wordForm: wordForm,
                               date: date,
                               isFav: isFav,
+                              topicId: topicId,
                               onSpeakerPressed: () async {
                                 await audioPlayer.stop();
                                 await audioPlayer.play(UrlSource(audio));
@@ -522,10 +355,6 @@ class _LibraryPageState extends State<LibraryPage> {
                                   user,
                                   topicService,
                                   wordForm,
-                                  () {
-                                    setState(
-                                        () {}); // Call setState in the parent widget
-                                  },
                                 );
                               },
                             ),

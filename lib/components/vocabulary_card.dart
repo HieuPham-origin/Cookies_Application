@@ -14,6 +14,7 @@ class VocabularyCard extends StatefulWidget {
   final String wordForm;
   final String date;
   final bool isFav;
+  final String topicId;
   final Function()? onSpeakerPressed;
   final Future<bool?> Function(bool)? onFavoritePressed;
   final Function()? onSavePressed;
@@ -32,7 +33,8 @@ class VocabularyCard extends StatefulWidget {
       this.onSavePressed,
       this.onSharePressed,
       this.onTap,
-      required this.isFav});
+      required this.isFav,
+      required this.topicId});
 
   @override
   State<VocabularyCard> createState() => _VocabularyCardState();
@@ -63,19 +65,17 @@ class _VocabularyCardState extends State<VocabularyCard> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.word,
-                        style: GoogleFonts.inter(
-                          textStyle: TextStyle(
-                              color: AppColors.cookie,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16),
-                        ),
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      text: widget.word,
+                      style: GoogleFonts.inter(
+                        textStyle: TextStyle(
+                            color: AppColors.cookie,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18),
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 Row(
@@ -146,7 +146,9 @@ class _VocabularyCardState extends State<VocabularyCard> {
                           onTap: widget.onSavePressed,
                           child: Icon(
                             CupertinoIcons.bookmark_fill,
-                            color: AppColors.icon_grey,
+                            color: widget.topicId == ""
+                                ? AppColors.icon_grey
+                                : Colors.yellow.shade700,
                             size: 24,
                           ),
                         ),
