@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
+import 'dart:developer';
 import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/services/UserService.dart';
@@ -18,22 +18,16 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   // User user = ;
-  UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  // UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+
+  User user = FirebaseAuth.instance.currentUser!;
+
   String displayName = '';
   String email = '';
 
   @override
   void initState() {
     super.initState();
-    fetchUserInfo();
-  }
-
-  Future<void> fetchUserInfo() async {
-    final userInfo = await userService.getUserInfo();
-    setState(() {
-      displayName = userInfo['displayName'];
-      email = userInfo['uid'];
-    });
   }
 
   // sign user out method
@@ -110,7 +104,7 @@ class _SettingPageState extends State<SettingPage> {
                             height: 5,
                           ),
                           Text(
-                            email,
+                            "${user.email}",
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                                     fontSize: 12, color: Color(0xFF9A9A9A))),

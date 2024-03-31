@@ -2,6 +2,8 @@
 
 import 'dart:typed_data';
 
+import 'dart:developer';
+
 import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:cookie_app/pages/change_password.dart';
@@ -38,6 +40,7 @@ class _InformationPageState extends State<InformationPage> {
 
   Future<void> fetchUserInfo() async {
     final userInfo = await userService.getUserInfo();
+
     setState(() {
       email = userInfo["emailAddress"];
       displayName = userInfo["displayName"];
