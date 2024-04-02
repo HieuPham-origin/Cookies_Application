@@ -85,8 +85,11 @@ class _SettingPageState extends State<SettingPage> {
                     final rollback = await Navigator.push(context, route);
                     setState(
                       () {
-                        if (rollback != "") {
+                        if (rollback[0] != "") {
                           displayName = rollback[0];
+                        }
+
+                        if (rollback[1] != null) {
                           _image = rollback[1];
                         }
                       },

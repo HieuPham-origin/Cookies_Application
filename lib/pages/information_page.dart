@@ -24,6 +24,7 @@ class InformationPage extends StatefulWidget {
 
 class _InformationPageState extends State<InformationPage> {
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  User? user = FirebaseAuth.instance.currentUser!;
   Uint8List? _image;
 
   final emailController = TextEditingController();
@@ -47,11 +48,11 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   Future<void> fetchUserInfo() async {
-    final userInfo = await userService.getUserInfo();
+    // final userInfo = await userService.getUserInfo();
 
     setState(() {
-      email = userInfo["emailAddress"];
-      displayName = userInfo["displayName"];
+      email = user!.email!;
+      displayName = user!.displayName ?? 'cookieuser';
       usernameController.text = displayName;
       emailController.text = email;
       passwordController.text = "password";

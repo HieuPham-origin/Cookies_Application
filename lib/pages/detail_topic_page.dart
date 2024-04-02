@@ -7,6 +7,7 @@ import 'package:cookie_app/components/modal_bottom_sheet/detail_vocab_modal.dart
 import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/vocabulary_option.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
+import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
@@ -223,8 +224,9 @@ class _DetailTopicState extends State<DetailTopic> {
                           ),
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => SwipeCard(
-                                topidId: widget.docID,
+                              builder: (context) => QuizScreen(
+                                topicId: widget.docID,
+                                data: widget.data,
                               ),
                             ),
                           ),
