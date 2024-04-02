@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
+import 'dart:developer';
+import 'dart:typed_data';
 import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/services/UserService.dart';
@@ -17,28 +18,28 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  // User user = ;
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
-  String displayName = '';
-  String email = '';
+
+  User user = FirebaseAuth.instance.currentUser!;
+  Uint8List? _image;
+
+  String? displayName =
+      FirebaseAuth.instance.currentUser!.displayName ?? 'cookieuser';
 
   @override
   void initState() {
     super.initState();
-    fetchUserInfo();
-  }
-
-  Future<void> fetchUserInfo() async {
-    final userInfo = await userService.getUserInfo();
-    setState(() {
-      displayName = userInfo['displayName'];
-      email = userInfo['uid'];
-    });
+    loadProfileImage();
   }
 
   // sign user out method
   void signUserOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  void loadProfileImage() async {
+    _image = await userService.getProfileImage();
+    setState(() {});
   }
 
   @override
@@ -84,7 +85,10 @@ class _SettingPageState extends State<SettingPage> {
                     final rollback = await Navigator.push(context, route);
                     setState(
                       () {
-                        displayName = rollback;
+                        if (rollback != "") {
+                          displayName = rollback[0];
+                          _image = rollback[1];
+                        }
                       },
                     );
                   },
@@ -99,7 +103,7 @@ class _SettingPageState extends State<SettingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            displayName.isEmpty ? "cookieuser" : displayName,
+                            displayName!,
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                               fontSize: 28,
@@ -110,17 +114,22 @@ class _SettingPageState extends State<SettingPage> {
                             height: 5,
                           ),
                           Text(
-                            email,
+                            "${user.email}",
                             style: GoogleFonts.inter(
                                 textStyle: TextStyle(
                                     fontSize: 12, color: Color(0xFF9A9A9A))),
                           ),
                         ],
                       ),
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage('assets/logo.png'),
-                      )
+                      _image != null
+                          ? CircleAvatar(
+                              radius: 50.0,
+                              backgroundImage: MemoryImage(_image!),
+                            )
+                          : CircleAvatar(
+                              radius: 50,
+                              backgroundImage: AssetImage('assets/logo.png'),
+                            )
                     ],
                   ),
                 ),
