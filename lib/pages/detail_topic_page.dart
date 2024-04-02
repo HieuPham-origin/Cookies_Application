@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/add_topic_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/detail_vocab_modal.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/vocabulary_option.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
@@ -11,20 +14,32 @@ import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:toasty_box/toast_service.dart';
+import 'package:cookie_app/pages/library_page.dart';
 
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
   final String docID;
-  const DetailTopic({
+  int numOfVocabInTopic;
+  int numOfVocab;
+  void Function(int) setNumOfVocab;
+  void Function(int) setNumOfVocabInTopicFromLibrary;
+
+  DetailTopic({
     super.key,
     required this.data,
     required this.docID,
+    required this.numOfVocabInTopic,
+    required this.numOfVocab,
+    required this.setNumOfVocab,
+    required this.setNumOfVocabInTopicFromLibrary,
   });
   @override
   State<DetailTopic> createState() => _DetailTopicState();
@@ -52,6 +67,8 @@ class _DetailTopicState extends State<DetailTopic> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    String topicName = widget.data['topicName'];
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(
@@ -90,11 +107,40 @@ class _DetailTopicState extends State<DetailTopic> {
               onPressed: () {
                 // Add your onPressed action here
                 HapticFeedback.vibrate();
+                showVocabulariesModalBottomSheet(
+                  context,
+                  widget.docID,
+                  (int numOfWord1) {
+                    setState(() {
+                      numOfWord = numOfWord1;
+                    });
+                  },
+                  numOfWord,
+                  widget.setNumOfVocabInTopicFromLibrary,
+                  widget.numOfVocab,
+                  widget.setNumOfVocab,
+                );
               },
             ),
             GestureDetector(
               onTap: () {
                 HapticFeedback.vibrate();
+                showAddTopicModalBottomSheet(
+                  context,
+                  TextEditingController(text: topicName),
+                  user,
+                  topicService,
+                  setState,
+                  (String topicName) {
+                    setState(() {
+                      widget.data['topicName'] = topicName;
+                    });
+                  },
+                  widget.setNumOfVocabInTopicFromLibrary,
+                  widget.numOfVocabInTopic,
+                  widget.docID,
+                  2,
+                );
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
@@ -140,7 +186,7 @@ class _DetailTopicState extends State<DetailTopic> {
                           children: [
                             Container(
                               child: Text(
-                                widget.data['topicName'],
+                                topicName,
                                 style: TextStyle(
                                   fontSize: Dimensions.fontSize(context, 24),
                                   fontWeight: FontWeight.w500,
@@ -156,7 +202,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                "${numOfWord} từ",
+                                "$numOfWord từ",
                                 style: TextStyle(
                                   fontSize: Dimensions.fontSize(context, 16),
                                   color: AppColors.cookie,
@@ -166,6 +212,15 @@ class _DetailTopicState extends State<DetailTopic> {
                           ],
                         ),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            maximumSize: Size(200, 40),
+                            backgroundColor: AppColors.creamy,
+                            elevation: 0,
+                            foregroundColor: AppColors.cookie,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => SwipeCard(
@@ -196,18 +251,39 @@ class _DetailTopicState extends State<DetailTopic> {
                         stream:
                             topicService.getWordsForTopicStream(widget.docID),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
+                          if (snapshot.hasError) {
                             print(snapshot.error);
                             return Center(
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (snapshot.hasData) {
                             List words = snapshot.data!.docs;
+                            if (words.isEmpty) {
+                              return Center(
+                                  child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    height: screenSize.height * 0.18,
+                                    width: screenSize.width * 0.3,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                      image: AssetImage(
+                                          'assets/logo_icon_removebg.png'),
+                                      fit: BoxFit.contain,
+                                    )),
+                                  ),
+                                  Text("Không có từ vựng nào",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: AppColors.grey_light)),
+                                ],
+                              ));
+                            }
                             words.sort((a, b) {
                               return b['date'].compareTo(a['date']);
                             });
+
                             return ListView.builder(
                                 itemCount: words.length,
                                 shrinkWrap: true,
@@ -230,27 +306,53 @@ class _DetailTopicState extends State<DetailTopic> {
                                   int status = data['status'];
                                   String userId = data['userId'];
 
-                                  return Dismissible(
-                                    background: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: AppColors.red,
+                                  return Slidable(
+                                    closeOnScroll: true,
+                                    key: Key(wordId),
+                                    endActionPane: ActionPane(
+                                      extentRatio: 0.3,
+                                      motion: const ScrollMotion(),
+                                      children: [
+                                        SlidableAction(
+                                          autoClose: true,
+                                          onPressed: (direction) async {
+                                            final result = await QuickAlert.show(
+                                                context: context,
+                                                text: "Bạn có thật sự muốn xóa từ vựng này không ?",
+                                                type: QuickAlertType.confirm,
+                                                showCancelBtn: true,
+                                                confirmBtnText: "Có",
+                                                cancelBtnText: "Không",
+                                                confirmBtnColor: Colors.red,
+                                                onCancelBtnTap: () {
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .pop('dialog');
+                                                },
+                                                onConfirmBtnTap: () async {
+                                                  await topicService
+                                                      .deleteWordForTopic(
+                                                          widget.docID, wordId);
+                                                  setState(() {
+                                                    numOfWord -= 1;
+                                                  });
+                                                  widget.setNumOfVocabInTopicFromLibrary(
+                                                      widget.numOfVocabInTopic -
+                                                          1);
+
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .pop('dialog');
+                                                });
+
+                                            return result;
+                                          },
+                                          icon: Icons.delete,
+                                          backgroundColor: AppColors.red,
+                                          label: 'Delete',
                                         ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 24.0),
-                                          child: Icon(
-                                            Icons.delete,
-                                            color: Colors.white,
-                                            size: 32,
-                                          ),
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                    key: ValueKey(wordId),
                                     child: VocabularyCard(
                                       word: word,
                                       phonetics: phonetic != ""
@@ -261,36 +363,52 @@ class _DetailTopicState extends State<DetailTopic> {
                                       date: date,
                                       isFav: isFav,
                                       topicId: topicId,
+                                      type: 1,
                                       onSpeakerPressed: () async {
                                         await audioPlayer.stop();
                                         await audioPlayer
                                             .play(UrlSource(audio));
                                       },
                                       onFavoritePressed: (bool isFav) async {
-                                        await wordService.updateFavorite(
-                                            wordId, isFav);
+                                        await topicService
+                                            .updateFavoriteWordForTopic(
+                                                widget.docID, wordId, isFav);
                                         return !isFav;
                                       },
                                       onSavePressed: () {
-                                        // showTopicsModalBottomSheet(
-                                        //     context,
-                                        //     wordId,
-                                        //     word,
-                                        //     definition,
-                                        //     phonetic,
-                                        //     date,
-                                        //     image,
-                                        //     wordForm,
-                                        //     example,
-                                        //     audio,
-                                        //     isFav,
-                                        //     topicId,
-                                        //     status,
-                                        //     userId);
+                                        showTopicsModalBottomSheet(
+                                          context,
+                                          wordId,
+                                          word,
+                                          definition,
+                                          phonetic,
+                                          date,
+                                          image,
+                                          wordForm,
+                                          example,
+                                          audio,
+                                          isFav,
+                                          topicId,
+                                          status,
+                                          userId,
+                                          (int numOfVocabInTopic) {
+                                            widget
+                                                .setNumOfVocabInTopicFromLibrary(
+                                                    numOfVocabInTopic);
+                                          },
+                                          widget.numOfVocabInTopic,
+                                          (int numOfVocab) {
+                                            setState(() {
+                                              widget.numOfVocab = numOfVocab;
+                                            });
+                                          },
+                                          widget.numOfVocab,
+                                        );
                                       },
                                       onTap: () {
                                         showDetailVocabModalBottomSheet(
                                           context,
+                                          widget.docID,
                                           wordId,
                                           word,
                                           phonetic,
@@ -304,36 +422,6 @@ class _DetailTopicState extends State<DetailTopic> {
                                         );
                                       },
                                     ),
-                                    confirmDismiss: (direction) async {
-                                      final result = await QuickAlert.show(
-                                        context: context,
-                                        text:
-                                            "Bạn có thật sự muốn xóa từ vựng này không ?",
-                                        type: QuickAlertType.confirm,
-                                        showCancelBtn: true,
-                                        confirmBtnText: "Có",
-                                        cancelBtnText: "Không",
-                                        confirmBtnColor: Colors.red,
-                                        onConfirmBtnTap: () async {
-                                          try {
-                                            await wordService
-                                                .deleteWord(wordId);
-
-                                            ToastService.showSuccessToast(
-                                                context,
-                                                message:
-                                                    "Xóa $word thành công");
-                                            Navigator.of(context,
-                                                    rootNavigator: true)
-                                                .pop('dialog');
-                                          } catch (e) {
-                                            print("Error deleting word: $e");
-                                          }
-                                        },
-                                      );
-
-                                      return result;
-                                    },
                                   );
                                 });
                           } else {

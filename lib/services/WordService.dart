@@ -35,13 +35,14 @@ class WordService {
     return wordStream;
   }
 
-  // Stream<QuerySnapshot> getWordsByUserId(String userId) {
-  //   final wordStream = words
-  //       .where('userId', isEqualTo: userId)
-  //       .orderBy('date', descending: true) // Add this line
-  //       .snapshots();
-  //   return wordStream;
-  // }
+  //count words
+  Future<int> countWords(String userId) async {
+    int count = 0;
+    QuerySnapshot wordsSnapshot =
+        await words.where('userId', isEqualTo: userId).get();
+    count = wordsSnapshot.docs.length;
+    return count;
+  }
 
   Future<Word?> getWordById(String id) async {
     DocumentSnapshot snapshot = await words.doc(id).get();
@@ -66,6 +67,7 @@ class WordService {
       'wordForm': newWord.wordForm,
       'example': newWord.example,
       'topicId': newWord.topicId,
+      'audio': newWord.audio,
       'status': newWord.status,
     });
   }

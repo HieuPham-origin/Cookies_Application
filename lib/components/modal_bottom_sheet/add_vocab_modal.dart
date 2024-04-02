@@ -92,7 +92,9 @@ void showAddVocabModalBottomSheet(
     User user,
     String wordHintText,
     File? image,
-    String wordForm) {
+    String wordForm,
+    Function(int) setNumOfWord,
+    int numOfWord) {
   wordController.clear();
   definitionController.clear();
   image = null;
@@ -115,252 +117,255 @@ void showAddVocabModalBottomSheet(
       builder: (context) => StatefulBuilder(builder:
               (BuildContext context, void Function(void Function()) setState) {
             return SafeArea(
-              child: DraggableScrollableSheet(
-                expand: false,
-                initialChildSize: 0.95,
-                builder: (context, scrollController) => Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.header_background,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black.withOpacity(0.2),
+              child: GestureDetector(
+                child: DraggableScrollableSheet(
+                  expand: false,
+                  initialChildSize: 0.95,
+                  builder: (context, scrollController) => Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.header_background,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10),
+                          ),
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.black.withOpacity(0.2),
+                            ),
                           ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "Hủy",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.cookie,
-                                fontWeight: FontWeight.w500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: !isLoading
+                                  ? () async {
+                                      // Remove focus from any text fields to hide the keyboard
+                                      FocusScope.of(context).unfocus();
+
+                                      // Wait for a short duration to ensure the keyboard dismiss animation can complete
+                                      await Future.delayed(
+                                          const Duration(milliseconds: 200));
+
+                                      // Then, navigate back to the previous screen
+                                      Navigator.of(context).pop();
+                                    }
+                                  : null,
+                              child: const Text(
+                                "Hủy",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.cookie,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          const Text(
-                            "Tạo từ vựng",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.cookie,
+                            const Text(
+                              "Tạo từ vựng",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.cookie,
+                              ),
                             ),
-                          ),
-                          InkWell(
-                              onTap: () async {
-                                if (wordController.text.isEmpty) {
+                            InkWell(
+                                onTap: () async {
+                                  if (wordController.text.isEmpty) {
+                                    setState(() {
+                                      wordHintText =
+                                          "Từ vựng không được để trống";
+                                    });
+
+                                    return;
+                                  }
                                   // setModalState(() {
-                                  //   wordHintText =
-                                  //       "Từ vựng không được để trống";
+                                  //   isLoading = true;
                                   // });
+
                                   setState(() {
-                                    wordHintText =
-                                        "Từ vựng không được để trống";
+                                    isLoading = true;
                                   });
+                                  Word word = Word(
+                                    word: wordController.text,
+                                    definition: definitionController.text,
+                                    phonetic: await getPhoneticValues(
+                                        wordController.text),
+                                    date: getCurrentDate(),
+                                    image: image != null ? image!.path : "",
+                                    wordForm:
+                                        wordForm == "" ? "verb" : wordForm,
+                                    example:
+                                        await getExample(wordController.text),
+                                    audio:
+                                        'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
+                                    isFav: false,
+                                    topicId: "",
+                                    status: 0,
+                                    userId: user.uid,
+                                  );
 
-                                  return;
-                                }
-                                // setModalState(() {
-                                //   isLoading = true;
-                                // });
-
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                Word word = Word(
-                                  word: wordController.text,
-                                  definition: definitionController.text,
-                                  phonetic: await getPhoneticValues(
-                                      wordController.text),
-                                  date: getCurrentDate(),
-                                  image: image != null ? image!.path : "",
-                                  wordForm: wordForm == "" ? "verb" : wordForm,
-                                  example:
-                                      await getExample(wordController.text),
-                                  audio:
-                                      'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${wordController.text}"&tl=${wordController.text == "gay" ? "th" : "en"}&client=tw-ob',
-                                  isFav: false,
-                                  topicId: "",
-                                  status: 0,
-                                  userId: user.uid,
-                                );
-
-                                try {
-                                  await WordService().addWord(word);
-                                  ToastService.showSuccessToast(context,
-                                      message: "Add từ vựng thành công");
-                                  Navigator.pop(context);
-                                } catch (e) {
-                                  print('Failed to add word: $e');
-                                  // Optionally, show an error toast or dialog
-                                } finally {
-                                  // Reset loading state here, whether the operation succeeds or fails
-                                  // setModalState(() {
-                                  //   isLoading = false;
-                                  // });
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              },
-                              child: Container(
-                                width: Dimensions.width(context,
-                                    40), // Adjust width according to your needs
-                                height:
-                                    24, // Adjust height according to your needs
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Visibility(
-                                      visible: isLoading,
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                AppColors.cookie),
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: !isLoading,
-                                      child: Text(
-                                        "Tiếp",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.cookie,
+                                  try {
+                                    await WordService().addWord(word);
+                                    FocusScope.of(context).unfocus();
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 200));
+                                    setNumOfWord(numOfWord + 1);
+                                    Navigator.pop(context);
+                                  } catch (e) {
+                                    print('Failed to add word: $e');
+                                    // Optionally, show an error toast or dialog
+                                  } finally {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: Dimensions.width(context,
+                                      40), // Adjust width according to your needs
+                                  height:
+                                      24, // Adjust height according to your needs
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Visibility(
+                                        visible: isLoading,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  AppColors.cookie),
                                         ),
                                       ),
+                                      Visibility(
+                                        visible: !isLoading,
+                                        child: Text(
+                                          "Tiếp",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.cookie,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        child: Column(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  controller: wordController,
+                                  autofocus: true,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: wordHintText,
+                                    hintStyle: const TextStyle(
+                                      color: AppColors.red,
+                                      fontWeight: FontWeight.normal,
                                     ),
-                                  ],
-                                ),
-                              )),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Column(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextField(
-                                controller: wordController,
-                                autofocus: true,
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: wordHintText,
-                                  hintStyle: const TextStyle(
-                                    color: AppColors.red,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  contentPadding:
-                                      const EdgeInsets.only(bottom: 0),
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: AppColors.cookie),
+                                    contentPadding:
+                                        const EdgeInsets.only(bottom: 0),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.cookie),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  "TỪ VỰNG",
-                                  style: TextStyle(
-                                    color: AppColors.grey_light,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "TỪ VỰNG",
+                                    style: TextStyle(
+                                      color: AppColors.grey_light,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextField(
-                                textAlign: TextAlign.start,
-                                controller: definitionController,
-                                style: GoogleFonts.inter(),
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.only(bottom: 0),
-                                  suffixIconConstraints: const BoxConstraints(
-                                      maxHeight: 24, maxWidth: 24),
-                                  suffixIcon: IconButton(
-                                    padding: const EdgeInsets.only(bottom: 0),
-                                    onPressed: () {
-                                      showImageOptionModalBottomSheet(
-                                          context, setState, image,
-                                          (File? newImage) {
-                                        // setModalState(() {
-                                        //   image = newImage;
-                                        // });
-                                        setState(() {
-                                          image = newImage;
-                                        });
-                                      });
-                                    },
-                                    icon: const Icon(Icons.camera_alt),
-                                  ),
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: AppColors.cookie),
-                                  ),
-                                ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  "ĐỊNH NGHĨA",
-                                  style: TextStyle(
-                                    color: AppColors.grey_light,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          CustomSegmentButton(
-                            onSelectionChanged: handleSelectionChange,
-                            wordForm: wordForm,
-                            isDisabled: false,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            width: Dimensions.width(context, 200),
-                            height: Dimensions.height(context, 250),
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: FileImage(image ?? File("")),
-                                fit: BoxFit.contain,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                              ],
                             ),
-                          ),
-                        ],
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  textAlign: TextAlign.start,
+                                  controller: definitionController,
+                                  style: GoogleFonts.inter(),
+                                  decoration: InputDecoration(
+                                    contentPadding:
+                                        const EdgeInsets.only(bottom: 0),
+                                    suffixIconConstraints: const BoxConstraints(
+                                        maxHeight: 24, maxWidth: 24),
+                                    suffixIcon: IconButton(
+                                      padding: const EdgeInsets.only(bottom: 0),
+                                      onPressed: () {
+                                        showImageOptionModalBottomSheet(
+                                            context, image, (File? newImage) {
+                                          setState(() {
+                                            image = newImage;
+                                          });
+                                        });
+                                      },
+                                      icon: const Icon(Icons.camera_alt),
+                                    ),
+                                    focusedBorder: const UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: AppColors.cookie),
+                                    ),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "ĐỊNH NGHĨA",
+                                    style: TextStyle(
+                                      color: AppColors.grey_light,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            CustomSegmentButton(
+                              onSelectionChanged: handleSelectionChange,
+                              wordForm: wordForm,
+                              isDisabled: isLoading,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              width: Dimensions.width(context, 200),
+                              height: Dimensions.height(context, 250),
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: FileImage(image ?? File("")),
+                                  fit: BoxFit.contain,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

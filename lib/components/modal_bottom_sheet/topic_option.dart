@@ -20,20 +20,25 @@ void addWordToTopic(void Function() popCallback, String topicId, String wordId,
 }
 
 void showTopicsModalBottomSheet(
-    BuildContext context,
-    String wordId,
-    String word,
-    String definition,
-    String phonetic,
-    String date,
-    String image,
-    String wordForm,
-    String example,
-    String audio,
-    bool isFav,
-    String topicId,
-    int status,
-    String userId) {
+  BuildContext context,
+  String wordId,
+  String word,
+  String definition,
+  String phonetic,
+  String date,
+  String image,
+  String wordForm,
+  String example,
+  String audio,
+  bool isFav,
+  String topicId,
+  int status,
+  String userId,
+  Function(int) setNumOfVocabInTopic,
+  int numOfVocabInTopic,
+  Function(int) setNumOfVocab,
+  int numOfVocab,
+) {
   showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: true,
@@ -99,7 +104,7 @@ void showTopicsModalBottomSheet(
                   Expanded(
                     child: SingleChildScrollView(
                       child: StreamBuilder<QuerySnapshot>(
-                        stream: topicService.getTopicsByUserId(user.uid),
+                        stream: topicService.getTopicsByUserId(userId),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List topics = snapshot.data!.docs;
@@ -116,30 +121,44 @@ void showTopicsModalBottomSheet(
                                 //Topic's attributes
                                 String topicTitle = data['topicName'];
 
-                                return TopicCard(
-                                  onTap: () => {
-                                    addWordToTopic(() {
-                                      Navigator.of(context).pop();
-                                    },
-                                        docID,
-                                        wordId,
-                                        Word(
-                                          word: word,
-                                          definition: definition,
-                                          phonetic: phonetic,
-                                          date: date,
-                                          image: image,
-                                          wordForm: wordForm,
-                                          example: example,
-                                          audio: audio,
-                                          isFav: isFav,
-                                          topicId: docID,
-                                          status: status,
-                                          userId: userId,
-                                        )),
+                                return FutureBuilder(
+                                  future: topicService.countWordsInTopic(docID),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      int numOfVocabInTopicOption =
+                                          snapshot.data ?? 0;
+                                      return TopicCard(
+                                        onTap: () => {
+                                          addWordToTopic(() {
+                                            Navigator.of(context).pop();
+                                          },
+                                              docID,
+                                              wordId,
+                                              Word(
+                                                word: word,
+                                                definition: definition,
+                                                phonetic: phonetic,
+                                                date: date,
+                                                image: image,
+                                                wordForm: wordForm,
+                                                example: example,
+                                                audio: audio,
+                                                isFav: isFav,
+                                                topicId: docID,
+                                                status: status,
+                                                userId: userId,
+                                              )),
+                                          setNumOfVocabInTopic(
+                                              numOfVocabInTopic + 1),
+                                          setNumOfVocab(numOfVocab - 1),
+                                        },
+                                        topicName: topicTitle,
+                                        numOfVocab: numOfVocabInTopicOption,
+                                      );
+                                    }
                                   },
-                                  topicName: topicTitle,
-                                  numOfVocab: 1,
                                 );
                               },
                             );

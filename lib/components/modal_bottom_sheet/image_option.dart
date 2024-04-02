@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-void showImageOptionModalBottomSheet(BuildContext context,
-    StateSetter setModalState, File? image, Function(File?) setImage) {
+void showImageOptionModalBottomSheet(
+    BuildContext context, File? image, Function(File?) setImage) {
   showModalBottomSheet(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(0))),
@@ -19,7 +19,7 @@ void showImageOptionModalBottomSheet(BuildContext context,
               title: Text("Chụp ảnh"),
               onTap: () {
                 //open camera
-                pickImageFromCamera(setModalState, setImage);
+                pickImageFromCamera(setImage);
                 Navigator.pop(context);
               },
             ),
@@ -28,7 +28,7 @@ void showImageOptionModalBottomSheet(BuildContext context,
               title: Text("Chọn ảnh từ thư viện"),
               onTap: () {
                 //open gallery
-                pickImageFromLibrary(setModalState, setImage);
+                pickImageFromLibrary(setImage);
                 Navigator.pop(context);
               },
             ),
@@ -39,15 +39,13 @@ void showImageOptionModalBottomSheet(BuildContext context,
   );
 }
 
-Future pickImageFromLibrary(
-    StateSetter setModalState, Function(File) setImage) async {
+Future pickImageFromLibrary(Function(File) setImage) async {
   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
   if (pickedFile == null) return;
   setImage(File(pickedFile.path));
 }
 
-Future pickImageFromCamera(
-    StateSetter setModalState, Function(File) setImage) async {
+Future pickImageFromCamera(Function(File) setImage) async {
   final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
   if (pickedFile == null) return;
   setImage(File(pickedFile.path));

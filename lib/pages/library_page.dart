@@ -16,8 +16,10 @@ import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
@@ -50,15 +52,36 @@ class _LibraryPageState extends State<LibraryPage> {
   bool isError = false;
 // ValueNotifier<String> wordHintTextNotifier = ValueNotifier<String>('');
   String wordHintText = "";
+  int numOfVocabInTopic = 0;
+  int numOfTopic = 0;
   int numOfVocab = 0;
 
   @override
   void initState() {
     super.initState();
+    topicService.countTopics(user.uid).then((value) {
+      setState(() {
+        numOfTopic = value;
+      });
+    });
+
+    wordService.countWords(user.uid).then((value) {
+      setState(() {
+        numOfVocab = value;
+      });
+    });
+  }
+
+  void updateState(int numOfVocabInTopic) {
+    setState(() {
+      this.numOfVocabInTopic = numOfVocabInTopic;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -69,9 +92,9 @@ class _LibraryPageState extends State<LibraryPage> {
             "Thư viện từ vựng",
             style: GoogleFonts.inter(
               textStyle: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFB99B6B),
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.coffee,
               ),
             ),
           ),
@@ -121,8 +144,18 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               ),
             ),
-            onTap: () => showAddVocabModalBottomSheet(context, wordController,
-                definitionController, user, wordHintText, _image, wordForm),
+            onTap: () => showAddVocabModalBottomSheet(
+                context,
+                wordController,
+                definitionController,
+                user,
+                wordHintText,
+                _image,
+                wordForm, (int numOfVocab) {
+              setState(() {
+                this.numOfVocab = numOfVocab;
+              });
+            }, numOfVocab),
           ),
           SpeedDialChild(
             backgroundColor: Colors.white,
@@ -142,7 +175,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 // Optionally, add a border or shadow
               ),
               child: Text(
-                "Thêm topic",
+                "Tạo topic",
                 style: GoogleFonts.inter(
                   textStyle: TextStyle(
                     color: AppColors.cookie,
@@ -151,8 +184,17 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               ),
             ),
-            onTap: () => showAddTopicModalBottomSheet(context, topicController,
-                user, topicService, _btnActive, setState),
+            onTap: () => showAddTopicModalBottomSheet(
+                context,
+                topicController,
+                user,
+                topicService,
+                setState,
+                (String topicName) {}, (int numOfTopic) {
+              setState(() {
+                this.numOfTopic = numOfTopic;
+              });
+            }, numOfTopic, "", 1),
           ),
         ],
       ),
@@ -161,14 +203,80 @@ class _LibraryPageState extends State<LibraryPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TitleWidget(
-              title: "Topics",
+            Row(
+              children: [
+                TitleWidget(
+                  title: "Topics",
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Container(
+                  height: Dimensions.height(context, 30),
+                  width: Dimensions.width(context, 30),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.cookie,
+                  ),
+                  child: Center(
+                    child: Text(
+                      numOfTopic.toString(),
+                      style: GoogleFonts.inter(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             StreamBuilder<QuerySnapshot>(
               stream: topicService.getTopicsByUserId(user.uid),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List topics = snapshot.data!.docs;
+                  if (topics.isEmpty) {
+                    return Center(
+                        child: Column(
+                      children: [
+                        Container(
+                          height: screenSize.height * 0.18,
+                          width: screenSize.width * 0.3,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                            image: AssetImage('assets/logo_icon_removebg.png'),
+                            fit: BoxFit.contain,
+                          )),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            showAddTopicModalBottomSheet(
+                                context,
+                                topicController,
+                                user,
+                                topicService,
+                                setState,
+                                (String topicName) {}, (int numOfTopic) {
+                              setState(() {
+                                this.numOfTopic = numOfTopic;
+                              });
+                            }, numOfTopic, "", 1);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: AppColors.creamy,
+                            foregroundColor: AppColors.cookie,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: Text("Tạo topic đầu tiên"),
+                        ),
+                      ],
+                    ));
+                  }
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: topics.length,
@@ -176,69 +284,93 @@ class _LibraryPageState extends State<LibraryPage> {
                     itemBuilder: (context, index) {
                       DocumentSnapshot document = topics[index];
                       String docID = document.id;
+
                       Map<String, dynamic> data =
                           document.data() as Map<String, dynamic>;
-                      //Topic's attributes
+                      // Topic's attributes
                       String topicTitle = data['topicName'];
 
-                      return Dismissible(
-                        background: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Colors.red,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 24.0),
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                                size: 32,
+                      return FutureBuilder<int>(
+                        future: topicService.countWordsInTopic(docID),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            int numOfVocabInTopicLibrary = snapshot.data ?? 0;
+
+                            return Slidable(
+                              key: ValueKey(docID),
+                              closeOnScroll: true,
+                              endActionPane: ActionPane(
+                                extentRatio: 0.3,
+                                motion: ScrollMotion(),
+                                children: [
+                                  SlidableAction(
+                                    autoClose: true,
+                                    onPressed: (direction) async {
+                                      await QuickAlert.show(
+                                          context: context,
+                                          text:
+                                              "Bạn có thật sự muốn xóa topic này không ?",
+                                          type: QuickAlertType.confirm,
+                                          showCancelBtn: true,
+                                          confirmBtnText: "Có",
+                                          cancelBtnText: "Không",
+                                          confirmBtnColor: Colors.red,
+                                          onCancelBtnTap: () {
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pop('dialog');
+                                          },
+                                          onConfirmBtnTap: () async {
+                                            await topicService
+                                                .deleteTopic(docID);
+                                            setState(() {
+                                              numOfTopic -= 1;
+                                            });
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.of(context,
+                                                    rootNavigator: true)
+                                                .pop('dialog');
+                                          });
+                                    },
+                                    backgroundColor: AppColors.red,
+                                    icon: Icons.delete,
+                                    label: 'Xóa',
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                        ),
-                        key: ValueKey(docID),
-                        confirmDismiss: (direction) async {
-                          final result = await QuickAlert.show(
-                            context: context,
-                            text: "Bạn có thật sự muốn xóa topic này không ?",
-                            type: QuickAlertType.confirm,
-                            showCancelBtn: true,
-                            confirmBtnText: "Có",
-                            cancelBtnText: "Không",
-                            confirmBtnColor: Colors.red,
-                            onConfirmBtnTap: () async {
-                              try {
-                                await topicService.deleteTopic(docID);
-
-                                ToastService.showSuccessToast(context,
-                                    message: "Xóa topic thành công");
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop('dialog');
-                              } catch (e) {
-                                print("Error deleting topic: $e");
-                              }
-                            },
-                          );
-
-                          return result;
+                              child: TopicCard(
+                                onTap: () async => {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(PageTransition(
+                                          type: PageTransitionType.rightToLeft,
+                                          child: DetailTopic(
+                                            data: data,
+                                            docID: docID,
+                                            numOfVocabInTopic:
+                                                numOfVocabInTopic,
+                                            numOfVocab: numOfVocab,
+                                            setNumOfVocabInTopicFromLibrary:
+                                                (int numOfVocabInTopic) {
+                                              setState(() {
+                                                this.numOfVocabInTopic =
+                                                    numOfVocabInTopic;
+                                              });
+                                            },
+                                            setNumOfVocab: (int numOfVocab) {
+                                              setState(() {
+                                                this.numOfVocab = numOfVocab;
+                                              });
+                                            },
+                                          ))),
+                                },
+                                topicName: topicTitle,
+                                numOfVocab: numOfVocabInTopicLibrary,
+                              ),
+                            );
+                          }
                         },
-                        child: TopicCard(
-                          // onTap: () => showTopicDetail(context, data, docID),
-                          onTap: () async => {
-                            Navigator.of(context, rootNavigator: true)
-                                .push(PageTransition(
-                                    type: PageTransitionType.rightToLeft,
-                                    child: DetailTopic(
-                                      data: data,
-                                      docID: docID,
-                                    ))),
-                          },
-                          topicName: topicTitle,
-                          numOfVocab: 1,
-                        ),
                       );
                     },
                   );
@@ -250,8 +382,31 @@ class _LibraryPageState extends State<LibraryPage> {
             SizedBox(
               height: 20,
             ),
-            TitleWidget(
-              title: "Từ vựng",
+            Row(
+              children: [
+                TitleWidget(
+                  title: "Từ vựng",
+                ),
+                Container(
+                  height: Dimensions.height(context, 30),
+                  width: Dimensions.width(context, 30),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.cookie,
+                  ),
+                  child: Center(
+                    child: Text(
+                      numOfVocab.toString(),
+                      style: GoogleFonts.inter(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             StreamBuilder<QuerySnapshot>(
                 stream: wordService.getWordsByUserId(user.uid),
@@ -263,6 +418,54 @@ class _LibraryPageState extends State<LibraryPage> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
+
+                    if (words.isEmpty) {
+                      return Center(
+                          child: Column(
+                        children: [
+                          Container(
+                            height: screenSize.height * 0.18,
+                            width: screenSize.width * 0.3,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                              image:
+                                  AssetImage('assets/logo_icon_removebg.png'),
+                              fit: BoxFit.contain,
+                            )),
+                          ),
+                          Text("Không có từ vựng nào",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: AppColors.grey_light)),
+                          ElevatedButton(
+                            onPressed: () {
+                              showAddVocabModalBottomSheet(
+                                  context,
+                                  wordController,
+                                  definitionController,
+                                  user,
+                                  wordHintText,
+                                  _image,
+                                  wordForm, (int numOfVocab) {
+                                setState(() {
+                                  this.numOfVocab = numOfVocab;
+                                });
+                              }, numOfVocab);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: AppColors.creamy,
+                              foregroundColor: AppColors.cookie,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Text("Tạo từ vựng đầu tiên"),
+                          ),
+                        ],
+                      ));
+                    }
                     words.sort((a, b) {
                       return b['date'].compareTo(a['date']);
                     });
@@ -289,25 +492,46 @@ class _LibraryPageState extends State<LibraryPage> {
                           int status = data['status'];
                           String userId = data['userId'];
 
-                          return Dismissible(
-                            background: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: AppColors.red,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 24.0),
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.white,
-                                    size: 32,
-                                  ),
-                                ),
-                              ),
-                            ),
+                          return Slidable(
                             key: ValueKey(wordId),
+                            closeOnScroll: true,
+                            endActionPane: ActionPane(
+                              extentRatio: 0.3,
+                              motion: ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  autoClose: true,
+                                  onPressed: (direction) async {
+                                    await QuickAlert.show(
+                                        context: context,
+                                        text:
+                                            "Bạn có thật sự muốn xóa từ vựng này không ?",
+                                        type: QuickAlertType.confirm,
+                                        showCancelBtn: true,
+                                        confirmBtnText: "Có",
+                                        cancelBtnText: "Không",
+                                        confirmBtnColor: Colors.red,
+                                        onCancelBtnTap: () {
+                                          Navigator.of(context,
+                                                  rootNavigator: true)
+                                              .pop('dialog');
+                                        },
+                                        onConfirmBtnTap: () async {
+                                          await wordService.deleteWord(wordId);
+                                          setState(() {
+                                            numOfVocab -= 1;
+                                          });
+                                          Navigator.of(context,
+                                                  rootNavigator: true)
+                                              .pop('dialog');
+                                        });
+                                  },
+                                  backgroundColor: AppColors.red,
+                                  icon: Icons.delete,
+                                  label: 'Xóa',
+                                ),
+                              ],
+                            ),
                             child: VocabularyCard(
                               word: word,
                               phonetics:
@@ -317,6 +541,7 @@ class _LibraryPageState extends State<LibraryPage> {
                               date: date,
                               isFav: isFav,
                               topicId: topicId,
+                              type: 1,
                               onSpeakerPressed: () async {
                                 await audioPlayer.stop();
                                 await audioPlayer.play(UrlSource(audio));
@@ -327,24 +552,39 @@ class _LibraryPageState extends State<LibraryPage> {
                               },
                               onSavePressed: () {
                                 showTopicsModalBottomSheet(
-                                    context,
-                                    wordId,
-                                    word,
-                                    definition,
-                                    phonetic,
-                                    date,
-                                    image,
-                                    wordForm,
-                                    example,
-                                    audio,
-                                    isFav,
-                                    topicId,
-                                    status,
-                                    userId);
+                                  context,
+                                  wordId,
+                                  word,
+                                  definition,
+                                  phonetic,
+                                  date,
+                                  image,
+                                  wordForm,
+                                  example,
+                                  audio,
+                                  isFav,
+                                  topicId,
+                                  status,
+                                  userId,
+                                  (int numOfVocabInTopic) {
+                                    setState(() {
+                                      this.numOfVocabInTopic =
+                                          numOfVocabInTopic;
+                                    });
+                                  },
+                                  numOfVocabInTopic,
+                                  (int numOfVocab) {
+                                    setState(() {
+                                      this.numOfVocab = numOfVocab;
+                                    });
+                                  },
+                                  numOfVocab,
+                                );
                               },
                               onTap: () {
                                 showDetailVocabModalBottomSheet(
                                   context,
+                                  topicId,
                                   wordId,
                                   word,
                                   phonetic,
@@ -358,38 +598,15 @@ class _LibraryPageState extends State<LibraryPage> {
                                 );
                               },
                             ),
-                            confirmDismiss: (direction) async {
-                              final result = await QuickAlert.show(
-                                context: context,
-                                text:
-                                    "Bạn có thật sự muốn xóa từ vựng này không ?",
-                                type: QuickAlertType.confirm,
-                                showCancelBtn: true,
-                                confirmBtnText: "Có",
-                                cancelBtnText: "Không",
-                                confirmBtnColor: Colors.red,
-                                onConfirmBtnTap: () async {
-                                  try {
-                                    await wordService.deleteWord(wordId);
-
-                                    ToastService.showSuccessToast(context,
-                                        message: "Xóa $word thành công");
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop('dialog');
-                                  } catch (e) {
-                                    print("Error deleting word: $e");
-                                  }
-                                },
-                              );
-
-                              return result;
-                            },
                           );
                         });
                   } else {
                     return Center(child: Text("No Words Found"));
                   }
-                })
+                }),
+            SizedBox(
+              height: Dimensions.height(context, 80),
+            ),
           ],
         ),
       ),
@@ -401,6 +618,7 @@ class _LibraryPageState extends State<LibraryPage> {
     topicController.dispose();
     definitionController.dispose();
     audioPlayer.dispose();
+
     super.dispose();
   }
 }

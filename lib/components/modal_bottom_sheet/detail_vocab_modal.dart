@@ -21,6 +21,7 @@ import 'package:cookie_app/components/loading_skeleton.dart';
 
 void showDetailVocabModalBottomSheet(
   BuildContext context,
+  String topicId,
   String wordId,
   String word,
   String phonetic,
@@ -86,6 +87,7 @@ void showDetailVocabModalBottomSheet(
       TextEditingController(text: definition);
   TextEditingController exampleController =
       TextEditingController(text: example);
+  String audio_update = '';
   FocusNode focusNode = FocusNode();
   showModalBottomSheet(
     isScrollControlled: true,
@@ -159,25 +161,48 @@ void showDetailVocabModalBottomSheet(
                                     String definition =
                                         definitionController.text;
                                     String example = exampleController.text;
+                                    audio_update =
+                                        'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${word}"&tl=${word == "gay" ? "th" : "en"}&client=tw-ob';
 
-                                    WordService wordService = WordService();
-                                    wordService.updateWord(
-                                      wordId,
-                                      Word(
-                                        word: word,
-                                        phonetic: phonetic,
-                                        definition: definition,
-                                        example: example,
-                                        image: image!.path,
-                                        wordForm: wordForm,
-                                        date: getCurrentDate(),
-                                        isFav: false,
-                                        audio: '',
-                                        topicId: '',
-                                        status: 0,
-                                        userId: '',
-                                      ),
-                                    );
+                                    if (topicId.isNotEmpty) {
+                                      topicService.updateWordForTopic(
+                                        topicId,
+                                        wordId,
+                                        Word(
+                                          word: word,
+                                          phonetic: phonetic,
+                                          definition: definition,
+                                          example: example,
+                                          image: image!.path,
+                                          wordForm: wordForm,
+                                          date: getCurrentDate(),
+                                          isFav: false,
+                                          audio: audio_update,
+                                          topicId: '',
+                                          status: 0,
+                                          userId: '',
+                                        ),
+                                      );
+                                    } else {
+                                      WordService wordService = WordService();
+                                      wordService.updateWord(
+                                        wordId,
+                                        Word(
+                                          word: word,
+                                          phonetic: phonetic,
+                                          definition: definition,
+                                          example: example,
+                                          image: image!.path,
+                                          wordForm: wordForm,
+                                          date: getCurrentDate(),
+                                          isFav: false,
+                                          audio: audio_update,
+                                          topicId: '',
+                                          status: 0,
+                                          userId: '',
+                                        ),
+                                      );
+                                    }
                                   }
                                 });
                               },
@@ -286,7 +311,10 @@ void showDetailVocabModalBottomSheet(
                                 GestureDetector(
                                   onTap: () async {
                                     await audioPlayer.stop();
-                                    await audioPlayer.play(UrlSource(audio));
+                                    await audioPlayer.play(UrlSource(
+                                        audio_update == ''
+                                            ? audio
+                                            : audio_update));
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(
@@ -416,7 +444,7 @@ void showDetailVocabModalBottomSheet(
                                     onTap: edit == "Lưu"
                                         ? () {
                                             showImageOptionModalBottomSheet(
-                                                context, setState, image,
+                                                context, image,
                                                 (File? newImage) {
                                               setState(() {
                                                 image = newImage;
@@ -424,34 +452,38 @@ void showDetailVocabModalBottomSheet(
                                             });
                                           }
                                         : null,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          CupertinoIcons
-                                              .camera_fill, // Replace Icons.image with the desired icon
-                                          color: AppColors
-                                              .grey_heavy, // Set the color of the icon
-                                          size: Dimensions.fontSize(context,
-                                              18), // Set the size of the icon
-                                        ),
-                                        SizedBox(
-                                            width:
-                                                5), // Add some space between the icon and text
-                                        Text(
-                                          "Chọn ảnh",
-                                          style: GoogleFonts.inter(
-                                            textStyle: TextStyle(
-                                              fontSize: Dimensions.fontSize(
-                                                  context, 18),
-                                              color: AppColors.grey_heavy,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    child: edit == "Lưu"
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                CupertinoIcons
+                                                    .camera_fill, // Replace Icons.image with the desired icon
+                                                color: AppColors
+                                                    .grey_heavy, // Set the color of the icon
+                                                size: Dimensions.fontSize(
+                                                    context,
+                                                    18), // Set the size of the icon
+                                              ),
+                                              SizedBox(
+                                                  width:
+                                                      5), // Add some space between the icon and text
+                                              Text(
+                                                "Chọn ảnh",
+                                                style: GoogleFonts.inter(
+                                                  textStyle: TextStyle(
+                                                    fontSize:
+                                                        Dimensions.fontSize(
+                                                            context, 18),
+                                                    color: AppColors.grey_heavy,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        : Container(),
                                   ),
                                 ],
                               ),

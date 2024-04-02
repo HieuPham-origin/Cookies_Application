@@ -59,9 +59,7 @@ class TopicService {
 
   Future<List<Word>> getWordsForTopic(String topicId) async {
     List<Word> wordsList = [];
-
     DocumentReference topicRef = topics.doc(topicId);
-
     QuerySnapshot wordsSnapshot = await topicRef.collection('words').get();
     for (var wordDoc in wordsSnapshot.docs) {
       Word word = Word.fromSnapshot(wordDoc);
@@ -75,6 +73,36 @@ class TopicService {
   Stream<QuerySnapshot> getWordsForTopicStream(String topicId) {
     final wordStream = topics.doc(topicId).collection('words').snapshots();
     return wordStream;
+  }
+
+  //update words for topic
+  Future<void> updateWordForTopic(
+      String topicId, String wordId, Word newWord) async {
+    await topics.doc(topicId).collection('words').doc(wordId).update({
+      'word': newWord.word,
+      'definition': newWord.definition,
+      'phonetic': newWord.phonetic,
+      'date': newWord.date,
+      'image': newWord.image,
+      'wordForm': newWord.wordForm,
+      'example': newWord.example,
+      'audio': newWord.audio,
+      'status': newWord.status,
+      'userId': newWord.userId,
+    });
+  }
+
+  //update favorite word for topic
+  Future<void> updateFavoriteWordForTopic(
+      String topicId, String wordId, bool isFav) async {
+    await topics.doc(topicId).collection('words').doc(wordId).update({
+      'isFav': !isFav,
+    });
+  }
+
+  //delete word for topic
+  Future<void> deleteWordForTopic(String topicId, String wordId) async {
+    await topics.doc(topicId).collection('words').doc(wordId).delete();
   }
 
   Future<void> deleteTopic(String topicId) async {
@@ -144,7 +172,7 @@ class TopicService {
   }
 
   addWordToTopic(String topicId, String wordId, Word word) {
-    topics.doc(topicId).collection('words').doc(wordId).set({
+    topics.doc(topicId).collection('words').add({
       'word': word.word,
       'definition': word.definition,
       'phonetic': word.phonetic,

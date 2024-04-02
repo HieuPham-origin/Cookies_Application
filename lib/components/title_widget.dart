@@ -27,12 +27,14 @@ class _TitleWidgetState extends State<TitleWidget> {
                 borderRadius: BorderRadius.all(Radius.circular(20))),
             child: Padding(
               padding:
-                  const EdgeInsets.only(top: 7, bottom: 7, left: 12, right: 12),
+                  const EdgeInsets.only(top: 5, bottom: 5, left: 12, right: 12),
               child: Text(
                 widget.title,
                 style: GoogleFonts.inter(
-                  textStyle:
-                      const TextStyle(fontSize: 14, color: AppColors.cookie),
+                  textStyle: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.cookie,
+                      fontWeight: FontWeight.w500),
                 ),
               ),
             ),

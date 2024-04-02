@@ -1,138 +1,213 @@
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:toasty_box/toast_service.dart';
 
 void showAddTopicModalBottomSheet(
     BuildContext context,
     TextEditingController topicController,
     User user,
     TopicService topicService,
-    bool _btnActive,
-    void setState(void Function() fn)
+    void setState(void Function() fn),
+    Function(String) setTopicName,
+    Function(int) setNumOfTopic,
+    int numOfTopic,
+    String topicId,
+    int type
     // Assuming this is a dependency
     ) {
-  topicController.clear();
+  bool isLoading = false;
 
+  if (type == 1) {
+    topicController.text = "";
+  }
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    enableDrag: false,
+    enableDrag: true,
     useRootNavigator: true,
+    isDismissible: false,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    backgroundColor: Colors.white,
+    backgroundColor: const Color(0xfffefffe),
     builder: (context) => DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.95,
-      builder: (context, scrollController) => SingleChildScrollView(
-        controller: scrollController,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Container(
-                width: 60,
-                height: 7,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.lightGreen),
+      builder: (context, scrollController) => Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.header_background,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(10),
               ),
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 56.0,
-                    child: const Center(
-                        child: Text(
-                      "Thêm Topic",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 5,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, size: 28),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
-                ],
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.black.withOpacity(0.2),
+                ),
               ),
-              const SizedBox(
-                height: 24,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: topicController,
-                  onChanged: (value) {
-                    setState(() {
-                      _btnActive = value.isNotEmpty ? true : false;
-                    });
-                  },
-                  autofocus: true,
-                  style: GoogleFonts.inter(),
-                  decoration: const InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.cookie),
-                    ),
-                    label: Text("Tên Topic"),
-                    floatingLabelStyle: TextStyle(
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: !isLoading
+                      ? () async {
+                          // Remove focus from any text fields to hide the keyboard
+                          FocusScope.of(context).unfocus();
+
+                          // Wait for a short duration to ensure the keyboard dismiss animation can complete
+                          await Future.delayed(
+                              const Duration(milliseconds: 200));
+
+                          // Then, navigate back to the previous screen
+                          Navigator.of(context).pop();
+                        }
+                      : null,
+                  child: const Text(
+                    "Hủy",
+                    style: TextStyle(
+                      fontSize: 14,
                       color: AppColors.cookie,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: _btnActive == true
-                      ? () async {
-                          Topic topic = Topic(
+                Text(
+                  type == 1 ? "Tạo Topic" : "Sửa Topic",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.cookie,
+                  ),
+                ),
+                InkWell(
+                    onTap: () async {
+                      if (type == 1) {
+                        if (topicController.text.isNotEmpty) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            await topicService.addTopic(Topic(
                               topicName: topicController.text,
                               isPublic: false,
                               userId: user.uid,
-                              userEmail: user.email);
-                          try {
-                            await topicService.addTopic(topic);
-                            ToastService.showSuccessToast(context,
-                                message: "Add topic thành công");
-                            Navigator.pop(context);
+                              userEmail: user.email,
+                            ));
+                            FocusScope.of(context).unfocus();
+                            await Future.delayed(
+                                const Duration(milliseconds: 200));
+                            setNumOfTopic(numOfTopic + 1);
+                            Navigator.of(context).pop();
                           } catch (e) {
-                            print('Failed to add topic: $e');
-                            // Optionally, show an error toast or dialog
+                            print(e);
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
                           }
                         }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFB99B6B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: const Size.fromHeight(50),
+                      } else {
+                        if (topicController.text.isNotEmpty) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          try {
+                            await topicService.updateTopic(
+                                topicId,
+                                Topic(
+                                  topicName: topicController.text,
+                                  isPublic: false,
+                                  userId: user.uid,
+                                  userEmail: user.email,
+                                ));
+                            FocusScope.of(context).unfocus();
+                            await Future.delayed(
+                                const Duration(milliseconds: 200));
+                            setTopicName(topicController.text);
+                            Navigator.of(context).pop();
+                          } catch (e) {
+                            print(e);
+                          } finally {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        }
+                      }
+                    },
+                    child: Container(
+                      width: Dimensions.width(
+                          context, 40), // Adjust width according to your needs
+                      height: 24, // Adjust height according to your needs
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Visibility(
+                            visible: isLoading,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.cookie),
+                            ),
+                          ),
+                          Visibility(
+                            visible: !isLoading,
+                            child: Text(
+                              "Tiếp",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.cookie,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: topicController,
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
                   ),
-                  child: const Text(
-                    "Thêm Topic",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  decoration: InputDecoration(
+                    hintStyle: const TextStyle(
+                      color: AppColors.red,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    contentPadding: const EdgeInsets.only(bottom: 0),
+                    focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.cookie),
                     ),
                   ),
                 ),
-              ),
-            ],
+                const Padding(
+                  padding: EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    "TOPIC",
+                    style: TextStyle(
+                      color: AppColors.grey_light,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     ),
   );

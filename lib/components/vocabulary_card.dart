@@ -20,6 +20,7 @@ class VocabularyCard extends StatefulWidget {
   final Function()? onSavePressed;
   final Function()? onSharePressed;
   final Function()? onTap;
+  final int type;
 
   const VocabularyCard(
       {super.key,
@@ -34,7 +35,8 @@ class VocabularyCard extends StatefulWidget {
       this.onSharePressed,
       this.onTap,
       required this.isFav,
-      required this.topicId});
+      required this.topicId,
+      required this.type});
 
   @override
   State<VocabularyCard> createState() => _VocabularyCardState();
@@ -108,65 +110,68 @@ class _VocabularyCardState extends State<VocabularyCard> {
                         ),
                       )
                     : SizedBox(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(widget.date,
-                        style: GoogleFonts.inter(
-                            textStyle: TextStyle(
-                                fontSize: 12, color: Color(0xFFB59F55)))),
-                    Row(
-                      children: [
-                        LikeButton(
-                          size: 24,
-                          bubblesColor: BubblesColor(
-                            dotPrimaryColor: AppColors.cookie,
-                            dotSecondaryColor: AppColors.red,
-                          ),
-                          likeBuilder: (bool isLiked) {
-                            return Icon(
-                              CupertinoIcons.heart_fill,
-                              color:
-                                  isLiked ? AppColors.red : AppColors.icon_grey,
-                              size: 24,
-                            );
-                          },
-                          isLiked: widget.isFav,
-                          onTap: (isLiked) async {
-                            // Your custom logic here
-                            widget.onFavoritePressed!(isLiked);
-                            bool newLikeState = !isLiked;
-                            return newLikeState; // Return the new state
-                          },
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        GestureDetector(
-                          onTap: widget.onSavePressed,
-                          child: Icon(
-                            CupertinoIcons.bookmark_fill,
-                            color: widget.topicId == ""
-                                ? AppColors.icon_grey
-                                : Colors.yellow.shade700,
-                            size: 24,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        GestureDetector(
-                          onTap: widget.onSharePressed,
-                          child: Icon(
-                            CupertinoIcons.share_up,
-                            color: AppColors.icon_grey,
-                            size: 24,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                widget.type == 1
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(widget.date,
+                              style: GoogleFonts.inter(
+                                  textStyle: TextStyle(
+                                      fontSize: 12, color: Color(0xFFB59F55)))),
+                          Row(
+                            children: [
+                              LikeButton(
+                                size: 24,
+                                bubblesColor: BubblesColor(
+                                  dotPrimaryColor: AppColors.cookie,
+                                  dotSecondaryColor: AppColors.red,
+                                ),
+                                likeBuilder: (bool isLiked) {
+                                  return Icon(
+                                    CupertinoIcons.heart_fill,
+                                    color: isLiked
+                                        ? AppColors.red
+                                        : AppColors.icon_grey,
+                                    size: 24,
+                                  );
+                                },
+                                isLiked: widget.isFav,
+                                onTap: (isLiked) async {
+                                  // Your custom logic here
+                                  widget.onFavoritePressed!(isLiked);
+                                  bool newLikeState = !isLiked;
+                                  return newLikeState; // Return the new state
+                                },
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              GestureDetector(
+                                onTap: widget.onSavePressed,
+                                child: Icon(
+                                  CupertinoIcons.bookmark_fill,
+                                  color: widget.topicId == ""
+                                      ? AppColors.icon_grey
+                                      : Colors.yellow.shade700,
+                                  size: 24,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              GestureDetector(
+                                onTap: widget.onSharePressed,
+                                child: Icon(
+                                  CupertinoIcons.share_up,
+                                  color: AppColors.icon_grey,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      )
+                    : SizedBox(),
               ],
             ),
           ),

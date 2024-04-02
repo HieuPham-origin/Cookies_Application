@@ -50,34 +50,37 @@ class _CustomSegmentButtonState extends State<CustomSegmentButton> {
       width: double.infinity,
       child: IgnorePointer(
         ignoring: widget.isDisabled,
-        child: CupertinoSlidingSegmentedControl(
-          thumbColor: AppColors.creamy,
-          children: const <int, Widget>{
-            0: Text(
-              'Verb',
-              style: TextStyle(color: AppColors.cookie),
-            ),
-            1: Text(
-              'Noun',
-              style: TextStyle(color: AppColors.cookie),
-            ),
-            2: Text(
-              'Adj',
-              style: TextStyle(color: AppColors.cookie),
-            ),
-            3: Text(
-              'Adv',
-              style: TextStyle(color: AppColors.cookie),
-            ),
-          },
-          onValueChanged: (int? newValue) {
-            setState(() {
-              sliding = newValue;
-              wordForm = WordForm.values[sliding!];
-              widget.onSelectionChanged(wordForm);
-            });
-          },
-          groupValue: sliding,
+        child: Opacity(
+          opacity: widget.isDisabled ? 0.6 : 1,
+          child: CupertinoSlidingSegmentedControl(
+            thumbColor: AppColors.creamy,
+            children: const <int, Widget>{
+              0: Text(
+                'Verb',
+                style: TextStyle(color: AppColors.cookie),
+              ),
+              1: Text(
+                'Noun',
+                style: TextStyle(color: AppColors.cookie),
+              ),
+              2: Text(
+                'Adj',
+                style: TextStyle(color: AppColors.cookie),
+              ),
+              3: Text(
+                'Adv',
+                style: TextStyle(color: AppColors.cookie),
+              ),
+            },
+            onValueChanged: (int? newValue) {
+              setState(() {
+                sliding = newValue;
+                wordForm = WordForm.values[sliding!];
+                widget.onSelectionChanged(wordForm);
+              });
+            },
+            groupValue: sliding,
+          ),
         ),
       ),
     );
