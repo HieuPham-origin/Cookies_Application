@@ -161,10 +161,10 @@ class _DetailTopicState extends State<DetailTopic> {
         ),
       ),
       body: numOfWord == -1
-          ? Scaffold(
+          ? const Scaffold(
               backgroundColor: AppColors.background,
               body: Center(
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   backgroundColor: AppColors.background,
                   strokeCap: StrokeCap.round,
                   color: AppColors.cookie,
@@ -212,25 +212,34 @@ class _DetailTopicState extends State<DetailTopic> {
                             ),
                           ],
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            maximumSize: Size(200, 40),
-                            backgroundColor: AppColors.creamy,
-                            elevation: 0,
-                            foregroundColor: AppColors.cookie,
-                            shape: RoundedRectangleBorder(
+                        Container(
+                          height: 40,
+                          decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => QuizScreen(
-                                topicId: widget.docID,
-                                data: widget.data,
+                              gradient: LinearGradient(colors: [
+                                AppColors.cookie,
+                                Color.fromARGB(204, 185, 155, 107),
+                              ])),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              maximumSize: Size(200, 40),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => QuizScreen(
+                                  topicId: widget.docID,
+                                  data: widget.data,
+                                ),
+                              ),
+                            ),
+                            child: const Text("Luyện tập"),
                           ),
-                          child: const Text("Flashcard"),
                         )
                       ],
                     ),
@@ -414,6 +423,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                           wordId,
                                           word,
                                           phonetic,
+                                          date,
                                           definition,
                                           File(image),
                                           audio,
@@ -421,6 +431,18 @@ class _DetailTopicState extends State<DetailTopic> {
                                           user,
                                           topicService,
                                           wordForm,
+                                          (int numOfVocabInTopic) {
+                                            widget
+                                                .setNumOfVocabInTopicFromLibrary(
+                                                    numOfVocabInTopic);
+                                          },
+                                          widget.numOfVocabInTopic,
+                                          (int numOfVocab) {
+                                            setState(() {
+                                              widget.numOfVocab = numOfVocab;
+                                            });
+                                          },
+                                          widget.numOfVocab,
                                         );
                                       },
                                     ),

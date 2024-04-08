@@ -87,7 +87,7 @@ class BottomNavBar extends StatelessWidget {
         duration: Duration(milliseconds: 300),
       ),
       navBarStyle:
-          NavBarStyle.style3, // Choose the nav bar style with this property.
+          NavBarStyle.style6, // Choose the nav bar style with this property.
     );
   }
 }

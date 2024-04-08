@@ -14,7 +14,6 @@ class QuizService {
           .toList();
       definitions.add(word.definition);
 
-      // Shuffle the options to randomize their order
       definitions.shuffle();
 
       questions.add(Question(

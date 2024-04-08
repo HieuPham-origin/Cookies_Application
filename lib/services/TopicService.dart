@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:http/http.dart' as http;
+import 'package:rxdart/rxdart.dart';
 
 class TopicService {
   final CollectionReference topics =
@@ -30,6 +31,25 @@ class TopicService {
     return topicStream;
   }
 
+  ValueStream<List<Word>> convertListToStream(List<Word> words) {
+    final wordStream = BehaviorSubject<List<Word>>.seeded(words).stream;
+    return wordStream;
+  }
+
+// Stream<QuerySnapshot> getAllFavoriteWords(String userId) {
+//   final wordStream = topics
+//       .where('userId', isEqualTo: userId).
+//       .collection('words')
+//       .where('isFav', isEqualTo: true)
+//       .snapshots();
+//   return wordStream;
+// }
+
+  // Stream<QuerySnapshot> getFavoriteWordsForTopicByUserId(
+  //     List<String> topicId, String userId) {
+
+  // }
+
   Future<void> updateTopic(String topicId, Topic newTopic) async {
     await topics.doc(topicId).update({
       'topicName': newTopic.topicName,
@@ -37,6 +57,50 @@ class TopicService {
       'userId': newTopic.userId,
       'userEmail': newTopic.userEmail,
     });
+  }
+
+  //function to get list of topic id
+  Future<List<String>> getTopicIdList(String userId) async {
+    List<String> topicIdList = [];
+    QuerySnapshot topicsSnapshot =
+        await topics.where('userId', isEqualTo: userId).get();
+    for (var topicDoc in topicsSnapshot.docs) {
+      topicIdList.add(topicDoc.id);
+    }
+    return topicIdList;
+  }
+
+  // get all favorite words in list of topic id
+  Future<List<Word>> getAllFavoriteWords(List<String> topicId) async {
+    List<Word> wordsList = [];
+    for (var id in topicId) {
+      QuerySnapshot wordsSnapshot = await topics
+          .doc(id)
+          .collection('words')
+          .where('isFav', isEqualTo: true)
+          .get();
+      for (var wordDoc in wordsSnapshot.docs) {
+        Word word = Word.fromSnapshot(wordDoc);
+        wordsList.add(word);
+      }
+    }
+    return wordsList;
+  }
+
+  //get all id favorite words in list of topic id
+  Future<List<String>> getAllFavoriteWordsId(List<String> topicId) async {
+    List<String> wordsIdList = [];
+    for (var id in topicId) {
+      QuerySnapshot wordsSnapshot = await topics
+          .doc(id)
+          .collection('words')
+          .where('isFav', isEqualTo: true)
+          .get();
+      for (var wordDoc in wordsSnapshot.docs) {
+        wordsIdList.add(wordDoc.id);
+      }
+    }
+    return wordsIdList;
   }
 
   //count word in topic
@@ -98,6 +162,18 @@ class TopicService {
     await topics.doc(topicId).collection('words').doc(wordId).update({
       'isFav': !isFav,
     });
+  }
+
+  //update favorite word for topic without wordId
+  Future<void> updateFavoriteWordForTopicWithoutWordId(
+      String topicId, bool isFav) async {
+    QuerySnapshot wordsSnapshot =
+        await topics.doc(topicId).collection('words').get();
+    for (var wordDoc in wordsSnapshot.docs) {
+      await topics.doc(topicId).collection('words').doc(wordDoc.id).update({
+        'isFav': !isFav,
+      });
+    }
   }
 
   //delete word for topic
