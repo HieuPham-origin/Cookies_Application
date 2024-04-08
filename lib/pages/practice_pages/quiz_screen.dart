@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/services/QuizService.dart';
+import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cookie_app/services/TopicService.dart';
@@ -24,10 +25,13 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int questionTimerSeconds = 20;
   bool isLocked = true;
+
   TopicService topicService = TopicService();
   QuizService quizService = QuizService();
   List<Word> words = [];
+  var questions;
   Timer? _timer;
+  int point = 0;
 
   PageController _pageController = PageController();
   List optionsLetters = ["A.", "B.", "C.", "D."];
@@ -38,19 +42,34 @@ class _QuizScreenState extends State<QuizScreen> {
     return words;
   }
 
+  void startTimerOnQuestions() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          if (questionTimerSeconds > 0) {
+            questionTimerSeconds--;
+          } else {
+            _timer?.cancel();
+          }
+        });
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     fetchWords().then((fetchedWords) {
       setState(() {
         words = fetchedWords;
+        questions = quizService.generateQuizQuestions(words);
       });
     });
+    startTimerOnQuestions();
   }
 
   @override
   Widget build(BuildContext context) {
-    var questions = quizService.generateQuizQuestions(words);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
@@ -94,12 +113,12 @@ class _QuizScreenState extends State<QuizScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: LinearProgressIndicator(
-                          minHeight: 20,
-                          value: 1 - (100 / 20),
+                          minHeight: 15,
+                          value: (questionTimerSeconds / 20),
                           backgroundColor: Colors.blue.shade100,
                           color: Colors.blueGrey,
                           valueColor:
-                              const AlwaysStoppedAnimation(Colors.blueAccent),
+                              const AlwaysStoppedAnimation(AppColors.coffee),
                         ),
                       ),
                     ),
@@ -125,7 +144,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: words.isEmpty
                     ? SizedBox.shrink()
                     : Padding(
-                        padding: EdgeInsets.all(4.0),
+                        padding: EdgeInsets.all(0.0),
                         child: Center(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,76 +159,126 @@ class _QuizScreenState extends State<QuizScreen> {
                                   controller: _pageController,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: questions.length,
-                                  onPageChanged: (value) {},
+                                  onPageChanged: (value) {
+                                    // setState(() {
+                                    //   isLocked = true;
+                                    //   questionTimerSeconds = 20;
+                                    // });
+                                  },
                                   itemBuilder: (context, index) {
                                     var currentQuestion = questions[index];
 
-                                    return Column(
-                                      children: [
-                                        Text(
-                                          "${currentQuestion.question}",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge!
-                                              .copyWith(
-                                                fontSize: 18,
-                                              ),
-                                        ),
-                                        const SizedBox(
-                                          height: 25,
-                                        ),
-                                        Expanded(
-                                          child: ListView.builder(
-                                            itemCount: 4,
-                                            itemBuilder:
-                                                (context, optionIndex) {
-                                              final letters =
-                                                  optionsLetters[optionIndex];
-                                              final option = currentQuestion
-                                                  .options[optionIndex];
-
-                                              return InkWell(
-                                                onTap: () {
-                                                  log("clicked" +
-                                                      index.toString());
-                                                },
-                                                child: Container(
-                                                  height: 45,
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  margin: const EdgeInsets
-                                                      .symmetric(vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors
-                                                            .grey.shade200),
-                                                    color: Colors.grey.shade100,
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                            Radius.circular(
-                                                                10)),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        "${letters + option}",
-                                                        style: const TextStyle(
-                                                            fontSize: 16),
-                                                      ),
-                                                    ],
-                                                  ),
+                                    return Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "${currentQuestion.question}",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                  fontSize: 18,
                                                 ),
-                                              );
-                                            },
                                           ),
-                                        ),
-                                        isLocked
-                                            ? buildElevatedButton()
-                                            : const SizedBox.shrink(),
-                                      ],
+                                          const SizedBox(
+                                            height: 25,
+                                          ),
+                                          Expanded(
+                                            child: ListView.builder(
+                                              itemCount: 4,
+                                              itemBuilder:
+                                                  (context, optionIndex) {
+                                                var color =
+                                                    Colors.grey.shade300;
+                                                var iconColor =
+                                                    Colors.grey.shade300;
+                                                IconData icon = Icons.abc;
+                                                final letters =
+                                                    optionsLetters[optionIndex];
+                                                final option = currentQuestion
+                                                    .options[optionIndex];
+                                                final userAnswer =
+                                                    questions[index]
+                                                        .options[optionIndex];
+
+                                                final correctAnswer =
+                                                    questions[index]
+                                                        .correctAnswer;
+
+                                                if (!isLocked) {
+                                                  if (option == correctAnswer) {
+                                                    color =
+                                                        Colors.green.shade700;
+                                                    icon = Icons.check_circle;
+                                                    iconColor =
+                                                        Colors.green.shade700;
+                                                  } else {
+                                                    color = Colors.red.shade700;
+                                                    icon = Icons.cancel;
+                                                    iconColor = Colors.red;
+                                                  }
+                                                }
+
+                                                return InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      isLocked = false;
+                                                    });
+
+                                                    if (userAnswer ==
+                                                        correctAnswer) {
+                                                      point++;
+                                                    }
+
+                                                    _timer!.cancel();
+                                                  },
+                                                  child: Container(
+                                                    height: 45,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    margin: const EdgeInsets
+                                                        .symmetric(vertical: 8),
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: color),
+                                                      color:
+                                                          Colors.grey.shade100,
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .all(
+                                                              Radius.circular(
+                                                                  10)),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "${letters + option}",
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 16),
+                                                        ),
+                                                        !isLocked
+                                                            ? Icon(icon,
+                                                                color:
+                                                                    iconColor)
+                                                            : SizedBox.shrink(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          isLocked
+                                              ? const SizedBox.shrink()
+                                              : buildElevatedButton(),
+                                        ],
+                                      ),
                                     );
                                   },
                                 ),
@@ -225,15 +294,42 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   ElevatedButton buildElevatedButton() {
-    log("built...");
     return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(AppColors.coffee),
+        fixedSize: MaterialStateProperty.all(
+          Size(MediaQuery.sizeOf(context).width * 0.80, 40),
+        ),
+        elevation: MaterialStateProperty.all(4),
+      ),
       onPressed: () {
         _pageController.nextPage(
-          duration: const Duration(milliseconds: 800),
+          duration: const Duration(milliseconds: 900),
           curve: Curves.easeInOut,
         );
+        setState(
+          () {
+            isLocked = true;
+            questionTimerSeconds = 20;
+            if (currentQuiz < words.length) {
+              currentQuiz++;
+              startTimerOnQuestions();
+            }
+          },
+        );
       },
-      child: Text("Tiếp tục"),
+      child: Text(
+        "Tiếp tục",
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer!.cancel();
+    super.dispose();
   }
 }

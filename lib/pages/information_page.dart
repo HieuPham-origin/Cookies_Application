@@ -60,7 +60,9 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   Future<void> clickToChangeNamePage() async {
-    Route route = MaterialPageRoute(builder: (context) => ChangeName());
+    Route route = MaterialPageRoute(
+      builder: (context) => ChangeName(),
+    );
     final rollback = await Navigator.push(context, route);
     setState(() {
       displayName = rollback;
@@ -69,7 +71,9 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   Future<void> clickToChangePasswordPage() async {
-    Route route = MaterialPageRoute(builder: (context) => ChangePassword());
+    Route route = MaterialPageRoute(
+      builder: (context) => ChangePassword(),
+    );
     final rollback = await Navigator.push(context, route);
     setState(() {
       password = rollback;
