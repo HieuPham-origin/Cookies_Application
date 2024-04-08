@@ -17,5 +17,6 @@ class AppColors {
   static const Color title = Color(0xff020202);
   static const Color grey_heavy = Color(0xff474747);
   static const Color green = Color(0xff698269);
+  static const Color blue = Color.fromARGB(255, 156, 192, 223);
   const AppColors();
 }

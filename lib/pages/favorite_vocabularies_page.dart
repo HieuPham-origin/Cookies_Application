@@ -53,7 +53,7 @@ class _FavoriteVocabPageState extends State<FavoriteVocabPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Favorite Vocabularies"),
+          title: const Text("Từ yêu thích"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {

@@ -41,7 +41,7 @@ class BottomNavBar extends StatelessWidget {
         inactiveColorPrimary: AppColors.grey_heavy,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.folder),
+        icon: Icon(CupertinoIcons.collections),
         title: ("Thư Viện"),
         activeColorPrimary: Color(0xFFB99B6B),
         activeColorSecondary: AppColors.coffee,
