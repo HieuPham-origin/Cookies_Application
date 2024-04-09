@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/word.dart';
@@ -136,6 +137,24 @@ class WordService {
       throw Exception('Phonetic text not found');
     } else {
       throw Exception('Failed to load phonetic values');
+    }
+  }
+
+  Future<String> getRandomWord() async {
+    final url = Uri.parse('https://random-words5.p.rapidapi.com/getRandom');
+
+    final res = await http.get(
+      url,
+      headers: {
+        'X-RapidAPI-Key': '0f8e9ff84emsh710091ba6d52f30p1fb565jsn4fc5e1a5a9d0',
+        'X-RapidAPI-Host': 'random-words5.p.rapidapi.com'
+      },
+    );
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      throw Exception("Failed to get random word");
     }
   }
 }

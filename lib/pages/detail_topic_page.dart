@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:toasty_box/toast_service.dart';
@@ -222,15 +223,50 @@ class _DetailTopicState extends State<DetailTopic> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => QuizScreen(
-                                topicId: widget.docID,
-                                data: widget.data,
+                          onPressed: () {
+                            showModalBottomSheet(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(10.0)),
                               ),
-                            ),
-                          ),
-                          child: const Text("Flashcard"),
+                              context: context,
+                              builder: (BuildContext context) {
+                                return SizedBox(
+                                  height: 112,
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text("Flashcard"),
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => SwipeCard(
+                                                topidId: widget.docID,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ListTile(
+                                        title: Text("Trắc nghiệm"),
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => QuizScreen(
+                                                data: widget.data,
+                                                topicId: widget.docID,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: const Text("Luyện tập"),
                         )
                       ],
                     ),

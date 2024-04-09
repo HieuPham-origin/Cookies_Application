@@ -196,6 +196,7 @@ class _SwipeCardState extends State<SwipeCard> {
                     lottieBuilder: Lottie.asset(
                       'assets/card_finish.json',
                       fit: BoxFit.contain,
+                      repeat: false,
                     ),
                     context: context,
                     actions: [
@@ -205,7 +206,6 @@ class _SwipeCardState extends State<SwipeCard> {
                           Navigator.of(context).popUntil((_) => count++ >= 2);
                         },
                         text: 'Hoàn tất ',
-                        iconData: Icons.done,
                         color: AppColors.coffee,
                         textStyle: TextStyle(color: Colors.white),
                         iconColor: Colors.white,
@@ -236,6 +236,7 @@ class _SwipeCardState extends State<SwipeCard> {
                             elevation: 4,
                             shadowColor: Colors.black,
                             surfaceTintColor: Colors.white,
+                            
                             child: Container(
                               alignment: Alignment.center,
                               width: double.infinity,
