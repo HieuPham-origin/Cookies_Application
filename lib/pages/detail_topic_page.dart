@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -20,7 +22,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:toasty_box/toast_service.dart';
@@ -264,7 +265,7 @@ class _DetailTopicState extends State<DetailTopic> {
                             topicService.getWordsForTopicStream(widget.docID),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
-                            print(snapshot.error);
+                            // print(snapshot.error);
                             return Center(
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (snapshot.hasData) {
