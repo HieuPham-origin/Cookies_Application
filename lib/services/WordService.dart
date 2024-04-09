@@ -36,6 +36,15 @@ class WordService {
     return wordStream;
   }
 
+  //get favorite words by userId
+  Stream<QuerySnapshot> getFavoriteWordsByUserId(String userId) {
+    final wordStream = words
+        .where('userId', isEqualTo: userId)
+        .where('isFav', isEqualTo: true)
+        .snapshots();
+    return wordStream;
+  }
+
   //count words
   Future<int> countWords(String userId) async {
     int count = 0;

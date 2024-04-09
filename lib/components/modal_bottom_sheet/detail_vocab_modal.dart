@@ -1,23 +1,20 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/custom_segment_button.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/image_option.dart';
-import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:toasty_box/toast_service.dart';
-import 'package:cookie_app/utils/demension.dart';
-import 'package:cookie_app/components/loading_skeleton.dart';
 
 void showDetailVocabModalBottomSheet(
   BuildContext context,
@@ -25,6 +22,7 @@ void showDetailVocabModalBottomSheet(
   String wordId,
   String word,
   String phonetic,
+  String date,
   String definition,
   File? image,
   String audio,
@@ -32,10 +30,71 @@ void showDetailVocabModalBottomSheet(
   User user,
   TopicService topicService,
   String wordForm,
+  Function(int) setNumOfVocabInTopic,
+  int numOfVocabInTopic,
+  Function(int) setNumOfVocab,
+  int numOfVocab,
   // Assuming this is a dependency
 ) {
   void handleSelectionChange(WordForm selectedForm) {
     wordForm = selectedForm.toString().split('.').last;
+  }
+
+  TopicService topicService = TopicService();
+
+  void showTopicOption(BuildContext context) {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return StreamBuilder<QuerySnapshot>(
+              stream: topicService.getTopicsByUserId(user.uid),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final actions = snapshot.data!.docs.map((doc) {
+                  return CupertinoActionSheetAction(
+                    onPressed: () {
+                      addWordToTopic(() {
+                        setNumOfVocabInTopic(numOfVocabInTopic + 1);
+                        setNumOfVocab(numOfVocab - 1);
+                      },
+                          doc.id,
+                          wordId,
+                          Word(
+                            word: word,
+                            phonetic: phonetic,
+                            definition: definition,
+                            example: example,
+                            image: image!.path,
+                            wordForm: wordForm,
+                            date: date,
+                            isFav: false,
+                            audio: audio,
+                            topicId: doc.id,
+                            status: 0,
+                            userId: user.uid,
+                          ));
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(doc['topicName'],
+                        style: const TextStyle(color: AppColors.icon_grey)),
+                  );
+                }).toList();
+                return CupertinoActionSheet(
+                  title: const Text('Thêm vào Topic'),
+                  actions: actions,
+                  actionScrollController: ScrollController(),
+                  cancelButton: CupertinoActionSheetAction(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel',
+                        style: TextStyle(color: AppColors.red)),
+                  ),
+                );
+              });
+        });
   }
 
   String getCurrentDate() {
@@ -54,7 +113,8 @@ void showDetailVocabModalBottomSheet(
         return Dialog(
           backgroundColor: Colors
               .transparent, // Ensures no background color for the dialog itself
-          insetPadding: EdgeInsets.all(10), // Adjust the padding as needed
+          insetPadding:
+              const EdgeInsets.all(10), // Adjust the padding as needed
           child: Container(
             // Set width and height as a proportion of the screen size
             width: screenSize.width * 0.9, // 90% of screen width
@@ -87,7 +147,7 @@ void showDetailVocabModalBottomSheet(
       TextEditingController(text: definition);
   TextEditingController exampleController =
       TextEditingController(text: example);
-  String audio_update = '';
+  String audioUpdate = '';
   FocusNode focusNode = FocusNode();
   showModalBottomSheet(
     isScrollControlled: true,
@@ -140,8 +200,11 @@ void showDetailVocabModalBottomSheet(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const InkWell(
-                              child: Icon(
+                            InkWell(
+                              onTap: () {
+                                showTopicOption(context);
+                              },
+                              child: const Icon(
                                 Icons.bookmark_add,
                                 color: AppColors.icon_grey,
                               ),
@@ -161,7 +224,7 @@ void showDetailVocabModalBottomSheet(
                                     String definition =
                                         definitionController.text;
                                     String example = exampleController.text;
-                                    audio_update =
+                                    audioUpdate =
                                         'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${word}"&tl=${word == "gay" ? "th" : "en"}&client=tw-ob';
 
                                     if (topicId.isNotEmpty) {
@@ -177,7 +240,7 @@ void showDetailVocabModalBottomSheet(
                                           wordForm: wordForm,
                                           date: getCurrentDate(),
                                           isFav: false,
-                                          audio: audio_update,
+                                          audio: audioUpdate,
                                           topicId: '',
                                           status: 0,
                                           userId: '',
@@ -196,7 +259,7 @@ void showDetailVocabModalBottomSheet(
                                           wordForm: wordForm,
                                           date: getCurrentDate(),
                                           isFav: false,
-                                          audio: audio_update,
+                                          audio: audioUpdate,
                                           topicId: '',
                                           status: 0,
                                           userId: '',
@@ -221,7 +284,7 @@ void showDetailVocabModalBottomSheet(
                                 ),
                               ),
                             ),
-                            InkWell(
+                            const InkWell(
                               child: Icon(
                                 CupertinoIcons.share_up,
                                 color: AppColors.icon_grey,
@@ -312,9 +375,9 @@ void showDetailVocabModalBottomSheet(
                                   onTap: () async {
                                     await audioPlayer.stop();
                                     await audioPlayer.play(UrlSource(
-                                        audio_update == ''
+                                        audioUpdate == ''
                                             ? audio
-                                            : audio_update));
+                                            : audioUpdate));
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(
@@ -466,7 +529,7 @@ void showDetailVocabModalBottomSheet(
                                                     context,
                                                     18), // Set the size of the icon
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                   width:
                                                       5), // Add some space between the icon and text
                                               Text(

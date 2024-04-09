@@ -10,5 +10,12 @@ class FolderService {
     return folderStream;
   }
 
-  
+  Future<void> addFolder(Folder folder) async {
+    await folders.add(
+      {
+        'folderName': folder.folderName,
+        'userId': folder.userId,
+      },
+    );
+  }
 }

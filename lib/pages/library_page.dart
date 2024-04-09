@@ -11,20 +11,20 @@ import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/pages/detail_topic_page.dart';
-import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
-import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
+import 'package:cookie_app/pages/favorite_vocabularies_page.dart';
+import 'package:cookie_app/pages/folder_page.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:toasty_box/toasty_box.dart';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({
@@ -40,7 +40,6 @@ class _LibraryPageState extends State<LibraryPage> {
   final topicController = TextEditingController();
   final topicService = TopicService();
   final user = FirebaseAuth.instance.currentUser!;
-  bool _btnActive = false;
 
   final wordController = TextEditingController();
   final definitionController = TextEditingController();
@@ -111,7 +110,6 @@ class _LibraryPageState extends State<LibraryPage> {
         backgroundColor: AppColors.black_opacity,
         foregroundColor: Colors.white,
         switchLabelPosition: false,
-        renderOverlay: true,
         elevation: 8,
         overlayColor: Colors.black45,
         overlayOpacity: 0.2,
@@ -123,7 +121,7 @@ class _LibraryPageState extends State<LibraryPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(40),
             ),
-            child: Icon(Icons.abc, color: AppColors.cookie),
+            child: Icon(CupertinoIcons.textformat_alt, color: AppColors.cookie),
             labelWidget: Container(
               margin: EdgeInsets.only(right: 10),
               padding: EdgeInsets.symmetric(
@@ -162,8 +160,8 @@ class _LibraryPageState extends State<LibraryPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(40),
             ),
-            child: Icon(Icons.topic_outlined, color: AppColors.cookie),
-            label: "Thêm topic",
+            child: Icon(CupertinoIcons.bookmark_fill,
+                color: Colors.yellow.shade700),
             labelWidget: Container(
               margin: EdgeInsets.only(right: 10),
               padding: EdgeInsets.symmetric(
@@ -178,7 +176,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 "Tạo topic",
                 style: GoogleFonts.inter(
                   textStyle: TextStyle(
-                    color: AppColors.cookie,
+                    color: Colors.yellow.shade700,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -196,6 +194,75 @@ class _LibraryPageState extends State<LibraryPage> {
               });
             }, numOfTopic, "", 1),
           ),
+          SpeedDialChild(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Ink(
+                  child:
+                      Icon(CupertinoIcons.folder_fill, color: AppColors.blue)),
+              labelWidget: Container(
+                margin: EdgeInsets.only(right: 10),
+                padding: EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4), // Adjust padding as needed
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color of the label
+                  borderRadius: BorderRadius.circular(30),
+
+                  // Optionally, add a border or shadow
+                ),
+                child: Text(
+                  "Thư mục",
+                  style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      color: AppColors.blue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () => {
+                    Navigator.of(context, rootNavigator: true).push(
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: FolderPage()),
+                    )
+                  }),
+          SpeedDialChild(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Ink(
+                  child: Icon(CupertinoIcons.heart_fill, color: AppColors.red)),
+              labelWidget: Container(
+                margin: EdgeInsets.only(right: 10),
+                padding: EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4), // Adjust padding as needed
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color of the label
+                  borderRadius: BorderRadius.circular(30),
+
+                  // Optionally, add a border or shadow
+                ),
+                child: Text(
+                  "Từ yêu thích",
+                  style: GoogleFonts.inter(
+                    textStyle: TextStyle(
+                      color: AppColors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              onTap: () => {
+                    Navigator.of(context, rootNavigator: true).push(
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child: FavoriteVocabPage()),
+                    )
+                  }),
         ],
       ),
       backgroundColor: AppColors.background,
@@ -588,6 +655,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                   wordId,
                                   word,
                                   phonetic,
+                                  date,
                                   definition,
                                   File(image),
                                   audio,
@@ -595,6 +663,19 @@ class _LibraryPageState extends State<LibraryPage> {
                                   user,
                                   topicService,
                                   wordForm,
+                                  (int numOfVocabInTopic) {
+                                    setState(() {
+                                      this.numOfVocabInTopic =
+                                          numOfVocabInTopic;
+                                    });
+                                  },
+                                  numOfVocabInTopic,
+                                  (int numOfVocab) {
+                                    setState(() {
+                                      this.numOfVocab = numOfVocab;
+                                    });
+                                  },
+                                  numOfVocab,
                                 );
                               },
                             ),
