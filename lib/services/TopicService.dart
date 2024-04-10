@@ -17,6 +17,7 @@ class TopicService {
         'isPublic': topic.isPublic,
         'userId': topic.userId,
         'userEmail': topic.userEmail,
+        'color': topic.color, // Include color when adding a new topic
       },
     );
   }
@@ -35,20 +36,6 @@ class TopicService {
     final wordStream = BehaviorSubject<List<Word>>.seeded(words).stream;
     return wordStream;
   }
-
-// Stream<QuerySnapshot> getAllFavoriteWords(String userId) {
-//   final wordStream = topics
-//       .where('userId', isEqualTo: userId).
-//       .collection('words')
-//       .where('isFav', isEqualTo: true)
-//       .snapshots();
-//   return wordStream;
-// }
-
-  // Stream<QuerySnapshot> getFavoriteWordsForTopicByUserId(
-  //     List<String> topicId, String userId) {
-
-  // }
 
   Future<void> updateTopic(String topicId, Topic newTopic) async {
     await topics.doc(topicId).update({

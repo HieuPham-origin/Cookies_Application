@@ -21,21 +21,16 @@ class _TitleWidgetState extends State<TitleWidget> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-                color: AppColors.creamy,
-                borderRadius: BorderRadius.all(Radius.circular(20))),
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 5, bottom: 5, left: 12, right: 12),
-              child: Text(
-                widget.title,
-                style: GoogleFonts.inter(
-                  textStyle: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.cookie,
-                      fontWeight: FontWeight.w500),
-                ),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(top: 5, bottom: 5, left: 12, right: 12),
+            child: Text(
+              widget.title,
+              style: GoogleFonts.inter(
+                textStyle: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.icon_grey,
+                    fontWeight: FontWeight.w500),
               ),
             ),
           ),

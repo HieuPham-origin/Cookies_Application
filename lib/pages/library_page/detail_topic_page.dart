@@ -4,9 +4,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_topic_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/detail_vocab_modal.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/folder_option.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/vocabulary_option.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
+import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
@@ -28,17 +30,25 @@ import 'package:cookie_app/pages/library_page.dart';
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
   final String docID;
+  int numOfVocabInTopicInFolder;
   int numOfVocabInTopic;
   int numOfVocab;
+  int numOfTopic;
+  void Function(int) setNumOfTopic;
   void Function(int) setNumOfVocab;
   void Function(int) setNumOfVocabInTopicFromLibrary;
+  void Function(int) setNumOfTopicInFolder;
 
   DetailTopic({
     super.key,
     required this.data,
     required this.docID,
     required this.numOfVocabInTopic,
+    required this.numOfVocabInTopicInFolder,
     required this.numOfVocab,
+    required this.numOfTopic,
+    required this.setNumOfTopic,
+    required this.setNumOfTopicInFolder,
     required this.setNumOfVocab,
     required this.setNumOfVocabInTopicFromLibrary,
   });
@@ -52,6 +62,7 @@ int numOfWord = -1;
 final user = FirebaseAuth.instance.currentUser!;
 final wordService = WordService();
 final audioPlayer = AudioPlayer();
+String userId = FirebaseAuth.instance.currentUser!.uid;
 
 class _DetailTopicState extends State<DetailTopic> {
   @override
@@ -85,7 +96,7 @@ class _DetailTopicState extends State<DetailTopic> {
             ),
           ),
           elevation: 0,
-          centerTitle: true,
+          centerTitle: false,
           title: Text(
             "Topic",
             style: TextStyle(
@@ -103,7 +114,35 @@ class _DetailTopicState extends State<DetailTopic> {
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.add,
+              highlightColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              constraints:
+                  BoxConstraints(maxWidth: Dimensions.width(context, 20)),
+              icon: Icon(CupertinoIcons.folder_badge_plus,
+                  color: AppColors.grey_heavy), // Adjust the color as needed
+              onPressed: () {
+                // Add your onPressed action here
+                HapticFeedback.vibrate();
+                showFolderModalBottomSheet(
+                    context,
+                    widget.docID,
+                    Topic(
+                      topicName: topicName,
+                      isPublic: false,
+                      userId: user.uid,
+                      userEmail: user.email,
+                      color: widget.data['color'],
+                    ),
+                    widget.setNumOfTopic,
+                    widget.numOfTopic);
+              },
+            ),
+            IconButton(
+              highlightColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              constraints:
+                  BoxConstraints(maxWidth: Dimensions.width(context, 20)),
+              icon: Icon(CupertinoIcons.add,
                   color: AppColors.grey_heavy), // Adjust the color as needed
               onPressed: () {
                 // Add your onPressed action here
@@ -244,19 +283,32 @@ class _DetailTopicState extends State<DetailTopic> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Container(
                       height: 3,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: AppColors.red,
+                        color: widget.data['color'] == 'red'
+                            ? AppColors.red
+                            : widget.data['color'] == 'green'
+                                ? AppColors.green
+                                : widget.data['color'] == 'blue'
+                                    ? AppColors.blue
+                                    : widget.data['color'] == 'yellow'
+                                        ? AppColors.yellow
+                                        : widget.data['color'] == 'orange'
+                                            ? AppColors.orange
+                                            : widget.data['color'] == 'grey'
+                                                ? AppColors.grey_light
+                                                : widget.data['color'] ==
+                                                        'purple'
+                                                    ? AppColors.purple
+                                                    : AppColors.coffee,
                       ),
                     ),
                   ),
+                  SizedBox(height: 5),
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
                         stream:
@@ -298,7 +350,7 @@ class _DetailTopicState extends State<DetailTopic> {
                             return ListView.builder(
                                 itemCount: words.length,
                                 shrinkWrap: true,
-                                itemBuilder: (context, index) {
+                                itemBuilder: (contextVocab, index) {
                                   DocumentSnapshot document = words[index];
                                   String wordId = document.id;
                                   Map<String, dynamic> data =
@@ -328,7 +380,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                           autoClose: true,
                                           onPressed: (direction) async {
                                             final result = await QuickAlert.show(
-                                                context: context,
+                                                context: contextVocab,
                                                 text: "Bạn có thật sự muốn xóa từ vựng này không ?",
                                                 type: QuickAlertType.confirm,
                                                 showCancelBtn: true,
@@ -336,7 +388,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                                 cancelBtnText: "Không",
                                                 confirmBtnColor: Colors.red,
                                                 onCancelBtnTap: () {
-                                                  Navigator.of(context,
+                                                  Navigator.of(contextVocab,
                                                           rootNavigator: true)
                                                       .pop('dialog');
                                                 },
@@ -350,8 +402,11 @@ class _DetailTopicState extends State<DetailTopic> {
                                                   widget.setNumOfVocabInTopicFromLibrary(
                                                       widget.numOfVocabInTopic -
                                                           1);
+                                                  widget.setNumOfTopicInFolder(
+                                                      widget.numOfVocabInTopicInFolder -
+                                                          1);
 
-                                                  Navigator.of(context,
+                                                  Navigator.of(contextVocab,
                                                           rootNavigator: true)
                                                       .pop('dialog');
                                                 });
@@ -388,7 +443,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                       },
                                       onSavePressed: () {
                                         showTopicsModalBottomSheet(
-                                          context,
+                                          contextVocab,
                                           wordId,
                                           word,
                                           definition,
@@ -418,7 +473,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                       },
                                       onTap: () {
                                         showDetailVocabModalBottomSheet(
-                                          context,
+                                          contextVocab,
                                           widget.docID,
                                           wordId,
                                           word,

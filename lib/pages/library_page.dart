@@ -10,9 +10,9 @@ import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
-import 'package:cookie_app/pages/detail_topic_page.dart';
+import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/pages/favorite_vocabularies_page.dart';
-import 'package:cookie_app/pages/folder_page.dart';
+import 'package:cookie_app/pages/library_page/folder_page.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
@@ -226,7 +226,27 @@ class _LibraryPageState extends State<LibraryPage> {
                     Navigator.of(context, rootNavigator: true).push(
                       PageTransition(
                           type: PageTransitionType.rightToLeft,
-                          child: FolderPage()),
+                          child: FolderPage(
+                            numOfVocabInTopic: numOfVocabInTopic,
+                            numOfVocab: numOfVocab,
+                            numOfTopic: numOfTopic,
+                            setNumOfTopic: (int numOfTopic) {
+                              setState(() {
+                                this.numOfTopic = numOfTopic;
+                              });
+                            },
+                            setNumOfVocabInTopicFromLibrary:
+                                (int numOfVocabInTopic) {
+                              setState(() {
+                                this.numOfVocabInTopic = numOfVocabInTopic;
+                              });
+                            },
+                            setNumOfVocab: (int numOfVocab) {
+                              setState(() {
+                                this.numOfVocab = numOfVocab;
+                              });
+                            },
+                          )),
                     )
                   }),
           SpeedDialChild(
@@ -274,9 +294,6 @@ class _LibraryPageState extends State<LibraryPage> {
               children: [
                 TitleWidget(
                   title: "Topics",
-                ),
-                SizedBox(
-                  width: 10,
                 ),
                 Container(
                   height: Dimensions.height(context, 30),
@@ -356,6 +373,7 @@ class _LibraryPageState extends State<LibraryPage> {
                           document.data() as Map<String, dynamic>;
                       // Topic's attributes
                       String topicTitle = data['topicName'];
+                      String color = data['color'];
 
                       return FutureBuilder<int>(
                         future: topicService.countWordsInTopic(docID),
@@ -418,6 +436,14 @@ class _LibraryPageState extends State<LibraryPage> {
                                             numOfVocabInTopic:
                                                 numOfVocabInTopic,
                                             numOfVocab: numOfVocab,
+                                            numOfVocabInTopicInFolder: 0,
+                                            setNumOfTopicInFolder: (p0) {},
+                                            numOfTopic: numOfTopic,
+                                            setNumOfTopic: (int numOfTopic) {
+                                              setState(() {
+                                                this.numOfTopic = numOfTopic;
+                                              });
+                                            },
                                             setNumOfVocabInTopicFromLibrary:
                                                 (int numOfVocabInTopic) {
                                               setState(() {
@@ -434,6 +460,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                 },
                                 topicName: topicTitle,
                                 numOfVocab: numOfVocabInTopicLibrary,
+                                color: color,
                               ),
                             );
                           }

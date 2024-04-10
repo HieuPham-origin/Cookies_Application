@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/models/word.dart';
-import 'package:cookie_app/pages/detail_topic_page.dart';
+import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

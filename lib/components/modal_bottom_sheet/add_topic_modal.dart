@@ -1,9 +1,15 @@
+import 'dart:math';
+
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Import the necessary package
+import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 void showAddTopicModalBottomSheet(
     BuildContext context,
@@ -19,7 +25,7 @@ void showAddTopicModalBottomSheet(
     // Assuming this is a dependency
     ) {
   bool isLoading = false;
-
+  String color_changed = "default";
   if (type == 1) {
     topicController.text = "";
   }
@@ -97,6 +103,9 @@ void showAddTopicModalBottomSheet(
                               isPublic: false,
                               userId: user.uid,
                               userEmail: user.email,
+                              color: color_changed == "default"
+                                  ? "default"
+                                  : color_changed,
                             ));
                             FocusScope.of(context).unfocus();
                             await Future.delayed(
@@ -124,6 +133,9 @@ void showAddTopicModalBottomSheet(
                                   isPublic: false,
                                   userId: user.uid,
                                   userEmail: user.email,
+                                  color: color_changed == "default"
+                                      ? "default"
+                                      : color_changed,
                                 ));
                             FocusScope.of(context).unfocus();
                             await Future.delayed(
@@ -207,6 +219,56 @@ void showAddTopicModalBottomSheet(
               ],
             ),
           ),
+          ColorPicker(
+            color: AppColors.cookie,
+            borderRadius: 50,
+            height: Dimensions.height(context, 36),
+            width: Dimensions.width(context, 36),
+            enableShadesSelection: false,
+            spacing: 8,
+            customColorSwatchesAndNames: {
+              AppColors.cookie_list: 'Cookie',
+              AppColors.red_list: 'Red',
+              AppColors.green_list: 'Green',
+              AppColors.blue_list: 'Blue',
+              AppColors.yellow_list: 'Yellow',
+              AppColors.orange_list: 'Orange',
+              AppColors.grey_list: 'Grey',
+              AppColors.purple_list: 'Purple',
+            },
+            selectedColorIcon: Icons.check,
+            pickersEnabled: const <ColorPickerType, bool>{
+              ColorPickerType.wheel: false,
+              ColorPickerType.accent: false,
+              ColorPickerType.bw: false,
+              ColorPickerType.custom: true,
+              ColorPickerType.primary: false,
+            },
+            onColorChanged: (Color color) {
+              setState(() {
+                if (color.value == AppColors.red_list.value) {
+                  color_changed = "red";
+                } else if (color.value == AppColors.green_list.value) {
+                  color_changed = "green";
+                } else if (color.value == AppColors.blue_list.value) {
+                  color_changed = "blue";
+                } else if (color.value == AppColors.yellow_list.value) {
+                  color_changed = "yellow";
+                } else if (color.value == AppColors.orange_list.value) {
+                  color_changed = "orange";
+                } else if (color.value == AppColors.grey_list.value) {
+                  color_changed = "grey";
+                } else if (color.value == AppColors.purple_list.value) {
+                  color_changed = "purple";
+                } else if (color.value == AppColors.cookie_list.value) {
+                  color_changed = "default";
+                } else {
+                  color_changed = "default";
+                }
+              });
+              print(color);
+            },
+          )
         ],
       ),
     ),
