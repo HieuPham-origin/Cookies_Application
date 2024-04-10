@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -315,7 +317,7 @@ class _DetailTopicState extends State<DetailTopic> {
                             topicService.getWordsForTopicStream(widget.docID),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
-                            print(snapshot.error);
+                            // print(snapshot.error);
                             return Center(
                                 child: Text('Error: ${snapshot.error}'));
                           } else if (snapshot.hasData) {

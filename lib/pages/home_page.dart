@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:cookie_app/services/WordService.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -9,6 +12,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  WordService wordService = WordService();
+  String randomWord = "";
+  @override
+  void initState() {
+    super.initState();
+    fetchRandomWord().then((fetchedWord) {
+      setState(() {
+        randomWord = fetchedWord;
+      });
+    });
+  }
+
+  Future<String> fetchRandomWord() async {
+    randomWord = await wordService.getRandomWord();
+    return randomWord;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,13 +37,21 @@ class _HomePageState extends State<HomePage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text("Trang chủ",
-                style: GoogleFonts.inter(
-                    textStyle: const TextStyle(
+            child: Text(
+              "Trang chủ",
+              style: GoogleFonts.inter(
+                textStyle: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                ))),
+                ),
+              ),
+            ),
           ),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text("random word"),
+          ),
+          Text("$randomWord"),
         ],
       ),
     );
