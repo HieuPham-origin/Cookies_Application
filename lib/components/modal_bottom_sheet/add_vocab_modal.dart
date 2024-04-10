@@ -232,10 +232,17 @@ void showAddVocabModalBottomSheet(
                                     children: [
                                       Visibility(
                                         visible: isLoading,
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  AppColors.cookie),
+                                        child: SizedBox(
+                                          // Wrap the CircularProgressIndicator in a SizedBox
+                                          width:
+                                              20, // Set the width of the CircularProgressIndicator
+                                          height:
+                                              20, // Set the height of the CircularProgressIndicator
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    AppColors.cookie),
+                                          ),
                                         ),
                                       ),
                                       Visibility(

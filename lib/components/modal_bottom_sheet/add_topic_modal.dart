@@ -220,7 +220,23 @@ void showAddTopicModalBottomSheet(
             ),
           ),
           ColorPicker(
-            color: AppColors.cookie,
+            color: color_changed == "default"
+                ? AppColors.cookie
+                : color_changed == "red"
+                    ? AppColors.red_list
+                    : color_changed == "green"
+                        ? AppColors.green_list
+                        : color_changed == "blue"
+                            ? AppColors.blue_list
+                            : color_changed == "yellow"
+                                ? AppColors.yellow_list
+                                : color_changed == "orange"
+                                    ? AppColors.orange_list
+                                    : color_changed == "grey"
+                                        ? AppColors.grey_list
+                                        : color_changed == "purple"
+                                            ? AppColors.purple_list
+                                            : AppColors.cookie_list,
             borderRadius: 50,
             height: Dimensions.height(context, 36),
             width: Dimensions.width(context, 36),
@@ -266,7 +282,6 @@ void showAddTopicModalBottomSheet(
                   color_changed = "default";
                 }
               });
-              print(color);
             },
           )
         ],
