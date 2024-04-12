@@ -9,6 +9,9 @@ class WordService {
   final CollectionReference words =
       FirebaseFirestore.instance.collection('words');
 
+  final CollectionReference favoriteWords =
+      FirebaseFirestore.instance.collection('favorite');
+
   Future<void> addWord(Word word) async {
     await words.add({
       'word': word.word,
@@ -38,7 +41,39 @@ class WordService {
 
   //get favorite words by userId
   Stream<QuerySnapshot> getFavoriteWordsByUserId(String userId) {
-    final wordStream = words
+    final wordStream = favoriteWords
+        .where('userId', isEqualTo: userId)
+        .where('isFav', isEqualTo: true)
+        .snapshots();
+    return wordStream;
+  }
+
+  //add favorite word to collections favorite_words
+  Future<void> addFavoriteWord(Word word, String wordId) async {
+    await favoriteWords.doc(wordId).set({
+      'word': word.word,
+      'definition': word.definition,
+      'phonetic': word.phonetic,
+      'date': word.date,
+      'image': word.image,
+      'wordForm': word.wordForm,
+      'example': word.example,
+      'audio': word.audio,
+      'isFav': word.isFav,
+      'topicId': word.topicId,
+      'status': word.status,
+      'userId': word.userId,
+    });
+  }
+
+  //remove favorite word from collections favorite_words
+  Future<void> removeFavoriteWord(String id) async {
+    await favoriteWords.doc(id).delete();
+  }
+
+  //get favorite word by userId
+  Stream<QuerySnapshot> getFavoriteWordByUserId(String userId) {
+    final wordStream = favoriteWords
         .where('userId', isEqualTo: userId)
         .where('isFav', isEqualTo: true)
         .snapshots();

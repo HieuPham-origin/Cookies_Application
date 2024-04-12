@@ -1,15 +1,10 @@
-import 'dart:math';
-
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart'; // Import the necessary package
 import 'package:flex_color_picker/flex_color_picker.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 void showAddTopicModalBottomSheet(
     BuildContext context,
@@ -236,7 +231,7 @@ void showAddTopicModalBottomSheet(
                                         ? AppColors.grey_list
                                         : color_changed == "purple"
                                             ? AppColors.purple_list
-                                            : AppColors.cookie_list,
+                                            : AppColors.cookie,
             borderRadius: 50,
             height: Dimensions.height(context, 36),
             width: Dimensions.width(context, 36),

@@ -10,8 +10,9 @@ import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/title_widget.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
+import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
-import 'package:cookie_app/pages/favorite_vocabularies_page.dart';
+import 'package:cookie_app/pages/library_page/favorite_vocabularies_page.dart';
 import 'package:cookie_app/pages/library_page/folder_page.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
@@ -641,8 +642,30 @@ class _LibraryPageState extends State<LibraryPage> {
                                 await audioPlayer.play(UrlSource(audio));
                               },
                               onFavoritePressed: (bool isFav) async {
-                                await wordService.updateFavorite(wordId, isFav);
-                                return !isFav;
+                                if (!isFav) {
+                                  await wordService.updateFavorite(
+                                      wordId, isFav);
+                                  await wordService.addFavoriteWord(
+                                      Word(
+                                          word: word,
+                                          definition: definition,
+                                          phonetic: phonetic,
+                                          date: date,
+                                          image: image,
+                                          wordForm: wordForm,
+                                          example: example,
+                                          audio: audio,
+                                          isFav: !isFav,
+                                          topicId: topicId,
+                                          status: status,
+                                          userId: userId),
+                                      wordId);
+                                } else {
+                                  await wordService.updateFavorite(
+                                      wordId, isFav);
+                                  await wordService.removeFavoriteWord(wordId);
+                                }
+                                return null;
                               },
                               onSavePressed: () {
                                 showTopicsModalBottomSheet(

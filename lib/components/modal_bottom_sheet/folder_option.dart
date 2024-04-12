@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/folder_card.dart';
 import 'package:cookie_app/models/topic.dart';
-import 'package:cookie_app/pages/favorite_vocabularies_page.dart';
+import 'package:cookie_app/pages/library_page/favorite_vocabularies_page.dart';
 import 'package:cookie_app/pages/library_page/folder_page.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';

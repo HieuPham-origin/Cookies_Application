@@ -27,7 +27,9 @@ void showVocabulariesModalBottomSheet(
     int numOfVocabInTopicFromLibrary,
     Function(int) setNumOfWord,
     int numOfVocab,
-    void Function(int) setNumOfVocab
+    void Function(int) setNumOfVocab,
+    int numOfTopicInFolder,
+    void Function(int) setNumOfTopicInFolder
     // int numOfWord,
     ) {
   var screenSize = MediaQuery.of(context).size;
@@ -217,6 +219,8 @@ void showVocabulariesModalBottomSheet(
                                         setNumOfVocabInTopicFromLibrary(
                                             numOfVocabInTopicFromLibrary + 1),
                                         setNumOfVocab(numOfVocab - 1),
+                                        setNumOfTopicInFolder(
+                                            numOfTopicInFolder + 1),
                                         Navigator.of(contextVocabulary).pop(),
                                       },
                                     );

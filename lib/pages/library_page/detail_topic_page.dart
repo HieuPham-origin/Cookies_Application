@@ -7,10 +7,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_topic_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/detail_vocab_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/folder_option.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/practice_option.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/topic_option.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/vocabulary_option.dart';
 import 'package:cookie_app/components/vocabulary_card.dart';
 import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/pages/practice_pages/quiz_screen.dart';
 import 'package:cookie_app/pages/practice_pages/swipe_card.dart';
 import 'package:cookie_app/services/TopicService.dart';
@@ -19,15 +21,11 @@ import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:toasty_box/toast_service.dart';
-import 'package:cookie_app/pages/library_page.dart';
 
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -161,6 +159,8 @@ class _DetailTopicState extends State<DetailTopic> {
                   widget.setNumOfVocabInTopicFromLibrary,
                   widget.numOfVocab,
                   widget.setNumOfVocab,
+                  widget.numOfVocabInTopicInFolder,
+                  widget.setNumOfTopicInFolder,
                 );
               },
             ),
@@ -271,14 +271,10 @@ class _DetailTopicState extends State<DetailTopic> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => QuizScreen(
-                                  topicId: widget.docID,
-                                  data: widget.data,
-                                ),
-                              ),
-                            ),
+                            onPressed: () {
+                              showPracticeptionModalBottomSheet(
+                                  context, widget.docID, widget.data);
+                            },
                             child: const Text("Luyện tập"),
                           ),
                         )
@@ -438,10 +434,33 @@ class _DetailTopicState extends State<DetailTopic> {
                                             .play(UrlSource(audio));
                                       },
                                       onFavoritePressed: (bool isFav) async {
-                                        await topicService
-                                            .updateFavoriteWordForTopic(
-                                                widget.docID, wordId, isFav);
-                                        return !isFav;
+                                        if (!isFav) {
+                                          await topicService
+                                              .updateFavoriteWordForTopic(
+                                                  widget.docID, wordId, isFav);
+                                          await wordService.addFavoriteWord(
+                                              Word(
+                                                  word: word,
+                                                  definition: definition,
+                                                  phonetic: phonetic,
+                                                  date: date,
+                                                  image: image,
+                                                  wordForm: wordForm,
+                                                  example: example,
+                                                  audio: audio,
+                                                  isFav: !isFav,
+                                                  topicId: topicId,
+                                                  status: status,
+                                                  userId: userId),
+                                              wordId);
+                                        } else {
+                                          await topicService
+                                              .updateFavoriteWordForTopic(
+                                                  widget.docID, wordId, isFav);
+                                          await wordService
+                                              .removeFavoriteWord(wordId);
+                                        }
+                                        return null;
                                       },
                                       onSavePressed: () {
                                         showTopicsModalBottomSheet(
