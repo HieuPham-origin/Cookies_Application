@@ -12,4 +12,14 @@ class Topic {
     required this.userEmail,
     required this.color, // Initialize color field in the constructor
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'topicName': topicName,
+      'isPublic': isPublic,
+      'userId': userId,
+      'userEmail': userEmail,
+      'color': color,
+    };
+  }
 }

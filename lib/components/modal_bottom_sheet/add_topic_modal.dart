@@ -13,6 +13,7 @@ void showAddTopicModalBottomSheet(
     TopicService topicService,
     void setState(void Function() fn),
     Function(String) setTopicName,
+    Function(String)? setColor,
     Function(int) setNumOfTopic,
     int numOfTopic,
     String topicId,
@@ -136,6 +137,7 @@ void showAddTopicModalBottomSheet(
                             await Future.delayed(
                                 const Duration(milliseconds: 200));
                             setTopicName(topicController.text);
+                            setColor!(color_changed);
                             Navigator.of(context).pop();
                           } catch (e) {
                             print(e);
@@ -277,6 +279,7 @@ void showAddTopicModalBottomSheet(
                   color_changed = "default";
                 }
               });
+              print(color_changed);
             },
           )
         ],

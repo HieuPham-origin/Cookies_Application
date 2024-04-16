@@ -89,16 +89,16 @@ class AppColors {
   static const MaterialColor yellow_list = MaterialColor(
     0xFFFBC02D,
     <int, Color>{
-      50: Color(0xFFFFD600),
-      100: Color(0xFFFFD600),
-      200: Color(0xFFFFD600),
-      300: Color(0xFFFFD600),
-      400: Color(0xFFFFD600),
-      500: Color(0xFFFFD600),
-      600: Color(0xFFFFD600),
-      700: Color(0xFFFFD600),
-      800: Color(0xFFFFD600),
-      900: Color(0xFFFFD600),
+      50: Color(0xFFFBC02D),
+      100: Color(0xFFFBC02D),
+      200: Color(0xFFFBC02D),
+      300: Color(0xFFFBC02D),
+      400: Color(0xFFFBC02D),
+      500: Color(0xFFFBC02D),
+      600: Color(0xFFFBC02D),
+      700: Color(0xFFFBC02D),
+      800: Color(0xFFFBC02D),
+      900: Color(0xFFFBC02D),
     },
   );
 

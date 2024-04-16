@@ -1,10 +1,8 @@
-import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/auth_page.dart';
 import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/pages/settings_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/pages/sign_up.dart';
-import 'package:cookie_app/services/TopicService.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +27,7 @@ class MyApp extends StatelessWidget {
       home: const AuthPage(),
       routes: {
         '/signup': (context) => const SignUp(),
-        '/signin': (context) => const SignIn(),
+        '/signlamin': (context) => const SignIn(),
         '/profile': (context) => const SettingPage(),
         '/information': (context) => const InformationPage(),
       },

@@ -100,7 +100,7 @@ class _DetailTopicState extends State<DetailTopic> {
           title: Text(
             "Topic",
             style: TextStyle(
-              color: AppColors.grey_heavy,
+              color: AppColors.icon_grey,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -141,7 +141,7 @@ class _DetailTopicState extends State<DetailTopic> {
               highlightColor: Colors.transparent,
               padding: EdgeInsets.zero,
               constraints:
-                  BoxConstraints(maxWidth: Dimensions.width(context, 20)),
+                  BoxConstraints(maxWidth: Dimensions.width(context, 30)),
               icon: Icon(CupertinoIcons.add,
                   color: AppColors.grey_heavy), // Adjust the color as needed
               onPressed: () {
@@ -178,6 +178,11 @@ class _DetailTopicState extends State<DetailTopic> {
                       widget.data['topicName'] = topicName;
                     });
                   },
+                  (String color) {
+                    setState(() {
+                      widget.data['color'] = color;
+                    });
+                  },
                   widget.setNumOfVocabInTopicFromLibrary,
                   widget.numOfVocabInTopic,
                   widget.docID,
@@ -197,6 +202,18 @@ class _DetailTopicState extends State<DetailTopic> {
                   ),
                 ),
               ),
+            ),
+            IconButton(
+              highlightColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              constraints:
+                  BoxConstraints(maxWidth: Dimensions.width(context, 20)),
+              icon: Icon(CupertinoIcons.share,
+                  color: AppColors.grey_heavy), // Adjust the color as needed
+              onPressed: () {
+                // Add your onPressed action here
+                HapticFeedback.vibrate();
+              },
             ),
           ],
         ),

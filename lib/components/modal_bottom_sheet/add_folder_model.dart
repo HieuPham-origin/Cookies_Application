@@ -10,20 +10,11 @@ import 'package:flutter/material.dart';
 void showAddFolderModalBottomSheet(
   BuildContext context,
   User user,
-  // void setState(void Function() fn),
-  // Function(String) setTopicName,
-  // Function(int) setNumOfTopic,
-  // int numOfTopic,
-  // String topicId,
-  // int type
-  // Assuming this is a dependency
 ) {
   bool isLoading = false;
   TextEditingController folderController = TextEditingController();
   FolderService folderService = FolderService();
-  // if (type == 1) {
-  //   topicController.text = "";
-  // }
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

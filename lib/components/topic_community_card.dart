@@ -1,35 +1,30 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/utils/colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cookie_app/utils/demension.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class TopicCard extends StatefulWidget {
+class TopicCommunityCard extends StatefulWidget {
   final String topicName;
   final int numOfVocab;
   final Function()? onTap;
   final String color;
-  final List<Topic>? listTopic;
 
-  const TopicCard(
+  const TopicCommunityCard(
       {super.key,
       required this.topicName,
       required this.numOfVocab,
       this.onTap,
-      required this.color,
-      this.listTopic});
+      required this.color});
 
   @override
-  State<TopicCard> createState() => _TopicCardState();
+  State<TopicCommunityCard> createState() => _TopicCommunityCardState();
 }
 
-class _TopicCardState extends State<TopicCard> {
-  bool isChoose = false;
-  String userId = FirebaseAuth.instance.currentUser!.uid;
-  String userEmail = FirebaseAuth.instance.currentUser!.email!;
-
+class _TopicCommunityCardState extends State<TopicCommunityCard> {
   Color getColor() {
     switch (widget.color) {
       case 'red':
@@ -93,55 +88,25 @@ class _TopicCardState extends State<TopicCard> {
     }
   }
 
-  void defaultTapAction() {
-    if (isChoose) {
-      widget.listTopic!.add(Topic(
-          topicName: widget.topicName,
-          isPublic: true,
-          userId: userId,
-          userEmail: userEmail,
-          color: widget.color));
-    } else {
-      widget.listTopic!
-          .removeWhere((element) => element.topicName == widget.topicName);
-    }
-    print(widget.listTopic!.length);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4.0, right: 4.0, top: 4),
-      child: Card(
-        elevation: 0,
-        surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-              color: isChoose ? getColor() : Colors.transparent, width: 1),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: InkWell(
-          onTap: () {
-            widget.onTap?.call(); // Call external onTap if provided
-            if (widget.onTap == null) {
-              // Define a default action here
-              setState(() {
-                isChoose = !isChoose; // Always toggle state
-              });
-              defaultTapAction();
-            }
-          },
-          customBorder: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+    return Row(
+      children: [
+        Card(
+          margin: EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            side: BorderSide(color: getColor(), width: 0.3),
           ),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, right: 15, top: 10, bottom: 10),
-              child: Container(
-                width: 40,
-                height: 40,
+          elevation: 0,
+          surfaceTintColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child:
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              Container(
+                width: Dimensions.width(context, 42),
+                height: Dimensions.height(context, 42),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: getBackgroundColor(),
@@ -161,36 +126,36 @@ class _TopicCardState extends State<TopicCard> {
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Text(
-                widget.topicName,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  textStyle: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: getColor(),
-                  ),
-                ),
+              SizedBox(
+                width: Dimensions.width(context, 10),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Text('${widget.numOfVocab} từ',
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.topicName,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.inter(
                       textStyle: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                         color: getColor(),
                       ),
-                    )),
+                    ),
+                  ),
+                  Text('${widget.numOfVocab} từ',
+                      style: GoogleFonts.inter(
+                        textStyle: TextStyle(
+                          fontSize: 12,
+                          color: getColor(),
+                        ),
+                      )),
+                ],
               ),
-            )
-          ]),
+            ]),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

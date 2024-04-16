@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -55,6 +56,9 @@ class _LibraryPageState extends State<LibraryPage> {
   int numOfVocabInTopic = 0;
   int numOfTopic = 0;
   int numOfVocab = 0;
+
+  bool isDataChange = false;
+  int isInit = 0;
 
   @override
   void initState() {
@@ -189,7 +193,8 @@ class _LibraryPageState extends State<LibraryPage> {
                 user,
                 topicService,
                 setState,
-                (String topicName) {}, (int numOfTopic) {
+                (String topicName) {},
+                (String color) {}, (int numOfTopic) {
               setState(() {
                 this.numOfTopic = numOfTopic;
               });
@@ -343,7 +348,8 @@ class _LibraryPageState extends State<LibraryPage> {
                                 user,
                                 topicService,
                                 setState,
-                                (String topicName) {}, (int numOfTopic) {
+                                (String topicName) {},
+                                (String color) {}, (int numOfTopic) {
                               setState(() {
                                 this.numOfTopic = numOfTopic;
                               });
@@ -514,6 +520,15 @@ class _LibraryPageState extends State<LibraryPage> {
                   } else if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
 
+                    // if (snapshot.data!.docChanges.isNotEmpty) {
+                    //   isInit++;
+                    //   if (isInit > 2) {
+                    //     setState(() {
+                    //       isDataChange = true;
+                    //       isInit = 0;
+                    //     });
+                    //   }
+                    // }
                     if (words.isEmpty) {
                       return Center(
                           child: Column(

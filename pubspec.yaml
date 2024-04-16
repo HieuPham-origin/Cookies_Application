@@ -108,6 +108,7 @@ flutter:
         - assets/flashcard.png
         - assets/quiz.png
         - assets/spell_check.png
+        - assets/girl.png
 
 flutter_icons:
     android: true

@@ -29,6 +29,14 @@ class UserService {
     };
   }
 
+  //get displayName by userId
+  Future<String> getDisplayName(String userId) async {
+    final User? userById = await FirebaseAuth.instance
+        .authStateChanges()
+        .firstWhere((element) => element?.uid == userId);
+    return userById!.displayName!;
+  }
+
   Future<void> updateDisplayName(String newDisplayName) async {
     await user.updateDisplayName(newDisplayName);
   }
@@ -40,7 +48,8 @@ class UserService {
   Future<Uint8List?> getProfileImage() async {
     try {
       if (user.photoURL != null) {
-        final Reference ref = FirebaseStorage.instance.refFromURL(user.photoURL!);
+        final Reference ref =
+            FirebaseStorage.instance.refFromURL(user.photoURL!);
         final Uint8List? imageData = await ref.getData();
         return imageData;
       }

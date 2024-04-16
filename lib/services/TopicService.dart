@@ -43,6 +43,7 @@ class TopicService {
       'isPublic': newTopic.isPublic,
       'userId': newTopic.userId,
       'userEmail': newTopic.userEmail,
+      'color': newTopic.color,
     });
   }
 
