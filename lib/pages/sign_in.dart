@@ -5,12 +5,10 @@ import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/pages/forgot_password.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:toasty_box/toasty_box.dart';
 import 'package:flutter/services.dart';
-
-import 'sign_up.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key});
@@ -174,7 +172,11 @@ class _SignInState extends State<SignIn> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Forgot_Password()));
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Forgot_Password()));
                                 },
                                 child: const Text('Quên mật khẩu ?',
                                     style: TextStyle(

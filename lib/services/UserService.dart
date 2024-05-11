@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:toasty_box/toasty_box.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class UserService {
   User user = FirebaseAuth.instance.currentUser!;
@@ -31,10 +31,10 @@ class UserService {
 
   //get displayName by userId
   Future<String> getDisplayName(String userId) async {
-    final User? userById = await FirebaseAuth.instance
+    final Stream<User?> userById = FirebaseAuth.instance
         .authStateChanges()
-        .firstWhere((element) => element?.uid == userId);
-    return userById!.displayName!;
+        .where((user) => user!.uid == userId);
+    return userById.first.then((user) => user!.displayName!);
   }
 
   Future<void> updateDisplayName(String newDisplayName) async {

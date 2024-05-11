@@ -11,10 +11,12 @@ import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 void showDetailVocabModalBottomSheet(
   BuildContext context,
@@ -24,7 +26,7 @@ void showDetailVocabModalBottomSheet(
   String phonetic,
   String date,
   String definition,
-  File? image,
+  String image,
   String audio,
   String example,
   User user,
@@ -66,7 +68,7 @@ void showDetailVocabModalBottomSheet(
                             phonetic: phonetic,
                             definition: definition,
                             example: example,
-                            image: image!.path,
+                            image: image,
                             wordForm: wordForm,
                             date: date,
                             isFav: false,
@@ -104,32 +106,39 @@ void showDetailVocabModalBottomSheet(
     return formattedDate;
   }
 
-  void showImageDialog(BuildContext context, File? image) {
+  Future<String> getDownloadUrlImage(String imagePath) async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImage = referenceRoot.child('images');
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    Reference referenceImageToUpload = referenceDirImage.child(fileName);
+    String downloadUrl = '';
+
+    try {
+      // Assuming `imagePath` is the path to the image file you want to upload
+      await referenceImageToUpload.putFile(File(imagePath));
+      downloadUrl = await referenceImageToUpload.getDownloadURL();
+    } catch (error) {
+      print('Error uploading image: $error');
+      // Optionally, handle the error more gracefully or inform the user
+    }
+
+    return downloadUrl;
+  }
+
+  void showImageDialog(BuildContext context, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // Getting the screen size
-        Size screenSize = MediaQuery.of(context).size;
         return Dialog(
-          backgroundColor: Colors
-              .transparent, // Ensures no background color for the dialog itself
-          insetPadding:
-              const EdgeInsets.all(10), // Adjust the padding as needed
           child: Container(
-            // Set width and height as a proportion of the screen size
-            width: screenSize.width * 0.9, // 90% of screen width
-            height: screenSize.height * 0.7, // 70% of screen height
+            width: MediaQuery.of(context).size.width * 0.9,
+            height: MediaQuery.of(context).size.height * 0.6,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(15), // Adjust borderRadius as needed
-            ),
-            child: ClipRRect(
-              // Clip it with rounded corners
-              borderRadius: BorderRadius.circular(15),
-              child: Image.file(
-                image!,
-                fit: BoxFit.cover, // Use BoxFit.cover to fill the container
+              borderRadius: BorderRadius.circular(10),
+              image: DecorationImage(
+                image: CachedNetworkImageProvider(
+                    "https://cp.tdung.co/?url=${Uri.encodeComponent(image)}"),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -226,46 +235,52 @@ void showDetailVocabModalBottomSheet(
                                     String example = exampleController.text;
                                     audioUpdate =
                                         'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${word}"&tl=${word == "gay" ? "th" : "en"}&client=tw-ob';
-
-                                    if (topicId.isNotEmpty) {
-                                      topicService.updateWordForTopic(
-                                        topicId,
-                                        wordId,
-                                        Word(
-                                          word: word,
-                                          phonetic: phonetic,
-                                          definition: definition,
-                                          example: example,
-                                          image: image!.path,
-                                          wordForm: wordForm,
-                                          date: getCurrentDate(),
-                                          isFav: false,
-                                          audio: audioUpdate,
-                                          topicId: '',
-                                          status: 0,
-                                          userId: '',
-                                        ),
-                                      );
-                                    } else {
-                                      WordService wordService = WordService();
-                                      wordService.updateWord(
-                                        wordId,
-                                        Word(
-                                          word: word,
-                                          phonetic: phonetic,
-                                          definition: definition,
-                                          example: example,
-                                          image: image!.path,
-                                          wordForm: wordForm,
-                                          date: getCurrentDate(),
-                                          isFav: false,
-                                          audio: audioUpdate,
-                                          topicId: '',
-                                          status: 0,
-                                          userId: '',
-                                        ),
-                                      );
-                                    }
+                                    getDownloadUrlImage(image).then((url) {
+                                      String imageUrl = url;
+                                      if (topicId.isNotEmpty) {
+                                        topicService.updateWordForTopic(
+                                          topicId,
+                                          wordId,
+                                          Word(
+                                            word: word,
+                                            phonetic: phonetic,
+                                            definition: definition,
+                                            example: example,
+                                            image: imageUrl.isNotEmpty
+                                                ? imageUrl
+                                                : image,
+                                            wordForm: wordForm,
+                                            date: getCurrentDate(),
+                                            isFav: false,
+                                            audio: audioUpdate,
+                                            topicId: '',
+                                            status: 0,
+                                            userId: '',
+                                          ),
+                                        );
+                                      } else {
+                                        WordService wordService = WordService();
+                                        wordService.updateWord(
+                                          wordId,
+                                          Word(
+                                            word: word,
+                                            phonetic: phonetic,
+                                            definition: definition,
+                                            example: example,
+                                            image: imageUrl.isNotEmpty
+                                                ? imageUrl
+                                                : image,
+                                            wordForm: wordForm,
+                                            date: getCurrentDate(),
+                                            isFav: false,
+                                            audio: audioUpdate,
+                                            topicId: '',
+                                            status: 0,
+                                            userId: '',
+                                          ),
+                                        );
+                                      }
+                                    });
                                   }
                                 });
                               },
@@ -376,8 +391,11 @@ void showDetailVocabModalBottomSheet(
                                     await audioPlayer.stop();
                                     await audioPlayer.play(UrlSource(
                                         audioUpdate == ''
-                                            ? audio
-                                            : audioUpdate));
+                                            ? "https://cp.tdung.co/?url=" +
+                                                Uri.encodeComponent(audio)
+                                            : "https://cp.tdung.co/?url=" +
+                                                Uri.encodeComponent(
+                                                    audioUpdate)));
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(
@@ -482,24 +500,61 @@ void showDetailVocabModalBottomSheet(
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      if (image!.path.isNotEmpty) {
+                                      if (image.isNotEmpty) {
                                         showImageDialog(context, image);
                                       }
                                     },
                                     child: Container(
-                                      width: Dimensions.width(context, 200),
-                                      height: Dimensions.height(context, 250),
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: FileImage(image!),
-                                          fit: BoxFit.contain,
+                                        width: Dimensions.width(context, 200),
+                                        height: Dimensions.height(context, 250),
+                                        decoration: BoxDecoration(
+                                          color: image.isNotEmpty
+                                              ? null
+                                              : Colors.grey[300],
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
-                                        color: image!.path.isNotEmpty
-                                            ? null
-                                            : Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
+                                        child: !image.contains("/data")
+                                            ? Stack(
+                                                children: [
+                                                  Positioned.fill(
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          "https://cp.tdung.co/?url=${Uri.encodeComponent(image)}",
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              SizedBox(
+                                                        width:
+                                                            20, // Adjust the width as per your requirement
+                                                        height:
+                                                            20, // Adjust the height as per your requirement
+                                                        child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: AppColors
+                                                                .cookie,
+                                                            strokeWidth:
+                                                                2, // Adjust the strokeWidth as per your requirement
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context,
+                                                          url, error) {
+                                                        print(error);
+                                                        return Icon(
+                                                          Icons.error,
+                                                          color: Colors.red,
+                                                        );
+                                                      },
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : Image.file(
+                                                File(image),
+                                                fit: BoxFit.contain,
+                                              )),
                                   ),
                                   SizedBox(
                                       height: Dimensions.height(context, 12)),
@@ -507,10 +562,10 @@ void showDetailVocabModalBottomSheet(
                                     onTap: edit == "Lưu"
                                         ? () {
                                             showImageOptionModalBottomSheet(
-                                                context, image,
+                                                context, File(image),
                                                 (File? newImage) {
                                               setState(() {
-                                                image = newImage;
+                                                image = newImage!.path;
                                               });
                                             });
                                           }

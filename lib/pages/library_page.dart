@@ -134,7 +134,6 @@ class _LibraryPageState extends State<LibraryPage> {
               decoration: BoxDecoration(
                 color: Colors.white, // Background color of the label
                 borderRadius: BorderRadius.circular(30),
-
                 // Optionally, add a border or shadow
               ),
               child: Text(
@@ -519,16 +518,6 @@ class _LibraryPageState extends State<LibraryPage> {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     List words = snapshot.data!.docs;
-
-                    // if (snapshot.data!.docChanges.isNotEmpty) {
-                    //   isInit++;
-                    //   if (isInit > 2) {
-                    //     setState(() {
-                    //       isDataChange = true;
-                    //       isInit = 0;
-                    //     });
-                    //   }
-                    // }
                     if (words.isEmpty) {
                       return Center(
                           child: Column(
@@ -722,7 +711,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                   phonetic,
                                   date,
                                   definition,
-                                  File(image),
+                                  image,
                                   audio,
                                   example,
                                   user,

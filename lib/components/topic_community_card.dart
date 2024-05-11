@@ -100,6 +100,7 @@ class _TopicCommunityCardState extends State<TopicCommunityCard> {
           ),
           elevation: 0,
           surfaceTintColor: Colors.white,
+          color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child:

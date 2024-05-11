@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'dart:developer';
@@ -8,12 +9,16 @@ import 'package:cookie_app/components/custom_textfield.dart';
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:cookie_app/pages/change_password.dart';
 import 'package:cookie_app/resources/store_data.dart';
+import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/UserService.dart';
+import 'package:cookie_app/utils/constants.dart';
 import 'package:cookie_app/utils/pick_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class InformationPage extends StatefulWidget {
   const InformationPage({super.key});
@@ -24,8 +29,9 @@ class InformationPage extends StatefulWidget {
 
 class _InformationPageState extends State<InformationPage> {
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
+  CommunityService communityService = CommunityService();
+
   User? user = FirebaseAuth.instance.currentUser!;
-  Uint8List? _image;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -39,12 +45,6 @@ class _InformationPageState extends State<InformationPage> {
   void initState() {
     super.initState();
     fetchUserInfo();
-    loadProfileImage();
-  }
-
-  void loadProfileImage() async {
-    _image = await userService.getProfileImage();
-    setState(() {});
   }
 
   Future<void> fetchUserInfo() async {
@@ -81,12 +81,54 @@ class _InformationPageState extends State<InformationPage> {
     });
   }
 
+  Future<String> getDownloadUrlImage(String imagePath) async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImage = referenceRoot.child('avatars');
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    Reference referenceImageToUpload = referenceDirImage.child(fileName);
+    String downloadUrl = '';
+
+    try {
+      // Assuming `imagePath` is the path to the image file you want to upload
+      await referenceImageToUpload.putFile(File(imagePath));
+      downloadUrl = await referenceImageToUpload.getDownloadURL();
+    } catch (error) {
+      print('Error uploading image: $error');
+      // Optionally, handle the error more gracefully or inform the user
+    }
+
+    return downloadUrl;
+  }
+
+  Future<File> convertUint8ListToFile(
+      Uint8List imageData, String fileName) async {
+    // Get the directory to save the file
+    final directory = await getApplicationDocumentsDirectory();
+
+    // Create a file path with the given file name
+    final filePath = '${directory.path}/$fileName';
+
+    // Create a new file
+    final file = File(filePath);
+
+    // Write the Uint8List data to the file
+    await file.writeAsBytes(imageData);
+
+    return file;
+  }
+
   void selectImage() async {
     Uint8List img = await pickAvatar(ImageSource.gallery);
     setState(() {
-      _image = img;
+      AppConstants.image = img;
     });
     await StoreData().saveData(file: img);
+    String uniqueFileName = "${DateTime.now().millisecondsSinceEpoch}.png";
+    File imagePath =
+        await convertUint8ListToFile(AppConstants.image!, uniqueFileName);
+    AppConstants.avatar = await getDownloadUrlImage(imagePath.path);
+    await communityService.updateImageForAllCommunitiesByUserId(
+        user!.uid, AppConstants.avatar!);
   }
 
   // void saveAvatar() async{
@@ -101,7 +143,7 @@ class _InformationPageState extends State<InformationPage> {
         leadingWidth: 24,
         leading: IconButton(
             onPressed: () {
-              Navigator.pop(context, [displayName, _image]);
+              Navigator.pop(context, [displayName, AppConstants.image]);
             },
             icon: Icon(
               Icons.arrow_back_ios,
@@ -185,10 +227,11 @@ class _InformationPageState extends State<InformationPage> {
                       ),
                       child: Stack(
                         children: [
-                          _image != null
+                          AppConstants.image != null
                               ? CircleAvatar(
                                   radius: 50.0,
-                                  backgroundImage: MemoryImage(_image!),
+                                  backgroundImage:
+                                      MemoryImage(AppConstants.image!),
                                 )
                               : CircleAvatar(
                                   radius: 50.0,

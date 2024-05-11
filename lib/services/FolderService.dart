@@ -14,6 +14,11 @@ class FolderService {
     return folderStream;
   }
 
+  Stream<QuerySnapshot> getFoldersByUserId(String userId) {
+    final folderStream = folders.where('userId', isEqualTo: userId).snapshots();
+    return folderStream;
+  }
+
   Future<void> addFolder(Folder folder) async {
     await folders.add(
       {

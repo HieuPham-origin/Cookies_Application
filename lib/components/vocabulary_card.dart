@@ -49,6 +49,7 @@ class _VocabularyCardState extends State<VocabularyCard> {
       padding: const EdgeInsets.only(left: 8, right: 8, top: 2),
       child: Card(
         elevation: 0,
+        color: Colors.white,
         surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),

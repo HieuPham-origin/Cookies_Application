@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:toasty_box/toasty_box.dart';
+import 'package:cookie_app/utils/constants.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -21,7 +22,6 @@ class _SettingPageState extends State<SettingPage> {
   UserService userService = UserService(FirebaseAuth.instance.currentUser!);
 
   User user = FirebaseAuth.instance.currentUser!;
-  Uint8List? _image;
 
   String? displayName =
       FirebaseAuth.instance.currentUser!.displayName ?? 'cookieuser';
@@ -38,7 +38,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   void loadProfileImage() async {
-    _image = await userService.getProfileImage();
+    AppConstants.image = await userService.getProfileImage();
     setState(() {});
   }
 
@@ -90,7 +90,7 @@ class _SettingPageState extends State<SettingPage> {
                         }
 
                         if (rollback[1] != null) {
-                          _image = rollback[1];
+                          AppConstants.image = rollback[1];
                         }
                       },
                     );
@@ -124,10 +124,10 @@ class _SettingPageState extends State<SettingPage> {
                           ),
                         ],
                       ),
-                      _image != null
+                      AppConstants.image != null
                           ? CircleAvatar(
                               radius: 50.0,
-                              backgroundImage: MemoryImage(_image!),
+                              backgroundImage: MemoryImage(AppConstants.image!),
                             )
                           : CircleAvatar(
                               radius: 50,

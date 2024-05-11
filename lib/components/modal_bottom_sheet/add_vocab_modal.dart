@@ -2,20 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cookie_app/components/custom_segment_button.dart';
-import 'package:cookie_app/models/topic.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/image_option.dart';
 import 'package:cookie_app/models/word.dart';
-import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:toasty_box/toast_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:cookie_app/components/modal_bottom_sheet/image_option.dart';
+import 'package:intl/intl.dart';
 
 String getCurrentDate() {
   DateTime now = DateTime.now();
@@ -100,6 +97,7 @@ void showAddVocabModalBottomSheet(
   image = null;
   wordHintText = "";
   bool isLoading = false;
+  String imageUrl = "";
 
   void handleSelectionChange(WordForm selectedForm) {
     wordForm = selectedForm.toString().split('.').last;
@@ -187,13 +185,31 @@ void showAddVocabModalBottomSheet(
                                   setState(() {
                                     isLoading = true;
                                   });
+                                  Reference referenceRoot =
+                                      FirebaseStorage.instance.ref();
+                                  Reference referenceDirImage =
+                                      referenceRoot.child('images');
+                                  String fileName = DateTime.now()
+                                      .millisecondsSinceEpoch
+                                      .toString();
+                                  Reference referenceImageToUpload =
+                                      referenceDirImage.child(fileName);
+                                  try {
+                                    await referenceImageToUpload
+                                        .putFile(File(image!.path));
+                                    imageUrl = await referenceImageToUpload
+                                        .getDownloadURL();
+                                  } catch (error) {
+                                    print(error);
+                                  }
+
                                   Word word = Word(
                                     word: wordController.text,
                                     definition: definitionController.text,
                                     phonetic: await getPhoneticValues(
                                         wordController.text),
                                     date: getCurrentDate(),
-                                    image: image != null ? image!.path : "",
+                                    image: imageUrl == "" ? "" : imageUrl,
                                     wordForm:
                                         wordForm == "" ? "verb" : wordForm,
                                     example:

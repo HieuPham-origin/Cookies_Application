@@ -105,7 +105,7 @@ class _FavoriteVocabPageState extends State<FavoriteVocabPage> {
                             phonetic,
                             date,
                             definition,
-                            File(image),
+                            image,
                             audio,
                             example,
                             user,

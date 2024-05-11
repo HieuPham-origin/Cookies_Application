@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/community_card.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_community_modal.dart';
@@ -8,6 +10,7 @@ import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/constants.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,12 +29,38 @@ class CommunityPage extends StatefulWidget {
 final GlobalKey<WallPostState> bottomSheetKey = GlobalKey<WallPostState>();
 
 class _CommunityPageState extends State<CommunityPage> {
-  String content = "hello";
-  String time = "1 giờ";
-  int numOfLove = 10;
-  int numOfComment = 5;
   CommunityService communityService = CommunityService();
   UserService userService = UserService(user);
+
+  @override
+  void initState() {
+    // TODO: implement in itState
+    super.initState();
+    _precacheImages();
+  }
+
+  Future<List<String>> fetchImageUrls() async {
+    List<String> imageUrls = [];
+    await communityService.getAllCommunitiesToLoadImage().then((value) {
+      for (var element in value.docs) {
+        imageUrls.add(element['image']);
+      }
+    });
+    return imageUrls;
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  Future<void> _precacheImages() async {
+    List<String> imageUrls = await fetchImageUrls();
+    for (String url in imageUrls) {
+      await precacheImage(NetworkImage(url), context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +70,7 @@ class _CommunityPageState extends State<CommunityPage> {
         width: 60,
         height: 60,
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             showPostTopicModalBottomSheet(context);
           },
           child: const Icon(Icons.add),
@@ -52,61 +81,55 @@ class _CommunityPageState extends State<CommunityPage> {
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Container(
-          color: AppColors.background,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text("Cộng đồng",
-                    style: GoogleFonts.inter(
-                        textStyle: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ))),
-              ),
-              StreamBuilder<QuerySnapshot>(
-                  stream: communityService.getAllCommunities(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Column(
-                        children: snapshot.data!.docs.map((e) {
-                          DateTime postTime = DateTime.parse(e['time']);
-                          String timeSince = formatTimeSince(postTime);
-                          return FutureBuilder<String>(
-                            future: userService.getDisplayName(e['user']),
-                            builder: (context, snapshot) {
-                              String displayName = snapshot.data ?? 'Unknown';
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            StreamBuilder<QuerySnapshot>(
+              stream: communityService.getAllCommunities(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List communities = snapshot.data!.docs;
+                  communities.sort((a, b) => a['time'].compareTo(b['time']));
 
-                              return CommunityCard(
-                                user: displayName,
-                                content: e['content'],
-                                time: timeSince,
-                                numOfLove: e['numOfLove'],
-                                numOfComment: e['numOfComment'],
-                                topicCommunityCard: e['topicCommunityCard']
-                                    .map((e) => TopicCommunityCard(
-                                          topicName: e['topicName'],
-                                          numOfVocab: 10,
-                                          color: e['color'],
-                                        ))
-                                    .toList(),
-                              );
-                            },
-                          );
-                        }).toList(),
+                  return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    reverse: true,
+                    itemCount: communities.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      DocumentSnapshot e = communities[index];
+                      DateTime postTime = DateTime.parse(e['time']);
+                      String timeSince = formatTimeSince(postTime);
+                      return CommunityCard(
+                        user: e['displayName'],
+                        avatar:
+                            "https://cp.tdung.co/?url=${Uri.encodeComponent(e['image'])}",
+                        content: e['content'],
+                        time: timeSince,
+                        numOfLove: e['numOfLove'],
+                        numOfComment: e['numOfComment'],
+                        topicCommunityCard: e['topicCommunityCard']
+                            .map((e) => TopicCommunityCard(
+                                  topicName: e['topicName'],
+                                  numOfVocab: 10,
+                                  color: e['color'],
+                                ))
+                            .toList(),
                       );
-                    }
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }),
-              SizedBox(
-                height: Dimensions.height(context, 80),
-              ),
-            ],
-          ),
+                    },
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+            SizedBox(
+              height: Dimensions.height(context, 80),
+            ),
+          ],
         ),
       ),
     );

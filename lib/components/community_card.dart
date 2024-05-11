@@ -1,23 +1,28 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cookie_app/components/topic_community_card.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ignore: must_be_immutable
 class CommunityCard extends StatefulWidget {
   final String user;
+  final String avatar;
   final String content;
   final String time;
   final int numOfLove;
   final int numOfComment;
+
   List<dynamic> topicCommunityCard = [];
 
   CommunityCard(
       {super.key,
       required this.user,
+      required this.avatar,
       required this.content,
       required this.time,
       required this.numOfLove,
@@ -33,7 +38,14 @@ class _CommunityCardState extends State<CommunityCard> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
+      margin: EdgeInsets.zero,
+      color: Colors.white,
       shape: const RoundedRectangleBorder(
+          side: BorderSide(
+              strokeAlign: BorderSide.strokeAlignOutside,
+              width: 0.1,
+              color: Colors.black), // Make the default border transparent
+
           borderRadius: BorderRadius.all(Radius.circular(0))),
       surfaceTintColor: Colors.white,
       child: Padding(
@@ -50,9 +62,30 @@ class _CommunityCardState extends State<CommunityCard> {
                     width: Dimensions.width(context, 42),
                     height: Dimensions.height(context, 42),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/girl.png'),
+                      color: widget.avatar.isNotEmpty ? null : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                          50), // This applies to the CachedNetworkImage
+
+                      child: CachedNetworkImage(
+                        memCacheWidth: 150, // memory cache width
+                        memCacheHeight: 200, // memory cache height
+                        imageUrl: widget.avatar,
+                        placeholder: (context, url) => SizedBox(
+                          width: 20, // Adjust the width as per your requirement
+                          height:
+                              20, // Adjust the height as per your requirement
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.cookie,
+                              strokeWidth:
+                                  2, // Adjust the strokeWidth as per your requirement
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -107,23 +140,20 @@ class _CommunityCardState extends State<CommunityCard> {
             ),
             Container(
               height: Dimensions.height(context, 70),
-              child: Expanded(
-                child: ListView(
-                  dragStartBehavior: DragStartBehavior.start,
-                  padding: const EdgeInsets.only(left: 40, right: 10),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (var i = 0; i < widget.topicCommunityCard.length; i++)
-                      Row(
-                        children: [
-                          widget.topicCommunityCard[i],
-                          SizedBox(
-                              width: 10), // SizedBox for horizontal spacing
-                        ],
-                      ),
-                  ],
-                ),
+              child: ListView(
+                dragStartBehavior: DragStartBehavior.start,
+                padding: const EdgeInsets.only(left: 40, right: 10),
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var i = 0; i < widget.topicCommunityCard.length; i++)
+                    Row(
+                      children: [
+                        widget.topicCommunityCard[i],
+                        SizedBox(width: 10), // SizedBox for horizontal spacing
+                      ],
+                    ),
+                ],
               ),
             ),
             SizedBox(

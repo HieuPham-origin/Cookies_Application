@@ -119,25 +119,7 @@ class _FolderPageState extends State<FolderPage> {
               },
             ),
             GestureDetector(
-              onTap: () {
-                // HapticFeedback.vibrate();
-                // showAddTopicModalBottomSheet(
-                //   context,
-                //   TextEditingController(text: topicName),
-                //   user,
-                //   topicService,
-                //   setState,
-                //   (String topicName) {
-                //     setState(() {
-                //       widget.data['topicName'] = topicName;
-                //     });
-                //   },
-                //   widget.setNumOfVocabInTopicFromLibrary,
-                //   widget.numOfVocabInTopic,
-                //   widget.docID,
-                //   2,
-                // );
-              },
+              onTap: () {},
               child: Container(
                   // padding: EdgeInsets.symmetric(
                   //     horizontal: 16), // Add padding if necessary
@@ -155,76 +137,80 @@ class _FolderPageState extends State<FolderPage> {
           ],
         ),
       ),
-      body: words.isEmpty
-          ? const Scaffold(
-              backgroundColor: AppColors.background,
-              body: Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: AppColors.background,
-                  strokeCap: StrokeCap.round,
-                  color: AppColors.cookie,
-                ),
-              ),
-            )
-          : Center(
-              child: Container(
-                padding: EdgeInsets.all(Dimensions.width(context, 25)),
-                color: Colors.white,
-                width: double.infinity,
-                height: double.infinity,
-                child: SingleChildScrollView(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: folderService.getAll(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-                      if (snapshot.hasData) {
-                        List folder = snapshot.data!.docs;
+      body: Center(
+        child: Container(
+          padding: EdgeInsets.all(Dimensions.width(context, 25)),
+          color: Colors.white,
+          width: double.infinity,
+          height: double.infinity,
+          child: SingleChildScrollView(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: folderService.getFoldersByUserId(user.uid),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+                if (snapshot.hasData) {
+                  List folder = snapshot.data!.docs;
+                  if (folder.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Chưa có thư mục nào",
+                        style: TextStyle(
+                          color: AppColors.grey_heavy,
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }
 
-                        return Wrap(
-                          spacing: Dimensions.width(
-                              context, 30), // adjust spacing as needed
-                          runSpacing:
-                              20, // adjust spacing between rows as needed
-                          children: List.generate(
-                            folder.length,
-                            (index) {
-                              DocumentSnapshot folderData = folder[index];
-                              String folderName = folderData['folderName'];
-                              // You can also retrieve other properties as needed
+                  return Wrap(
+                    spacing: Dimensions.width(
+                        context, 30), // adjust spacing as needed
+                    runSpacing: 20, // adjust spacing between rows as needed
+                    children: List.generate(
+                      folder.length,
+                      (index) {
+                        DocumentSnapshot folderData = folder[index];
+                        String folderName = folderData['folderName'];
+                        // You can also retrieve other properties as needed
 
-                              return FolderCard(
-                                folderName: folderName,
-                                numOfTopic: 0,
-                                onTap: () {
-                                  showDetailFolderModalBottomSheet(
-                                      context,
-                                      folderName,
-                                      folderData.id,
-                                      widget.numOfVocabInTopic,
-                                      widget.numOfVocab,
-                                      widget.numOfTopic,
-                                      widget.setNumOfTopic,
-                                      widget.setNumOfVocab,
-                                      widget.setNumOfVocabInTopicFromLibrary);
-                                },
-                                onTapDelete: () {
-                                  folderService.deleteFolder(folderData.id);
-                                },
-                                type: 1,
-                              );
-                            },
-                          ),
+                        return FolderCard(
+                          folderName: folderName,
+                          numOfTopic: 0,
+                          onTap: () {
+                            showDetailFolderModalBottomSheet(
+                                context,
+                                folderName,
+                                folderData.id,
+                                widget.numOfVocabInTopic,
+                                widget.numOfVocab,
+                                widget.numOfTopic,
+                                widget.setNumOfTopic,
+                                widget.setNumOfVocab,
+                                widget.setNumOfVocabInTopicFromLibrary);
+                          },
+                          onTapDelete: () {
+                            folderService.deleteFolder(folderData.id);
+                          },
+                          type: 1,
                         );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return CircularProgressIndicator(); // Or any loading indicator
-                      }
-                    },
-                  ),
-                ),
-              ),
+                      },
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: AppColors.cookie,
+                      strokeCap: StrokeCap.round,
+                    ),
+                  ); // Or any loading indicator
+                }
+              },
             ),
+          ),
+        ),
+      ),
     );
   }
 

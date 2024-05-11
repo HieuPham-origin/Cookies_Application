@@ -1,16 +1,58 @@
 import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/TopicService.dart';
+import 'package:cookie_app/services/UserService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/constants.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+
+Future<String> getDownloadUrlImage(String imagePath) async {
+  Reference referenceRoot = FirebaseStorage.instance.ref();
+  Reference referenceDirImage = referenceRoot.child('avatars');
+  String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+  Reference referenceImageToUpload = referenceDirImage.child(fileName);
+  String downloadUrl = '';
+
+  try {
+    // Assuming `imagePath` is the path to the image file you want to upload
+    await referenceImageToUpload.putFile(File(imagePath));
+    downloadUrl = await referenceImageToUpload.getDownloadURL();
+  } catch (error) {
+    print('Error uploading image: $error');
+    // Optionally, handle the error more gracefully or inform the user
+  }
+
+  return downloadUrl;
+}
+
+Future<File> convertUint8ListToFile(
+    Uint8List imageData, String fileName) async {
+  // Get the directory to save the file
+  final directory = await getApplicationDocumentsDirectory();
+
+  // Create a file path with the given file name
+  final filePath = '${directory.path}/$fileName';
+
+  // Create a new file
+  final file = File(filePath);
+
+  // Write the Uint8List data to the file
+  await file.writeAsBytes(imageData);
+
+  return file;
+}
 
 void showPostTopicModalBottomSheet(
   BuildContext context,
@@ -20,8 +62,11 @@ void showPostTopicModalBottomSheet(
   CommunityService communityService = CommunityService();
   bool isLoading = false;
   User user = FirebaseAuth.instance.currentUser!;
-
+  String userId = user.uid;
+  String displayName = user.displayName ?? 'cookieuser';
+  File imageFile;
   List<Topic> listTopic = [];
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -77,13 +122,16 @@ void showPostTopicModalBottomSheet(
                       ),
                     ),
                   ),
-                  Text(
-                    // type == 1 ? "Tạo Topic" : "Sửa Topic",
-                    "Bài mới",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.cookie,
+                  GestureDetector(
+                    onTap: () async {},
+                    child: Text(
+                      // type == 1 ? "Tạo Topic" : "Sửa Topic",
+                      "Bài mới",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.cookie,
+                      ),
                     ),
                   ),
                   InkWell(
@@ -93,20 +141,29 @@ void showPostTopicModalBottomSheet(
                             isLoading = true;
                           });
                           try {
-                            print('User details: $user');
+                            String uniqueFileName =
+                                "${DateTime.now().millisecondsSinceEpoch}.png";
+                            imageFile = await convertUint8ListToFile(
+                                AppConstants.image!, uniqueFileName);
+                            await getDownloadUrlImage(imageFile.path)
+                                .then((value) async {
+                              String imageUrl = value;
+                              List<Map<String, dynamic>> topicsAsJson =
+                                  listTopic
+                                      .map((topic) => topic.toJson())
+                                      .toList();
+                              await communityService.addCommunity(
+                                  userId,
+                                  displayName,
+                                  imageUrl,
+                                  communityController.text,
+                                  DateTime.now().toString(),
+                                  0,
+                                  0,
+                                  topicsAsJson);
 
-                            List<Map<String, dynamic>> topicsAsJson = listTopic
-                                .map((topic) => topic.toJson())
-                                .toList();
-                            await communityService.addCommunity(
-                                user,
-                                communityController.text,
-                                DateTime.now().toString(),
-                                0,
-                                0,
-                                topicsAsJson);
-
-                            Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            });
                           } catch (e) {
                             log(e.toString());
                           } finally {
@@ -161,9 +218,32 @@ void showPostTopicModalBottomSheet(
                           width: Dimensions.width(context, 42),
                           height: Dimensions.height(context, 42),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/girl.png'),
+                            color: AppConstants.avatar!.isNotEmpty
+                                ? null
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                50), // This applies to the CachedNetworkImage
+
+                            child: CachedNetworkImage(
+                              imageUrl: AppConstants.avatar!,
+                              placeholder: (context, url) => SizedBox(
+                                width:
+                                    20, // Adjust the width as per your requirement
+                                height:
+                                    20, // Adjust the height as per your requirement
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.cookie,
+                                    strokeWidth:
+                                        2, // Adjust the strokeWidth as per your requirement
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -180,7 +260,7 @@ void showPostTopicModalBottomSheet(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "LTP",
+                                  displayName,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.inter(
                                     textStyle: const TextStyle(

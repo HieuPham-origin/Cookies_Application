@@ -22,6 +22,7 @@ class WallPostState extends State<WallPost> with AutomaticKeepAliveClientMixin {
   TextEditingController communityController = TextEditingController();
   TopicService topicService = TopicService();
   String userId = FirebaseAuth.instance.currentUser!.uid;
+  String userImage = FirebaseAuth.instance.currentUser!.photoURL!;
 
   @override
   void initState() {
@@ -153,7 +154,7 @@ class WallPostState extends State<WallPost> with AutomaticKeepAliveClientMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "LTP",
+                                FirebaseAuth.instance.currentUser!.displayName!,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.inter(
                                   textStyle: const TextStyle(

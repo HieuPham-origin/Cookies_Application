@@ -518,7 +518,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                           phonetic,
                                           date,
                                           definition,
-                                          File(image),
+                                          image,
                                           audio,
                                           example,
                                           user,
