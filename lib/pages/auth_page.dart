@@ -18,7 +18,6 @@ class AuthPage extends StatelessWidget {
           if (snapshot.hasData) {
             return VerifyEmailPage();
           }
-
           // user is NOT logged in
           else {
             return SignIn();

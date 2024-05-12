@@ -21,12 +21,21 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value == "") {
+            return "Mật khẩu không được bỏ trống";
+          }
+
+          if (value.length < 6) {
+            return "Mật khẩu phải có ít nhất 6 ký tự";
+          }
+          return null;
+        },
         controller: widget.controller,
         style: GoogleFonts.inter(),
         obscureText: widget.obscure,
         decoration: InputDecoration(
-          constraints: const BoxConstraints(maxHeight: 60),
           focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
               borderRadius: BorderRadius.all(Radius.circular(12))),

@@ -198,12 +198,8 @@ class _SignInState extends State<SignIn> {
                                     minimumSize: const Size.fromHeight(50),
                                   ),
                                   onPressed: () => {
-                                        // if (!_formKey.currentState!.validate())
-                                        //   signInUser()
-                                        // else
-                                        //   _formKey.currentState!.save()
-                                        signInUser(),
-                                        showStatusBar()
+                                        if (_formKey.currentState!.validate())
+                                          signInUser()
                                       },
                                   child: Text(
                                     "Đăng Nhập",

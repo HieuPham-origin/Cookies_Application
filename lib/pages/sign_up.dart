@@ -21,10 +21,16 @@ class _SignUpState extends State<SignUp> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   var _isObsecured;
 
   void signUpUser() async {
+    if (passwordController.text != confirmPasswordController.text) {
+      ToastService.showErrorToast(context, message: "Mật khẩu không khớp");
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) {
@@ -37,27 +43,18 @@ class _SignUpState extends State<SignUp> {
     );
 
     try {
-      if (passwordController.text != confirmPasswordController.text) {
-        ToastService.showErrorToast(context,message:  "Passwords are not the same");
-      } else {
-        try{
-
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-          );
-        } on FirebaseAuthException catch(e){
-          print(e);
-        }
-        // Navigate to the verification screen
-       Navigator.pop(context);
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      // Navigate to the verification screen
+      Navigator.pop(context);
       Navigator.pop(context, true);
-      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
-        showErrorMessage( "Email hoặc mật khẩu không chính xác!");
+        showErrorMessage("Email hoặc mật khẩu không chính xác!");
       } else {
-        showErrorMessage( "Error creating account: ${e.message}");
+        showErrorMessage("Error creating account: ${e.message}");
       }
     }
   }
@@ -129,95 +126,102 @@ class _SignUpState extends State<SignUp> {
                       ),
                       elevation: 4,
                       surfaceTintColor: Colors.white,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text("Đăng ký",
-                              style: GoogleFonts.inter(
-                                textStyle: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFFB99B6B)),
-                              )),
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          //Email field
-                          EmailTextField(
-                              controller: emailController,
-                              hintText: "Email",
-                              obscureText: false),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          //Password field
-                          PasswordTextField(
-                              controller: passwordController,
-                              hintText: "Mật khẩu",
-                              obscure: _isObsecured),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          //Confirm Password field
-                          PasswordTextField(
-                              controller: confirmPasswordController,
-                              hintText: "Xác nhận mật khẩu",
-                              obscure: _isObsecured),
-
-                          SizedBox(
-                            height: 50,
-                          ),
-
-                          //Sign up button
-                          Padding(
-                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFB99B6B),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  minimumSize: const Size.fromHeight(50),
-                                ),
-                                onPressed: signUpUser,
-                                child: Text(
-                                  "Đăng ký",
-                                  style: GoogleFonts.inter(
-                                    textStyle: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text("Đăng ký",
+                                style: GoogleFonts.inter(
+                                  textStyle: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFFB99B6B)),
                                 )),
-                          ),
+                            SizedBox(
+                              height: 20,
+                            ),
 
-                          SizedBox(
-                            height: 20,
-                          ),
+                            //Email field
+                            EmailTextField(
+                                controller: emailController,
+                                hintText: "Email",
+                                obscureText: false),
 
-                          Align(
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "Đã có tài khoản",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF9A9A9A),
+                            SizedBox(
+                              height: 20,
+                            ),
+
+                            //Password field
+                            PasswordTextField(
+                                controller: passwordController,
+                                hintText: "Mật khẩu",
+                                obscure: _isObsecured),
+
+                            SizedBox(
+                              height: 20,
+                            ),
+
+                            //Confirm Password field
+                            PasswordTextField(
+                                controller: confirmPasswordController,
+                                hintText: "Xác nhận mật khẩu",
+                                obscure: _isObsecured),
+
+                            SizedBox(
+                              height: 50,
+                            ),
+
+                            //Sign up button
+                            Padding(
+                              padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0xFFB99B6B),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    minimumSize: const Size.fromHeight(50),
+                                  ),
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      signUpUser();
+                                    }
+                                  },
+                                  child: Text(
+                                    "Đăng ký",
+                                    style: GoogleFonts.inter(
+                                      textStyle: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  )),
+                            ),
+
+                            SizedBox(
+                              height: 20,
+                            ),
+
+                            Align(
+                              alignment: Alignment.center,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  "Đã có tài khoản",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF9A9A9A),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -228,5 +232,13 @@ class _SignUpState extends State<SignUp> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
   }
 }

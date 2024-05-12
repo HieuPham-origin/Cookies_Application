@@ -46,16 +46,7 @@ class _ChangePasswordPageState extends State<ChangePassword> {
       showErrorMessage("Mật khẩu mới không khớp nhau");
     }else{
       try {
-        // showDialog(
-        //   context: context,
-        //   builder: (context) {
-        //     return Center(
-        //       child: SpinKitSquareCircle(
-        //         color: Color(0xFFB99B6B),
-        //       ),
-        //     );
-        //   },
-        // );
+
         String err_msg = await userService.changePassword(currentPassword, newPassword);
         if (err_msg.isEmpty){
           fetchUserInfo();

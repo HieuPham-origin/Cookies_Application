@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';
@@ -33,7 +35,7 @@ void showAddTopicModalBottomSheet(
     isDismissible: false,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    backgroundColor: const Color(0xfffefffe),
+    backgroundColor: Color.fromRGBO(66, 69, 66, 1),
     builder: (context) => DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.95,
@@ -88,6 +90,8 @@ void showAddTopicModalBottomSheet(
                 ),
                 InkWell(
                     onTap: () async {
+
+
                       if (type == 1) {
                         if (topicController.text.isNotEmpty) {
                           setState(() {

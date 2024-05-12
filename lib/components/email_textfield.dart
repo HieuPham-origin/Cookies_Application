@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -24,30 +26,29 @@ class EmailTextField extends StatelessWidget {
         style: GoogleFonts.inter(),
         obscureText: obscureText,
         decoration: InputDecoration(
-            constraints: BoxConstraints(maxHeight: 60),
-            focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
-                borderRadius: BorderRadius.all(Radius.circular(12))),
-            border: const OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFB99B6B), width: 1.0),
-                borderRadius: BorderRadius.all(Radius.circular(12))),
-            labelText: hintText,
-            labelStyle: const TextStyle(
-              color: Color(0xFF9A9A9A),
-            )),
+          focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(width: 2, color: Color(0xFFB99B6B)),
+              borderRadius: BorderRadius.all(Radius.circular(12))),
+          border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFB99B6B), width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(12))),
+          labelText: hintText,
+          labelStyle: const TextStyle(
+            color: Color(0xFF9A9A9A),
+          ),
+        ),
       ),
     );
   }
 }
 
 class EmailValidator {
-  //validate Email
   static String? validate(String? value) {
     if (value!.isEmpty) {
-      return 'Email is required';
+      return 'Email không được bỏ trống';
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Email is invalid';
+      return 'Email không hợp lệ';
     }
     return null;
   }
