@@ -59,8 +59,6 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-
-
   @override
   void initState() {
     super.initState();
@@ -306,7 +304,7 @@ class _QuizScreenState extends State<QuizScreen> {
       onPressed: () {
         if (currentQuiz < words.length) {
           _pageController.nextPage(
-            duration: const Duration(milliseconds: 900),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
         } else {
@@ -334,7 +332,13 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
               IconsButton(
                 onPressed: () {
-                  setState(() {});
+                  Navigator.pop(context);
+                  setState(() {
+                    point = 0;
+                    currentQuiz = 1;
+                  });
+                  _pageController.jumpToPage(0);
+                  startTimerOnQuestions();
                 },
                 text: 'Làm lại',
                 iconData: Icons.redo,

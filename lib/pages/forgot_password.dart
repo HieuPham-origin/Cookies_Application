@@ -39,94 +39,86 @@ class _Forgot_PasswordPageState extends State<Forgot_Password> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 72,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 64),
-            child: Column(
-              children: [
-                Text(
-                  "Quên mật khẩu",
-                  style: GoogleFonts.inter(
-                    textStyle: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  "Nhập email xác nhận",
-                  style: GoogleFonts.inter(
-                    textStyle: const TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF9A9A9A),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    hintText: "Nhập email",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Color(0xFFB99B6B),
-                        width: 1.0,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Color(0xFFB99B6B),
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 32,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFB99B6B),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      minimumSize: const Size.fromHeight(50),
-                    ),
-                    onPressed: () async {
-                      // email
-                      AuthService authService = new AuthService();
-                      await authService.sendPasswordResetEmail(emailController.text);
-                      
-                    },
-                    child: Text(
-                      "Gửi",
-                      style: GoogleFonts.inter(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 72,
             ),
-          ),
-        ],
+            Text(
+              "Quên mật khẩu",
+              style: GoogleFonts.inter(
+                textStyle: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Text(
+              "Nhập email xác nhận",
+              style: GoogleFonts.inter(
+                textStyle: const TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFF9A9A9A),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                hintText: "Nhập email",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Color(0xFFB99B6B),
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Color(0xFFB99B6B),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 32,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFB99B6B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                minimumSize: const Size.fromHeight(50),
+              ),
+              onPressed: () async {
+                // email
+                AuthService authService = new AuthService();
+                await authService.sendPasswordResetEmail(emailController.text);
+              },
+              child: Text(
+                "Gửi",
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -191,6 +191,8 @@ class _SignInState extends State<SignIn> {
                               padding: EdgeInsets.only(left: 16.0, right: 16.0),
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
+                                    elevation: 3,
+                                    shadowColor: Colors.black,
                                     backgroundColor: Color(0xFFB99B6B),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -207,6 +209,7 @@ class _SignInState extends State<SignIn> {
                                       textStyle: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   )),

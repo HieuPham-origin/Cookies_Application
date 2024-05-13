@@ -28,7 +28,7 @@ void showPracticeptionModalBottomSheet(BuildContext contextDetailTopic,
         child: InkWell(
           onTap: () async {
             int wordCount = await topicService.countWordsInTopic(topicId);
-            wordCount > 5
+            wordCount >= 5
                 ? onTap()
                 : ToastService.showWarningToast(
                     contextDetailTopic,
