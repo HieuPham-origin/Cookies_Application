@@ -1,10 +1,11 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, prefer_const_literals_to_create_immutables, prefer_const_constructors
 import 'dart:async';
 import 'dart:developer';
 
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/services/QuizService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:cookie_app/utils/demension.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cookie_app/services/TopicService.dart';
@@ -26,20 +27,26 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  int questionTimerSeconds = 20;
-  bool isLocked = true;
-
+  //Service
   TopicService topicService = TopicService();
   QuizService quizService = QuizService();
+
+  //Variables
+  int questionTimerSeconds = 20;
+  bool isLocked = true;
   List<Word> words = [];
   var questions;
   Timer? _timer;
   int point = 0;
-
-  PageController _pageController = PageController();
   List optionsLetters = ["A.", "B.", "C.", "D."];
-
   int currentQuiz = 1;
+  int timeChoose = 10;
+
+  //Controllers
+  PageController _pageController = PageController();
+  TextEditingController _setTimeController = TextEditingController();
+
+  //Functions
   Future<List<Word>> fetchWords() async {
     words = await topicService.getWordsForTopic(widget.topicId);
     return words;
@@ -53,10 +60,98 @@ class _QuizScreenState extends State<QuizScreen> {
             questionTimerSeconds--;
           } else {
             _timer?.cancel();
+            restartTimer(timeChoose);
           }
         });
       }
     });
+  }
+
+  void restartQuiz() {
+    setState(() {
+      point = 0;
+      currentQuiz = 1;
+    });
+    _pageController.jumpToPage(0);
+    startTimerOnQuestions();
+  }
+
+  void restartTimer(int time) {
+    setState(
+      () {
+        isLocked = true;
+        questionTimerSeconds = time;
+        if (currentQuiz < words.length) {
+          currentQuiz++;
+          startTimerOnQuestions();
+        }
+      },
+    );
+  }
+
+  void quizSettingBottomSheet(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    showModalBottomSheet(
+      backgroundColor: AppColors.background,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: screenSize.height * 0.35,
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: Dimensions.height(context, 40),
+              ),
+
+              Text(
+                "Cài đặt",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+
+              SizedBox(
+                height: Dimensions.height(context, 10),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Đặt thời gian",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Flexible(
+                      child: SizedBox(
+                        width: 100,
+                        child: TextField(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(
+                height: Dimensions.height(context, 10),
+              ),
+
+              SizedBox(
+                height: Dimensions.height(context, 10),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -65,7 +160,7 @@ class _QuizScreenState extends State<QuizScreen> {
     fetchWords().then((fetchedWords) {
       setState(() {
         words = fetchedWords;
-        questions = quizService.generateQuizQuestions(words);
+        questions = quizService.generateQuizQuestions(words, false);
       });
     });
     startTimerOnQuestions();
@@ -74,6 +169,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
         child: Column(
@@ -81,6 +177,7 @@ class _QuizScreenState extends State<QuizScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -93,6 +190,13 @@ class _QuizScreenState extends State<QuizScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                IconButton(
+                  onPressed: () {
+                    _timer?.cancel();
+                    quizSettingBottomSheet(context);
+                  },
+                  icon: Icon(Icons.settings),
+                )
               ],
             ),
             const SizedBox(
@@ -117,7 +221,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       borderRadius: BorderRadius.circular(12),
                       child: LinearProgressIndicator(
                         minHeight: 15,
-                        value: (questionTimerSeconds / 20),
+                        value: (questionTimerSeconds / timeChoose),
                         backgroundColor: Colors.blue.shade100,
                         color: Colors.blueGrey,
                         valueColor:
@@ -228,12 +332,10 @@ class _QuizScreenState extends State<QuizScreen> {
                                                       isLocked = false;
                                                     },
                                                   );
-
                                                   if (userAnswer ==
                                                       correctAnswer) {
                                                     point++;
                                                   }
-
                                                   _timer!.cancel();
                                                 },
                                                 child: Container(
@@ -333,12 +435,7 @@ class _QuizScreenState extends State<QuizScreen> {
               IconsButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  setState(() {
-                    point = 0;
-                    currentQuiz = 1;
-                  });
-                  _pageController.jumpToPage(0);
-                  startTimerOnQuestions();
+                  restartQuiz();
                 },
                 text: 'Làm lại',
                 iconData: Icons.redo,
@@ -349,17 +446,7 @@ class _QuizScreenState extends State<QuizScreen> {
             ],
           );
         }
-
-        setState(
-          () {
-            isLocked = true;
-            questionTimerSeconds = 20;
-            if (currentQuiz < words.length) {
-              currentQuiz++;
-              startTimerOnQuestions();
-            }
-          },
-        );
+        restartTimer(timeChoose);
       },
       child: Text(
         currentQuiz < words.length ? "Tiếp tục" : "Hoàn thành",
