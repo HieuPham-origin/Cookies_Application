@@ -20,7 +20,7 @@ void showPracticeptionModalBottomSheet(BuildContext contextDetailTopic,
       height: Dimensions.height(contextDetailTopic, 70),
       width: screenSize.width * 0.85,
       child: Card(
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
         color: Colors.white,
         surfaceTintColor: Colors.white,
@@ -52,7 +52,7 @@ void showPracticeptionModalBottomSheet(BuildContext contextDetailTopic,
               ),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.icon_grey,
                   fontWeight: FontWeight.w500,
