@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:cookie_app/pages/Home.dart';
 import 'package:cookie_app/pages/home_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
+import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ class VerifyEmailPage extends StatefulWidget {
 class _VerifyEmailPageState extends State<VerifyEmailPage> {
   bool isEmailVerify = false;
   bool canResendEmail = false;
+  // UserService userService = UserService(FirebaseAuth.instance.currentUser!);
   Timer? timer;
 
   @override
@@ -62,8 +64,21 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   @override
   Widget build(BuildContext context) {
     if (isEmailVerify) {
-      FirebaseAuth.instance.currentUser!.reload();
-      return Home();
+      return FutureBuilder<void>(
+        future: () async {
+          await FirebaseAuth.instance.currentUser!.reload();
+          await UserService(FirebaseAuth.instance.currentUser!).loadAvatar();
+        }(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            return Home();
+          }
+        },
+      );
     } else {
       return Scaffold(
         appBar: AppBar(

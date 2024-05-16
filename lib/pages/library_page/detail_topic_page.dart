@@ -117,7 +117,7 @@ class _DetailTopicState extends State<DetailTopic> {
               highlightColor: Colors.transparent,
               padding: EdgeInsets.zero,
               constraints:
-                  BoxConstraints(maxWidth: Dimensions.width(context, 20)),
+                  BoxConstraints(maxWidth: Dimensions.width(context, 30)),
               icon: Icon(CupertinoIcons.folder_badge_plus,
                   color: AppColors.grey_heavy), // Adjust the color as needed
               onPressed: () {

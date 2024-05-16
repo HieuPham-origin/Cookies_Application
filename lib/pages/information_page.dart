@@ -1,11 +1,10 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'dart:developer';
 
+import 'package:camera/camera.dart';
 import 'package:cookie_app/components/custom_textfield.dart';
+import 'package:cookie_app/components/modal_bottom_sheet/image_option.dart';
+import 'package:cookie_app/models/community.dart';
 import 'package:cookie_app/pages/change_name.dart';
 import 'package:cookie_app/pages/change_password.dart';
 import 'package:cookie_app/resources/store_data.dart';
@@ -32,6 +31,7 @@ class _InformationPageState extends State<InformationPage> {
   CommunityService communityService = CommunityService();
 
   User? user = FirebaseAuth.instance.currentUser!;
+  File? avatar;
 
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -45,11 +45,30 @@ class _InformationPageState extends State<InformationPage> {
   void initState() {
     super.initState();
     fetchUserInfo();
+    loadAvatar();
+  }
+
+  // Load avatar from storage
+  Future<void> loadAvatar() async {
+    if (AppConstants.avatarUrl != null)
+      return; // Ensure the avatar URL is loaded only once
+
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = referenceRoot.child('avatars');
+    Reference referenceChildDirImages = referenceDirImages.child(user!.uid);
+    Reference referenceImageToUpload = referenceChildDirImages.child("avatar");
+
+    try {
+      final url = await referenceImageToUpload.getDownloadURL();
+      setState(() {
+        AppConstants.avatarUrl = url;
+      });
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<void> fetchUserInfo() async {
-    // final userInfo = await userService.getUserInfo();
-
     setState(() {
       email = user!.email!;
       displayName = user!.displayName ?? 'cookieuser';
@@ -80,60 +99,6 @@ class _InformationPageState extends State<InformationPage> {
       passwordController.text = rollback;
     });
   }
-
-  Future<String> getDownloadUrlImage(String imagePath) async {
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImage = referenceRoot.child('avatars');
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference referenceImageToUpload = referenceDirImage.child(fileName);
-    String downloadUrl = '';
-
-    try {
-      // Assuming `imagePath` is the path to the image file you want to upload
-      await referenceImageToUpload.putFile(File(imagePath));
-      downloadUrl = await referenceImageToUpload.getDownloadURL();
-    } catch (error) {
-      print('Error uploading image: $error');
-      // Optionally, handle the error more gracefully or inform the user
-    }
-
-    return downloadUrl;
-  }
-
-  Future<File> convertUint8ListToFile(
-      Uint8List imageData, String fileName) async {
-    // Get the directory to save the file
-    final directory = await getApplicationDocumentsDirectory();
-
-    // Create a file path with the given file name
-    final filePath = '${directory.path}/$fileName';
-
-    // Create a new file
-    final file = File(filePath);
-
-    // Write the Uint8List data to the file
-    await file.writeAsBytes(imageData);
-
-    return file;
-  }
-
-  void selectImage() async {
-    Uint8List img = await pickAvatar(ImageSource.gallery);
-    setState(() {
-      AppConstants.image = img;
-    });
-    await StoreData().saveData(file: img);
-    String uniqueFileName = "${DateTime.now().millisecondsSinceEpoch}.png";
-    File imagePath =
-        await convertUint8ListToFile(AppConstants.image!, uniqueFileName);
-    AppConstants.avatar = await getDownloadUrlImage(imagePath.path);
-    await communityService.updateImageForAllCommunitiesByUserId(
-        user!.uid, AppConstants.avatar!);
-  }
-
-  // void saveAvatar() async{
-  //   String response = await StoreData().saveData(file: _image!);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -227,21 +192,49 @@ class _InformationPageState extends State<InformationPage> {
                       ),
                       child: Stack(
                         children: [
-                          AppConstants.image != null
-                              ? CircleAvatar(
-                                  radius: 50.0,
-                                  backgroundImage:
-                                      MemoryImage(AppConstants.image!),
-                                )
-                              : CircleAvatar(
-                                  radius: 50.0,
-                                  backgroundImage:
-                                      AssetImage("assets/logo.png"),
-                                ),
+                          CircleAvatar(
+                            radius: 50.0,
+                            backgroundImage: AppConstants.avatarUrl != ""
+                                ? NetworkImage(AppConstants.avatarUrl!)
+                                : NetworkImage(
+                                        "https://cdn.discordapp.com/attachments/1049968383082373191/1239879020414238844/logo.png?ex=664486d2&is=66433552&hm=64d4af042d201ef1982c7b048c362dcc2b68863cb21699556e21c13b27696415&")
+                                    as ImageProvider,
+                          ),
                           FractionalTranslation(
                             translation: Offset(0.5, 1.3),
                             child: RawMaterialButton(
-                              onPressed: selectImage,
+                              onPressed: () {
+                                showImageOptionModalBottomSheet(context,
+                                    (File? newAvatar) async {
+                                  if (newAvatar != null) {
+                                    setState(() {
+                                      avatar = newAvatar;
+                                    });
+                                    Reference referenceRoot =
+                                        FirebaseStorage.instance.ref();
+                                    Reference referenceDirImages =
+                                        referenceRoot.child('avatars');
+                                    Reference referenceChildDirImages =
+                                        referenceDirImages.child(user!.uid);
+                                    Reference referenceImageToUpload =
+                                        referenceChildDirImages.child("avatar");
+                                    try {
+                                      await referenceImageToUpload
+                                          .putFile(avatar!);
+                                      final url = await referenceImageToUpload
+                                          .getDownloadURL();
+
+                                      setState(() {
+                                        AppConstants.avatarUrl = url;
+                                      });
+                                      Navigator.pop(
+                                          context, AppConstants.avatarUrl);
+                                    } catch (e) {
+                                      log(e.toString());
+                                    }
+                                  }
+                                });
+                              },
                               elevation: 2.0,
                               fillColor: Color(0xFFF5F6F9),
                               child: Icon(

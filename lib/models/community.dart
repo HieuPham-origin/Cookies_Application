@@ -1,7 +1,9 @@
 import 'package:cookie_app/components/topic_community_card.dart';
 
 class Community {
-  final String user;
+  final String userId;
+  String avatar;
+  final String displayName;
   final String content;
   final String time;
   final int numOfLove;
@@ -9,7 +11,9 @@ class Community {
   List<TopicCommunityCard> topicCommunityCard = [];
 
   Community(
-      {required this.user,
+      {required this.userId,
+      required this.avatar,
+      required this.displayName,
       required this.content,
       required this.time,
       required this.numOfLove,

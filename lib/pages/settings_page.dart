@@ -5,9 +5,11 @@ import 'package:cookie_app/components/setting_options.dart';
 import 'package:cookie_app/pages/information_page.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:toasty_box/toasty_box.dart';
 import 'package:cookie_app/utils/constants.dart';
 
@@ -29,17 +31,11 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    loadProfileImage();
   }
 
   // sign user out method
   void signUserOut() {
     FirebaseAuth.instance.signOut();
-  }
-
-  void loadProfileImage() async {
-    AppConstants.image = await userService.getProfileImage();
-    setState(() {});
   }
 
   @override
@@ -80,20 +76,15 @@ class _SettingPageState extends State<SettingPage> {
                 surfaceTintColor: Colors.white,
                 child: InkWell(
                   onTap: () async {
-                    Route route = MaterialPageRoute(
-                        builder: (context) => InformationPage());
-                    final rollback = await Navigator.push(context, route);
-                    setState(
-                      () {
-                        if (rollback[0] != "") {
-                          displayName = rollback[0];
-                        }
-
-                        if (rollback[1] != null) {
-                          AppConstants.image = rollback[1];
-                        }
-                      },
-                    );
+                    final roolback =
+                        await Navigator.of(context, rootNavigator: true).push(
+                            PageTransition(
+                                child: InformationPage(),
+                                type: PageTransitionType.rightToLeft));
+                    setState(() {
+                      AppConstants.avatarUrl = roolback;
+                    });
+                    print("roolback" + roolback);
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -124,15 +115,16 @@ class _SettingPageState extends State<SettingPage> {
                           ),
                         ],
                       ),
-                      AppConstants.image != null
-                          ? CircleAvatar(
-                              radius: 50.0,
-                              backgroundImage: MemoryImage(AppConstants.image!),
-                            )
-                          : CircleAvatar(
-                              radius: 50,
-                              backgroundImage: AssetImage('assets/logo.png'),
-                            )
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AppConstants.avatarUrl != ""
+                              ? NetworkImage(AppConstants.avatarUrl)
+                              : NetworkImage(
+                                  "https://cdn.discordapp.com/attachments/1049968383082373191/1239879020414238844/logo.png?ex=664486d2&is=66433552&hm=64d4af042d201ef1982c7b048c362dcc2b68863cb21699556e21c13b27696415&"),
+                        ),
+                      ),
                     ],
                   ),
                 ),

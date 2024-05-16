@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
+import 'package:cookie_app/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -9,6 +11,23 @@ class UserService {
 
   UserService(User user) {
     this.user = user;
+  }
+
+  Future<void> loadAvatar() async {
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+    Reference referenceDirImages = referenceRoot.child('avatars');
+
+    Reference referenceChildDirImages = referenceDirImages.child(user.uid);
+    Reference referenceImageToUpload = referenceChildDirImages.child("avatar");
+
+    try {
+      final url = await referenceImageToUpload.getDownloadURL();
+      AppConstants.avatarUrl = url;
+    } catch (e) {
+      log(e.toString());
+      AppConstants.avatarUrl =
+          "https://cdn.discordapp.com/attachments/1049968383082373191/1239879020414238844/logo.png?ex=66452f92&is=6643de12&hm=ff1ce84b67b83ecb0c8dcdae52ad72619fe4fbeaf33a654188df4613b083f698&";
+    }
   }
 
   Map<String, dynamic> getUserInfo() {

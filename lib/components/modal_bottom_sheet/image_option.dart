@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 void showImageOptionModalBottomSheet(
-    BuildContext context, File? image, Function(File?) setImage) {
+    BuildContext context, Function(File?) setImage) {
   showModalBottomSheet(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(0))),

@@ -13,6 +13,7 @@ class ChangeName extends StatefulWidget {
 
 class _ChangeNamePageState extends State<ChangeName> {
   final usernameController = TextEditingController();
+
   late UserService userService;
 
   dynamic displayName;
@@ -34,7 +35,7 @@ class _ChangeNamePageState extends State<ChangeName> {
   Future<void> fetchUserInfo() async {
     final userInfo = await userService.getUserInfo();
     setState(() {
-      displayName = userInfo['displayName'];
+      usernameController.text = userInfo['displayName'];
     });
   }
 
@@ -114,7 +115,6 @@ class _ChangeNamePageState extends State<ChangeName> {
                 TextField(
                   controller: usernameController,
                   decoration: InputDecoration(
-                    hintText: "Tên",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(

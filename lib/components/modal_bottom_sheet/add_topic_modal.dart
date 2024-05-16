@@ -35,7 +35,7 @@ void showAddTopicModalBottomSheet(
     isDismissible: false,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-    backgroundColor: Color.fromRGBO(66, 69, 66, 1),
+    backgroundColor: Colors.white,
     builder: (context) => DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.95,
@@ -90,8 +90,6 @@ void showAddTopicModalBottomSheet(
                 ),
                 InkWell(
                     onTap: () async {
-
-
                       if (type == 1) {
                         if (topicController.text.isNotEmpty) {
                           setState(() {

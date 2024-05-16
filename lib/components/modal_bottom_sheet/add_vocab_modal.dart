@@ -334,12 +334,13 @@ void showAddVocabModalBottomSheet(
                                     suffixIcon: IconButton(
                                       padding: const EdgeInsets.only(bottom: 0),
                                       onPressed: () {
-                                        showImageOptionModalBottomSheet(
-                                            context, image, (File? newImage) {
+                                        showImageOptionModalBottomSheet(context,
+                                            (File? newImage) {
                                           setState(() {
                                             image = newImage;
                                           });
                                         });
+                                        print("image" + image!.path);
                                       },
                                       icon: const Icon(Icons.camera_alt),
                                     ),

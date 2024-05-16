@@ -562,8 +562,7 @@ void showDetailVocabModalBottomSheet(
                                     onTap: edit == "Lưu"
                                         ? () {
                                             showImageOptionModalBottomSheet(
-                                                context, File(image),
-                                                (File? newImage) {
+                                                context, (File? newImage) {
                                               setState(() {
                                                 image = newImage!.path;
                                               });

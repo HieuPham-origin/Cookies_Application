@@ -1,9 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:developer';
+
 import 'package:cookie_app/components/email_textfield.dart';
 import 'package:cookie_app/components/password_textfield.dart';
 import 'package:cookie_app/pages/forgot_password.dart';
+import 'package:cookie_app/services/UserService.dart';
+import 'package:cookie_app/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -28,6 +33,7 @@ class _SignInState extends State<SignIn> {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  // User user = FirebaseAuth.instance.currentUser!;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -49,6 +55,7 @@ class _SignInState extends State<SignIn> {
         password: passwordController.text,
       );
 
+      await UserService(FirebaseAuth.instance.currentUser!).loadAvatar();
       // pop the loading circle
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {

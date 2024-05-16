@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cookie_app/pages/Home.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/pages/verify_email.dart';

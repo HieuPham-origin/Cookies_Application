@@ -5,6 +5,8 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/topic_card.dart';
+import 'package:cookie_app/components/topic_community_card.dart';
+import 'package:cookie_app/models/community.dart';
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/TopicService.dart';
@@ -18,45 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 
-Future<String> getDownloadUrlImage(String imagePath) async {
-  Reference referenceRoot = FirebaseStorage.instance.ref();
-  Reference referenceDirImage = referenceRoot.child('avatars');
-  String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-  Reference referenceImageToUpload = referenceDirImage.child(fileName);
-  String downloadUrl = '';
-
-  try {
-    // Assuming `imagePath` is the path to the image file you want to upload
-    await referenceImageToUpload.putFile(File(imagePath));
-    downloadUrl = await referenceImageToUpload.getDownloadURL();
-  } catch (error) {
-    print('Error uploading image: $error');
-    // Optionally, handle the error more gracefully or inform the user
-  }
-
-  return downloadUrl;
-}
-
-Future<File> convertUint8ListToFile(
-    Uint8List imageData, String fileName) async {
-  // Get the directory to save the file
-  final directory = await getApplicationDocumentsDirectory();
-
-  // Create a file path with the given file name
-  final filePath = '${directory.path}/$fileName';
-
-  // Create a new file
-  final file = File(filePath);
-
-  // Write the Uint8List data to the file
-  await file.writeAsBytes(imageData);
-
-  return file;
-}
-
-void showPostTopicModalBottomSheet(
-  BuildContext context,
-) {
+void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
   TextEditingController communityController = TextEditingController();
   TopicService topicService = TopicService();
   CommunityService communityService = CommunityService();
@@ -64,7 +28,6 @@ void showPostTopicModalBottomSheet(
   User user = FirebaseAuth.instance.currentUser!;
   String userId = user.uid;
   String displayName = user.displayName ?? 'cookieuser';
-  File imageFile;
   List<Topic> listTopic = [];
 
   showModalBottomSheet(
@@ -141,29 +104,36 @@ void showPostTopicModalBottomSheet(
                             isLoading = true;
                           });
                           try {
-                            String uniqueFileName =
-                                "${DateTime.now().millisecondsSinceEpoch}.png";
-                            imageFile = await convertUint8ListToFile(
-                                AppConstants.image!, uniqueFileName);
-                            await getDownloadUrlImage(imageFile.path)
-                                .then((value) async {
-                              String imageUrl = value;
-                              List<Map<String, dynamic>> topicsAsJson =
-                                  listTopic
-                                      .map((topic) => topic.toJson())
-                                      .toList();
-                              await communityService.addCommunity(
-                                  userId,
-                                  displayName,
-                                  imageUrl,
-                                  communityController.text,
-                                  DateTime.now().toString(),
-                                  0,
-                                  0,
-                                  topicsAsJson);
+                            List<Map<String, dynamic>> topicsAsJson = listTopic
+                                .map((topic) => topic.toJson())
+                                .toList();
+                            await communityService.addCommunity(
+                                userId,
+                                displayName,
+                                communityController.text,
+                                DateTime.now().toString(),
+                                0,
+                                0,
+                                topicsAsJson);
 
-                              Navigator.of(context).pop();
-                            });
+                            AppConstants.communities.add(Community(
+                                userId: userId,
+                                avatar: avatarUrl,
+                                displayName: displayName,
+                                content: communityController.text,
+                                time: DateTime.now().toString(),
+                                numOfLove: 0,
+                                numOfComment: 0,
+                                topicCommunityCard: listTopic
+                                    .map<TopicCommunityCard>(
+                                        (topic) => TopicCommunityCard(
+                                              topicName: topic.topicName,
+                                              numOfVocab: 10,
+                                              color: topic.color,
+                                            ))
+                                    .toList()));
+
+                            Navigator.of(context).pop();
                           } catch (e) {
                             log(e.toString());
                           } finally {
@@ -217,18 +187,14 @@ void showPostTopicModalBottomSheet(
                         child: Container(
                           width: Dimensions.width(context, 42),
                           height: Dimensions.height(context, 42),
-                          decoration: BoxDecoration(
-                            color: AppConstants.avatar!.isNotEmpty
-                                ? null
-                                : Colors.grey[300],
-                            borderRadius: BorderRadius.circular(50),
-                          ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(
                                 50), // This applies to the CachedNetworkImage
 
                             child: CachedNetworkImage(
-                              imageUrl: AppConstants.avatar!,
+                              imageUrl: avatarUrl != ""
+                                  ? avatarUrl
+                                  : "https://cdn.discordapp.com/attachments/1049968383082373191/1239879020414238844/logo.png?ex=664486d2&is=66433552&hm=64d4af042d201ef1982c7b048c362dcc2b68863cb21699556e21c13b27696415&",
                               placeholder: (context, url) => SizedBox(
                                 width:
                                     20, // Adjust the width as per your requirement

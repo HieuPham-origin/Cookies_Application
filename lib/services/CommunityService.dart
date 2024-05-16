@@ -11,7 +11,6 @@ class CommunityService {
   Future<void> addCommunity(
       String userId,
       String displayName,
-      String image,
       String content,
       String time,
       int numOfLove,
@@ -20,7 +19,6 @@ class CommunityService {
     await community.add({
       'userId': userId,
       'displayName': displayName,
-      'image': image,
       'content': content,
       'time': time,
       'numOfLove': numOfLove,
@@ -32,6 +30,17 @@ class CommunityService {
   Stream<QuerySnapshot> getAllCommunities() {
     final communityStream = community.snapshots();
     return communityStream;
+  }
+
+  //get community sort by time
+  Stream<QuerySnapshot> getCommunitySortByTime() {
+    final communityStream =
+        community.orderBy('time', descending: false).snapshots();
+    return communityStream;
+  }
+
+  Future<QuerySnapshot> getCommunitySortByTimeSnapShot() {
+    return community.orderBy('time', descending: false).get();
   }
 
   Future<QuerySnapshot> getAllCommunitiesToLoadImage() {
