@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -24,8 +25,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column, Row;
 
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -75,6 +79,23 @@ class _DetailTopicState extends State<DetailTopic> {
         numOfWord = value;
       });
     });
+  }
+
+  Future<void> exportTopic() async {
+    final topicName = widget.data['topicName'];
+
+    final Workbook workbook = Workbook();
+    final Worksheet sheet = workbook.worksheets[0];
+    sheet.getRangeByName("A1").setText("Yoooooo");
+    final List<int> bytes = workbook.saveAsStream();
+
+    workbook.dispose();
+
+    final String path = (await getApplicationSupportDirectory()).path;
+    final String fileName = '$path/$topicName.xlsx';
+    final File file = File(fileName);
+    await file.writeAsBytes(bytes, flush: true); 
+    OpenFile.open(fileName);
   }
 
   @override
@@ -213,6 +234,7 @@ class _DetailTopicState extends State<DetailTopic> {
               onPressed: () {
                 // Add your onPressed action here
                 HapticFeedback.vibrate();
+                exportTopic();
               },
             ),
           ],
