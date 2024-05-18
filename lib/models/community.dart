@@ -10,13 +10,14 @@ class Community {
   final int numOfComment;
   List<TopicCommunityCard> topicCommunityCard = [];
 
-  Community(
-      {required this.userId,
-      required this.avatar,
-      required this.displayName,
-      required this.content,
-      required this.time,
-      required this.numOfLove,
-      required this.numOfComment,
-      required this.topicCommunityCard});
+  Community({
+    required this.userId,
+    required this.avatar,
+    required this.displayName,
+    required this.content,
+    required this.time,
+    required this.numOfLove,
+    required this.numOfComment,
+    required this.topicCommunityCard,
+  });
 }

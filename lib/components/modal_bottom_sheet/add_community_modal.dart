@@ -104,9 +104,18 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
                             isLoading = true;
                           });
                           try {
-                            List<Map<String, dynamic>> topicsAsJson = listTopic
-                                .map((topic) => topic.toJson())
-                                .toList();
+                            // List<Map<String, dynamic>> topicsAsJson = listTopic
+                            //     .map((topic) => topic.toJson())
+                            //     .toList();
+                            // await communityService.addCommunity(
+                            //     userId,
+                            //     displayName,
+                            //     communityController.text,
+                            //     DateTime.now().toString(),
+                            //     0,
+                            //     0,
+                            //     topicsAsJson);
+
                             await communityService.addCommunity(
                                 userId,
                                 displayName,
@@ -114,24 +123,27 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
                                 DateTime.now().toString(),
                                 0,
                                 0,
-                                topicsAsJson);
+                                listTopic
+                                    .map((topic) => topic.topicId!)
+                                    .toList());
 
                             AppConstants.communities.add(Community(
-                                userId: userId,
-                                avatar: avatarUrl,
-                                displayName: displayName,
-                                content: communityController.text,
-                                time: DateTime.now().toString(),
-                                numOfLove: 0,
-                                numOfComment: 0,
-                                topicCommunityCard: listTopic
-                                    .map<TopicCommunityCard>(
-                                        (topic) => TopicCommunityCard(
-                                              topicName: topic.topicName,
-                                              numOfVocab: 10,
-                                              color: topic.color,
-                                            ))
-                                    .toList()));
+                              userId: userId,
+                              avatar: avatarUrl,
+                              displayName: displayName,
+                              content: communityController.text,
+                              time: DateTime.now().toString(),
+                              numOfLove: 0,
+                              numOfComment: 0,
+                              topicCommunityCard: listTopic
+                                  .map<TopicCommunityCard>(
+                                      (topic) => TopicCommunityCard(
+                                            topicName: topic.topicName,
+                                            numOfVocab: 10,
+                                            color: topic.color,
+                                          ))
+                                  .toList(),
+                            ));
 
                             Navigator.of(context).pop();
                           } catch (e) {
@@ -309,6 +321,7 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
                                       snapshot.data ?? 0;
 
                                   return TopicCard(
+                                    topicId: docID,
                                     topicName: topicTitle,
                                     numOfVocab: numOfVocabInTopicLibrary,
                                     color: color,

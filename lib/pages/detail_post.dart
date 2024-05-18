@@ -1,4 +1,5 @@
 import 'package:cookie_app/components/community_card.dart';
+import 'package:cookie_app/components/topic_community_card.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ class DetailPost extends StatefulWidget {
   final String time;
   final int numOfLove;
   final int numOfComment;
-  final List<dynamic> topicCommunityCard;
+  final List<TopicCommunityCard> topicCommunityCard;
   const DetailPost(
       {super.key,
       required this.user,
@@ -69,9 +70,20 @@ class _DetailPostState extends State<DetailPost> {
             topicCommunityCard: widget.topicCommunityCard,
             isDetailPost: true,
           ),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text("random word"),
+          const Divider(
+            height: 1,
+            thickness: 1,
+            color: AppColors.grey_heavy,
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text('Item $index'),
+                );
+              },
+            ),
           ),
         ],
       ),

@@ -15,7 +15,7 @@ class CommunityService {
       String time,
       int numOfLove,
       int numOfComment,
-      List<Map<String, dynamic>> topicCommunityCard) async {
+      List<String> topicCommunityCard) async {
     await community.add({
       'userId': userId,
       'displayName': displayName,

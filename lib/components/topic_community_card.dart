@@ -8,20 +8,25 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TopicCommunityCard extends StatefulWidget {
+  final String? topicId;
   final String topicName;
   final int numOfVocab;
   final Function()? onTap;
   final String color;
 
-  const TopicCommunityCard(
-      {super.key,
-      required this.topicName,
-      required this.numOfVocab,
-      this.onTap,
-      required this.color});
+  const TopicCommunityCard({
+    super.key,
+    required this.topicName,
+    required this.numOfVocab,
+    this.onTap,
+    required this.color,
+    this.topicId,
+  });
 
   @override
   State<TopicCommunityCard> createState() => _TopicCommunityCardState();
+
+  getColor() {}
 }
 
 class _TopicCommunityCardState extends State<TopicCommunityCard> {

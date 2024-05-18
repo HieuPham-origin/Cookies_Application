@@ -108,21 +108,9 @@ class _FavoriteVocabPageState extends State<FavoriteVocabPage> {
                             image,
                             audio,
                             example,
-                            user,
-                            topicService,
                             wordForm,
-                            (int numOfVocabInTopic) {
-                              // widget
-                              //     .setNumOfVocabInTopicFromLibrary(
-                              //         numOfVocabInTopic);
-                            },
-                            0,
-                            (int numOfVocab) {
-                              // setState(() {
-                              //   widget.numOfVocab = numOfVocab;
-                              // });
-                            },
-                            0,
+                            user: user,
+                            topicService: topicService,
                           );
                         },
                         type: 1,

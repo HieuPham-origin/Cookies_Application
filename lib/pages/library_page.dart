@@ -714,22 +714,23 @@ class _LibraryPageState extends State<LibraryPage> {
                                   image,
                                   audio,
                                   example,
-                                  user,
-                                  topicService,
                                   wordForm,
-                                  (int numOfVocabInTopic) {
+                                  user: user,
+                                  topicService: topicService,
+                                  setNumOfVocabInTopic:
+                                      (int numOfVocabInTopic) {
                                     setState(() {
                                       this.numOfVocabInTopic =
                                           numOfVocabInTopic;
                                     });
                                   },
-                                  numOfVocabInTopic,
-                                  (int numOfVocab) {
+                                  numOfVocab: numOfVocab,
+                                  setNumOfVocab: (int numOfVocab) {
                                     setState(() {
                                       this.numOfVocab = numOfVocab;
                                     });
                                   },
-                                  numOfVocab,
+                                  numOfVocabInTopic: numOfVocabInTopic,
                                 );
                               },
                             ),

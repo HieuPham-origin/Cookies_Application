@@ -19,25 +19,26 @@ import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 void showDetailVocabModalBottomSheet(
-  BuildContext context,
-  String topicId,
-  String wordId,
-  String word,
-  String phonetic,
-  String date,
-  String definition,
-  String image,
-  String audio,
-  String example,
-  User user,
-  TopicService topicService,
-  String wordForm,
-  Function(int) setNumOfVocabInTopic,
-  int numOfVocabInTopic,
-  Function(int) setNumOfVocab,
-  int numOfVocab,
-  // Assuming this is a dependency
-) {
+    BuildContext context,
+    String topicId,
+    String wordId,
+    String word,
+    String phonetic,
+    String date,
+    String definition,
+    String image,
+    String audio,
+    String example,
+    String wordForm,
+    {User? user,
+    TopicService? topicService,
+    Function(int)? setNumOfVocabInTopic,
+    int? numOfVocabInTopic = 0,
+    Function(int)? setNumOfVocab,
+    int? numOfVocab = 0,
+    int? type}
+    // Assuming this is a dependency
+    ) {
   void handleSelectionChange(WordForm selectedForm) {
     wordForm = selectedForm.toString().split('.').last;
   }
@@ -49,7 +50,7 @@ void showDetailVocabModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return StreamBuilder<QuerySnapshot>(
-              stream: topicService.getTopicsByUserId(user.uid),
+              stream: topicService.getTopicsByUserId(user!.uid),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -58,8 +59,8 @@ void showDetailVocabModalBottomSheet(
                   return CupertinoActionSheetAction(
                     onPressed: () {
                       addWordToTopic(() {
-                        setNumOfVocabInTopic(numOfVocabInTopic + 1);
-                        setNumOfVocab(numOfVocab - 1);
+                        setNumOfVocabInTopic!(numOfVocabInTopic! + 1);
+                        setNumOfVocab!(numOfVocab! - 1);
                       },
                           doc.id,
                           wordId,
@@ -75,7 +76,7 @@ void showDetailVocabModalBottomSheet(
                             audio: audio,
                             topicId: doc.id,
                             status: 0,
-                            userId: user.uid,
+                            userId: user!.uid,
                           ));
                       Navigator.of(context).pop();
                     },
@@ -205,109 +206,117 @@ void showDetailVocabModalBottomSheet(
                           ),
                         ),
                       ),
-                      GestureDetector(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                showTopicOption(context);
-                              },
-                              child: const Icon(
-                                Icons.bookmark_add,
-                                color: AppColors.icon_grey,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  edit = edit == "Sửa" ? "Lưu" : "Sửa";
-                                  if (edit == "Lưu") {
-                                    Future.delayed(
-                                        const Duration(milliseconds: 100), () {
-                                      focusNode.requestFocus();
-                                    });
-                                  } else {
-                                    String word = wordController.text;
-                                    String phonetic = phoneticController.text;
-                                    String definition =
-                                        definitionController.text;
-                                    String example = exampleController.text;
-                                    audioUpdate =
-                                        'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${word}"&tl=${word == "gay" ? "th" : "en"}&client=tw-ob';
-                                    getDownloadUrlImage(image).then((url) {
-                                      String imageUrl = url;
-                                      if (topicId.isNotEmpty) {
-                                        topicService.updateWordForTopic(
-                                          topicId,
-                                          wordId,
-                                          Word(
-                                            word: word,
-                                            phonetic: phonetic,
-                                            definition: definition,
-                                            example: example,
-                                            image: imageUrl.isNotEmpty
-                                                ? imageUrl
-                                                : image,
-                                            wordForm: wordForm,
-                                            date: getCurrentDate(),
-                                            isFav: false,
-                                            audio: audioUpdate,
-                                            topicId: '',
-                                            status: 0,
-                                            userId: '',
-                                          ),
-                                        );
-                                      } else {
-                                        WordService wordService = WordService();
-                                        wordService.updateWord(
-                                          wordId,
-                                          Word(
-                                            word: word,
-                                            phonetic: phonetic,
-                                            definition: definition,
-                                            example: example,
-                                            image: imageUrl.isNotEmpty
-                                                ? imageUrl
-                                                : image,
-                                            wordForm: wordForm,
-                                            date: getCurrentDate(),
-                                            isFav: false,
-                                            audio: audioUpdate,
-                                            topicId: '',
-                                            status: 0,
-                                            userId: '',
-                                          ),
-                                        );
-                                      }
-                                    });
-                                  }
-                                });
-                              },
-                              child: Container(
-                                width: 60,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  edit,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: edit == "Lưu"
-                                        ? AppColors.cookie
-                                        : AppColors.icon_grey,
+                      type != 1
+                          ? GestureDetector(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      showTopicOption(context);
+                                    },
+                                    child: const Icon(
+                                      Icons.bookmark_add,
+                                      color: AppColors.icon_grey,
+                                    ),
                                   ),
-                                ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        edit = edit == "Sửa" ? "Lưu" : "Sửa";
+                                        if (edit == "Lưu") {
+                                          Future.delayed(
+                                              const Duration(milliseconds: 100),
+                                              () {
+                                            focusNode.requestFocus();
+                                          });
+                                        } else {
+                                          String word = wordController.text;
+                                          String phonetic =
+                                              phoneticController.text;
+                                          String definition =
+                                              definitionController.text;
+                                          String example =
+                                              exampleController.text;
+                                          audioUpdate =
+                                              'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"${word}"&tl=${word == "gay" ? "th" : "en"}&client=tw-ob';
+                                          getDownloadUrlImage(image)
+                                              .then((url) {
+                                            String imageUrl = url;
+                                            if (topicId.isNotEmpty) {
+                                              topicService.updateWordForTopic(
+                                                topicId,
+                                                wordId,
+                                                Word(
+                                                  word: word,
+                                                  phonetic: phonetic,
+                                                  definition: definition,
+                                                  example: example,
+                                                  image: imageUrl.isNotEmpty
+                                                      ? imageUrl
+                                                      : image,
+                                                  wordForm: wordForm,
+                                                  date: getCurrentDate(),
+                                                  isFav: false,
+                                                  audio: audioUpdate,
+                                                  topicId: '',
+                                                  status: 0,
+                                                  userId: '',
+                                                ),
+                                              );
+                                            } else {
+                                              WordService wordService =
+                                                  WordService();
+                                              wordService.updateWord(
+                                                wordId,
+                                                Word(
+                                                  word: word,
+                                                  phonetic: phonetic,
+                                                  definition: definition,
+                                                  example: example,
+                                                  image: imageUrl.isNotEmpty
+                                                      ? imageUrl
+                                                      : image,
+                                                  wordForm: wordForm,
+                                                  date: getCurrentDate(),
+                                                  isFav: false,
+                                                  audio: audioUpdate,
+                                                  topicId: '',
+                                                  status: 0,
+                                                  userId: '',
+                                                ),
+                                              );
+                                            }
+                                          });
+                                        }
+                                      });
+                                    },
+                                    child: Container(
+                                      width: 60,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        edit,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: edit == "Lưu"
+                                              ? AppColors.cookie
+                                              : AppColors.icon_grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const InkWell(
+                                    child: Icon(
+                                      CupertinoIcons.share_up,
+                                      color: AppColors.icon_grey,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const InkWell(
-                              child: Icon(
-                                CupertinoIcons.share_up,
-                                color: AppColors.icon_grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),

@@ -326,225 +326,227 @@ class _DetailTopicState extends State<DetailTopic> {
                   SizedBox(height: 5),
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
-                        stream:
-                            topicService.getWordsForTopicStream(widget.docID),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            // print(snapshot.error);
+                      stream: topicService.getWordsForTopicStream(widget.docID),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          // print(snapshot.error);
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (snapshot.hasData) {
+                          List words = snapshot.data!.docs;
+                          if (words.isEmpty) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            List words = snapshot.data!.docs;
-                            if (words.isEmpty) {
-                              return Center(
-                                  child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: screenSize.height * 0.18,
-                                    width: screenSize.width * 0.3,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                      image: AssetImage(
-                                          'assets/logo_icon_removebg.png'),
-                                      fit: BoxFit.contain,
-                                    )),
-                                  ),
-                                  Text("Không có từ vựng nào",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                          color: AppColors.grey_light)),
-                                ],
-                              ));
-                            }
-                            words.sort((a, b) {
-                              return b['date'].compareTo(a['date']);
-                            });
-
-                            return ListView.builder(
-                                itemCount: words.length,
-                                shrinkWrap: true,
-                                itemBuilder: (contextVocab, index) {
-                                  DocumentSnapshot document = words[index];
-                                  String wordId = document.id;
-                                  Map<String, dynamic> data =
-                                      document.data() as Map<String, dynamic>;
-
-                                  String word = data['word'];
-                                  String definition = data['definition'];
-                                  String phonetic = data['phonetic'];
-                                  String date = data['date'];
-                                  String image = data['image'];
-                                  String wordForm = data['wordForm'];
-                                  String example = data['example'];
-                                  String audio = data['audio'];
-                                  bool isFav = data['isFav'];
-                                  String topicId = data['topicId'];
-                                  int status = data['status'];
-                                  String userId = data['userId'];
-
-                                  return Slidable(
-                                    closeOnScroll: true,
-                                    key: Key(wordId),
-                                    endActionPane: ActionPane(
-                                      extentRatio: 0.3,
-                                      motion: const ScrollMotion(),
-                                      children: [
-                                        SlidableAction(
-                                          autoClose: true,
-                                          onPressed: (direction) async {
-                                            final result = await QuickAlert.show(
-                                                context: contextVocab,
-                                                text: "Bạn có thật sự muốn xóa từ vựng này không ?",
-                                                type: QuickAlertType.confirm,
-                                                showCancelBtn: true,
-                                                confirmBtnText: "Có",
-                                                cancelBtnText: "Không",
-                                                confirmBtnColor: Colors.red,
-                                                onCancelBtnTap: () {
-                                                  Navigator.of(contextVocab,
-                                                          rootNavigator: true)
-                                                      .pop('dialog');
-                                                },
-                                                onConfirmBtnTap: () async {
-                                                  await topicService
-                                                      .deleteWordForTopic(
-                                                          widget.docID, wordId);
-                                                  setState(() {
-                                                    numOfWord -= 1;
-                                                  });
-                                                  widget.setNumOfVocabInTopicFromLibrary(
-                                                      widget.numOfVocabInTopic -
-                                                          1);
-                                                  widget.setNumOfTopicInFolder(
-                                                      widget.numOfVocabInTopicInFolder -
-                                                          1);
-
-                                                  Navigator.of(contextVocab,
-                                                          rootNavigator: true)
-                                                      .pop('dialog');
-                                                });
-
-                                            return result;
-                                          },
-                                          icon: Icons.delete,
-                                          backgroundColor: AppColors.red,
-                                          label: 'Delete',
-                                        ),
-                                      ],
-                                    ),
-                                    child: VocabularyCard(
-                                      word: word,
-                                      phonetics: phonetic != ""
-                                          ? phonetic
-                                          : "/transcription/",
-                                      definition: definition,
-                                      wordForm: wordForm,
-                                      date: date,
-                                      isFav: isFav,
-                                      topicId: topicId,
-                                      type: 1,
-                                      onSpeakerPressed: () async {
-                                        await audioPlayer.stop();
-                                        await audioPlayer
-                                            .play(UrlSource(audio));
-                                      },
-                                      onFavoritePressed: (bool isFav) async {
-                                        if (!isFav) {
-                                          await topicService
-                                              .updateFavoriteWordForTopic(
-                                                  widget.docID, wordId, isFav);
-                                          await wordService.addFavoriteWord(
-                                              Word(
-                                                  word: word,
-                                                  definition: definition,
-                                                  phonetic: phonetic,
-                                                  date: date,
-                                                  image: image,
-                                                  wordForm: wordForm,
-                                                  example: example,
-                                                  audio: audio,
-                                                  isFav: !isFav,
-                                                  topicId: topicId,
-                                                  status: status,
-                                                  userId: userId),
-                                              wordId);
-                                        } else {
-                                          await topicService
-                                              .updateFavoriteWordForTopic(
-                                                  widget.docID, wordId, isFav);
-                                          await wordService
-                                              .removeFavoriteWord(wordId);
-                                        }
-                                        return null;
-                                      },
-                                      onSavePressed: () {
-                                        showTopicsModalBottomSheet(
-                                          contextVocab,
-                                          wordId,
-                                          word,
-                                          definition,
-                                          phonetic,
-                                          date,
-                                          image,
-                                          wordForm,
-                                          example,
-                                          audio,
-                                          isFav,
-                                          topicId,
-                                          status,
-                                          userId,
-                                          (int numOfVocabInTopic) {
-                                            widget
-                                                .setNumOfVocabInTopicFromLibrary(
-                                                    numOfVocabInTopic);
-                                          },
-                                          widget.numOfVocabInTopic,
-                                          (int numOfVocab) {
-                                            setState(() {
-                                              widget.numOfVocab = numOfVocab;
-                                            });
-                                          },
-                                          widget.numOfVocab,
-                                        );
-                                      },
-                                      onTap: () {
-                                        showDetailVocabModalBottomSheet(
-                                          contextVocab,
-                                          widget.docID,
-                                          wordId,
-                                          word,
-                                          phonetic,
-                                          date,
-                                          definition,
-                                          image,
-                                          audio,
-                                          example,
-                                          user,
-                                          topicService,
-                                          wordForm,
-                                          (int numOfVocabInTopic) {
-                                            widget
-                                                .setNumOfVocabInTopicFromLibrary(
-                                                    numOfVocabInTopic);
-                                          },
-                                          widget.numOfVocabInTopic,
-                                          (int numOfVocab) {
-                                            setState(() {
-                                              widget.numOfVocab = numOfVocab;
-                                            });
-                                          },
-                                          widget.numOfVocab,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                });
-                          } else {
-                            return Center(child: Text("No Words Found"));
+                                child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: screenSize.height * 0.18,
+                                  width: screenSize.width * 0.3,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                    image: AssetImage(
+                                        'assets/logo_icon_removebg.png'),
+                                    fit: BoxFit.contain,
+                                  )),
+                                ),
+                                Text("Không có từ vựng nào",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                        color: AppColors.grey_light)),
+                              ],
+                            ));
                           }
-                        }),
+                          words.sort((a, b) {
+                            return b['date'].compareTo(a['date']);
+                          });
+
+                          return ListView.builder(
+                              itemCount: words.length,
+                              shrinkWrap: true,
+                              itemBuilder: (contextVocab, index) {
+                                DocumentSnapshot document = words[index];
+                                String wordId = document.id;
+                                Map<String, dynamic> data =
+                                    document.data() as Map<String, dynamic>;
+
+                                String word = data['word'];
+                                String definition = data['definition'];
+                                String phonetic = data['phonetic'];
+                                String date = data['date'];
+                                String image = data['image'];
+                                String wordForm = data['wordForm'];
+                                String example = data['example'];
+                                String audio = data['audio'];
+                                bool isFav = data['isFav'];
+                                String topicId = data['topicId'];
+                                int status = data['status'];
+                                String userId = data['userId'];
+
+                                return Slidable(
+                                  closeOnScroll: true,
+                                  key: Key(wordId),
+                                  endActionPane: ActionPane(
+                                    extentRatio: 0.3,
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        autoClose: true,
+                                        onPressed: (direction) async {
+                                          final result = await QuickAlert.show(
+                                              context: contextVocab,
+                                              text:
+                                                  "Bạn có thật sự muốn xóa từ vựng này không ?",
+                                              type: QuickAlertType.confirm,
+                                              showCancelBtn: true,
+                                              confirmBtnText: "Có",
+                                              cancelBtnText: "Không",
+                                              confirmBtnColor: Colors.red,
+                                              onCancelBtnTap: () {
+                                                Navigator.of(contextVocab,
+                                                        rootNavigator: true)
+                                                    .pop('dialog');
+                                              },
+                                              onConfirmBtnTap: () async {
+                                                await topicService
+                                                    .deleteWordForTopic(
+                                                        widget.docID, wordId);
+                                                setState(() {
+                                                  numOfWord -= 1;
+                                                });
+                                                widget.setNumOfVocabInTopicFromLibrary(
+                                                    widget.numOfVocabInTopic -
+                                                        1);
+                                                widget.setNumOfTopicInFolder(
+                                                    widget.numOfVocabInTopicInFolder -
+                                                        1);
+
+                                                Navigator.of(contextVocab,
+                                                        rootNavigator: true)
+                                                    .pop('dialog');
+                                              });
+
+                                          return result;
+                                        },
+                                        icon: Icons.delete,
+                                        backgroundColor: AppColors.red,
+                                        label: 'Delete',
+                                      ),
+                                    ],
+                                  ),
+                                  child: VocabularyCard(
+                                    word: word,
+                                    phonetics: phonetic != ""
+                                        ? phonetic
+                                        : "/transcription/",
+                                    definition: definition,
+                                    wordForm: wordForm,
+                                    date: date,
+                                    isFav: isFav,
+                                    topicId: topicId,
+                                    type: 1,
+                                    onSpeakerPressed: () async {
+                                      await audioPlayer.stop();
+                                      await audioPlayer.play(UrlSource(audio));
+                                    },
+                                    onFavoritePressed: (bool isFav) async {
+                                      if (!isFav) {
+                                        await topicService
+                                            .updateFavoriteWordForTopic(
+                                                widget.docID, wordId, isFav);
+                                        await wordService.addFavoriteWord(
+                                            Word(
+                                                word: word,
+                                                definition: definition,
+                                                phonetic: phonetic,
+                                                date: date,
+                                                image: image,
+                                                wordForm: wordForm,
+                                                example: example,
+                                                audio: audio,
+                                                isFav: !isFav,
+                                                topicId: topicId,
+                                                status: status,
+                                                userId: userId),
+                                            wordId);
+                                      } else {
+                                        await topicService
+                                            .updateFavoriteWordForTopic(
+                                                widget.docID, wordId, isFav);
+                                        await wordService
+                                            .removeFavoriteWord(wordId);
+                                      }
+                                      return null;
+                                    },
+                                    onSavePressed: () {
+                                      showTopicsModalBottomSheet(
+                                        contextVocab,
+                                        wordId,
+                                        word,
+                                        definition,
+                                        phonetic,
+                                        date,
+                                        image,
+                                        wordForm,
+                                        example,
+                                        audio,
+                                        isFav,
+                                        topicId,
+                                        status,
+                                        userId,
+                                        (int numOfVocabInTopic) {
+                                          widget
+                                              .setNumOfVocabInTopicFromLibrary(
+                                                  numOfVocabInTopic);
+                                        },
+                                        widget.numOfVocabInTopic,
+                                        (int numOfVocab) {
+                                          setState(() {
+                                            widget.numOfVocab = numOfVocab;
+                                          });
+                                        },
+                                        widget.numOfVocab,
+                                      );
+                                    },
+                                    onTap: () {
+                                      showDetailVocabModalBottomSheet(
+                                        contextVocab,
+                                        widget.docID,
+                                        wordId,
+                                        word,
+                                        phonetic,
+                                        date,
+                                        definition,
+                                        image,
+                                        audio,
+                                        example,
+                                        wordForm,
+                                        user: user,
+                                        topicService: topicService,
+                                        numOfVocabInTopic:
+                                            widget.numOfVocabInTopic,
+                                        setNumOfVocabInTopic:
+                                            (int numOfVocabInTopic) {
+                                          widget
+                                              .setNumOfVocabInTopicFromLibrary(
+                                                  numOfVocabInTopic);
+                                        },
+                                        setNumOfVocab: (int numOfVocab) {
+                                          setState(() {
+                                            widget.numOfVocab = numOfVocab;
+                                          });
+                                        },
+                                        numOfVocab: widget.numOfVocab,
+                                      );
+                                    },
+                                  ),
+                                );
+                              });
+                        } else {
+                          return Center(child: Text("No Words Found"));
+                        }
+                      },
+                    ),
                   )
                 ],
               ),

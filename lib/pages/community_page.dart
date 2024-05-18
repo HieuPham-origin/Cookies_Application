@@ -1,26 +1,21 @@
 import 'dart:developer';
-import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/components/community_card.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_community_modal.dart';
 import 'package:cookie_app/components/modal_bottom_sheet/add_wallpost.dart';
-import 'package:cookie_app/components/topic_card.dart';
 import 'package:cookie_app/components/topic_community_card.dart';
 import 'package:cookie_app/models/community.dart';
+import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/services/CommunityService.dart';
+import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/UserService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/constants.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CommunityPage extends StatefulWidget {
   // const CommunityPage({super.key});
@@ -37,6 +32,7 @@ final GlobalKey<WallPostState> bottomSheetKey = GlobalKey<WallPostState>();
 
 class _CommunityPageState extends State<CommunityPage> {
   CommunityService communityService = CommunityService();
+  TopicService topicService = TopicService();
   UserService userService = UserService(user);
 
   // List<String> avatarUrls = [];
@@ -73,54 +69,50 @@ class _CommunityPageState extends State<CommunityPage> {
     final result = await communityService.getCommunitySortByTimeSnapShot();
     for (var doc in result.docs) {
       AppConstants.communities.add(Community(
-          userId: doc['userId'],
-          avatar: await getAvatarUrl(doc['userId']),
-          displayName: doc['displayName'],
-          content: doc['content'],
-          time: doc['time'],
-          numOfLove: doc['numOfLove'],
-          numOfComment: doc['numOfComment'],
-          topicCommunityCard: doc['topicCommunityCard']
-              .map<TopicCommunityCard>((topic) => TopicCommunityCard(
-                    topicName: topic['topicName'],
-                    numOfVocab: 10,
-                    color: topic['color'],
-                  ))
-              .toList()));
+        // communityId: doc.id,
+        userId: doc['userId'],
+        avatar: await getAvatarUrl(doc['userId']),
+        displayName: doc['displayName'],
+        content: doc['content'],
+        time: doc['time'],
+        numOfLove: doc['numOfLove'],
+        numOfComment: doc['numOfComment'],
+        topicCommunityCard:
+            await loadTopic((doc['topicCommunityCard']).cast<String>()),
+      ));
     }
     setState(() {
       flag = true;
     });
   }
 
+  //load topic from topicId
+  Future<List<TopicCommunityCard>> loadTopic(List<String> topicId) async {
+    List<TopicCommunityCard> listTopic = [];
+    for (var id in topicId) {
+      final topic = await topicService.getTopicById(id);
+      listTopic.add(TopicCommunityCard(
+        topicName: topic.topicName,
+        numOfVocab: 10,
+        color: topic.color,
+        topicId: topic.topicId,
+      ));
+    }
+    return listTopic;
+  }
+
+  Future<List<Topic>> loadTopicFromList(List<String> topicId) async {
+    List<Topic> listTopic = [];
+    for (var id in topicId) {
+      final topic = await topicService.getTopicById(id);
+      listTopic.add(topic);
+    }
+    return listTopic;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        title: const Text(
-          'Cộng đồng',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/search');
-            },
-            icon: const Icon(
-              Icons.search,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
       resizeToAvoidBottomInset: false,
       floatingActionButton: Container(
         width: 60,
@@ -138,56 +130,68 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          flag = false;
-          await getAllCommunities();
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FutureBuilder(
-                future: getAllCommunities(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.cookie,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    reverse: true,
-                    itemCount: AppConstants.communities.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Community e = AppConstants.communities[index];
-                      DateTime postTime = DateTime.parse(e.time);
-                      String timeSince = formatTimeSince(postTime);
+      body: NestedScrollView(
+        body: RefreshIndicator(
+          onRefresh: () async {
+            flag = false;
+            await getAllCommunities();
+          },
+          child: FutureBuilder(
+            future: getAllCommunities(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.cookie,
+                    strokeWidth: 2,
+                  ),
+                );
+              }
 
-                      return CommunityCard(
-                        user: e.displayName,
-                        avatar: e.avatar,
-                        content: e.content,
-                        time: timeSince,
-                        numOfLove: e.numOfLove,
-                        numOfComment: e.numOfComment,
-                        topicCommunityCard: e.topicCommunityCard,
-                        isDetailPost: false,
-                      );
-                    },
+              return ListView.builder(
+                padding:
+                    EdgeInsets.only(bottom: Dimensions.height(context, 80)),
+                reverse: false,
+                itemCount: AppConstants.communities.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Community e = AppConstants.communities[index];
+                  DateTime postTime = DateTime.parse(e.time);
+                  String timeSince = formatTimeSince(postTime);
+
+                  return CommunityCard(
+                    user: e.displayName,
+                    avatar: e.avatar,
+                    content: e.content,
+                    time: timeSince,
+                    numOfLove: e.numOfLove,
+                    numOfComment: e.numOfComment,
+                    topicCommunityCard: e.topicCommunityCard,
+                    isDetailPost: false,
+                    // communityId: e.communityId,
                   );
                 },
-              ),
-              SizedBox(
-                height: Dimensions.height(context, 80),
-              ),
-            ],
+              );
+            },
           ),
         ),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              centerTitle: true,
+              forceElevated: innerBoxIsScrolled,
+              toolbarHeight: 40,
+              title: const Text(
+                'Cộng đồng',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ];
+        },
       ),
     );
   }

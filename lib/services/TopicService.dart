@@ -251,4 +251,17 @@ class TopicService {
       'userId': word.userId,
     });
   }
+
+  Future<Topic> getTopicById(String id) async {
+    return topics.doc(id).get().then((value) {
+      return Topic(
+        topicId: value.id,
+        topicName: value['topicName'],
+        isPublic: value['isPublic'],
+        userId: value['userId'],
+        userEmail: value['userEmail'],
+        color: value['color'],
+      );
+    });
+  }
 }

@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cookie_app/components/topic_community_card.dart';
+import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/detail_post.dart';
+import 'package:cookie_app/pages/detail_topic_for_community.dart';
+import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,19 +22,19 @@ class CommunityCard extends StatefulWidget {
   final int numOfLove;
   final int numOfComment;
   final bool isDetailPost;
+  List<TopicCommunityCard> topicCommunityCard;
 
-  List<dynamic> topicCommunityCard = [];
-
-  CommunityCard(
-      {super.key,
-      required this.user,
-      required this.avatar,
-      required this.content,
-      required this.time,
-      required this.numOfLove,
-      required this.numOfComment,
-      required this.topicCommunityCard,
-      required this.isDetailPost});
+  CommunityCard({
+    super.key,
+    required this.user,
+    required this.avatar,
+    required this.content,
+    required this.time,
+    required this.numOfLove,
+    required this.numOfComment,
+    required this.topicCommunityCard,
+    required this.isDetailPost,
+  });
 
   @override
   State<CommunityCard> createState() => _CommunityCardState();
@@ -171,13 +174,46 @@ class _CommunityCardState extends State<CommunityCard> {
                   scrollDirection: Axis.horizontal,
                   children: [
                     for (var i = 0; i < widget.topicCommunityCard.length; i++)
-                      Row(
-                        children: [
-                          widget.topicCommunityCard[i],
-                          SizedBox(
-                              width: 10), // SizedBox for horizontal spacing
-                        ],
-                      ),
+                      widget.isDetailPost
+                          ? InkWell(
+                              hoverColor: Colors.transparent,
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .push(PageTransition(
+                                        child: DetailTopicCommunity(
+                                          topicCommunityCard:
+                                              widget.topicCommunityCard[i],
+                                          data: {
+                                            "topicName": widget
+                                                .topicCommunityCard[i]
+                                                .topicName,
+                                            "user": widget.user,
+                                            "avatar": widget.avatar,
+                                            "content": widget.content,
+                                            "time": widget.time,
+                                            "numOfLove": widget.numOfLove,
+                                            "numOfComment": widget.numOfComment
+                                          },
+                                        ),
+                                        type: PageTransitionType.rightToLeft));
+                              },
+                              child: Row(
+                                children: [
+                                  widget.topicCommunityCard[i],
+                                  SizedBox(
+                                      width:
+                                          10), // SizedBox for horizontal spacing
+                                ],
+                              ),
+                            )
+                          : Row(
+                              children: [
+                                widget.topicCommunityCard[i],
+                                SizedBox(
+                                    width:
+                                        10), // SizedBox for horizontal spacing
+                              ],
+                            )
                   ],
                 ),
               ),

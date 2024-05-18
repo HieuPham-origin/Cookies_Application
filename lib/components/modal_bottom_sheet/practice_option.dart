@@ -9,8 +9,9 @@ import 'package:cookie_app/utils/demension.dart';
 import 'package:flutter/material.dart';
 import 'package:toasty_box/toasty_box.dart';
 
-void showPracticeptionModalBottomSheet(BuildContext contextDetailTopic,
-    String topicId, Map<String, dynamic> data) {
+void showPracticeptionModalBottomSheet(
+    BuildContext contextDetailTopic, String topicId, Map<String, dynamic> data,
+    {int? type}) {
   var screenSize = MediaQuery.of(contextDetailTopic).size;
 
   Widget _buildOption(String title, String image, Function() onTap) {
@@ -80,14 +81,17 @@ void showPracticeptionModalBottomSheet(BuildContext contextDetailTopic,
             SizedBox(
               height: Dimensions.height(context, 40),
             ),
-            _buildOption("Flashcards", "assets/flashcard.png", () {
-              Navigator.pop(context);
-              Navigator.of(contextDetailTopic).push(
-                MaterialPageRoute(
-                  builder: (contextDetailTopic) => SwipeCard(topidId: topicId),
-                ),
-              );
-            }),
+            type != 1
+                ? _buildOption("Flashcards", "assets/flashcard.png", () {
+                    Navigator.pop(context);
+                    Navigator.of(contextDetailTopic).push(
+                      MaterialPageRoute(
+                        builder: (contextDetailTopic) =>
+                            SwipeCard(topidId: topicId),
+                      ),
+                    );
+                  })
+                : Container(),
             SizedBox(
               height: Dimensions.height(context, 10),
             ),

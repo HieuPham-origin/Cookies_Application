@@ -12,14 +12,15 @@ class TopicCard extends StatefulWidget {
   final Function()? onTap;
   final String color;
   final List<Topic>? listTopic;
-
+  final String? topicId;
   const TopicCard(
       {super.key,
       required this.topicName,
       required this.numOfVocab,
       this.onTap,
       required this.color,
-      this.listTopic});
+      this.listTopic,
+      this.topicId});
 
   @override
   State<TopicCard> createState() => _TopicCardState();
@@ -96,6 +97,7 @@ class _TopicCardState extends State<TopicCard> {
   void defaultTapAction() {
     if (isChoose) {
       widget.listTopic!.add(Topic(
+          topicId: widget.topicId!,
           topicName: widget.topicName,
           isPublic: true,
           userId: userId,
