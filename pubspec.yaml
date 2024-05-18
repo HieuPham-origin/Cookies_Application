@@ -76,6 +76,7 @@ dependencies:
     bottom_picker: ^2.7.0
     open_file: ^3.3.2
     syncfusion_flutter_xlsio: ^24.2.8
+    wheel_picker: ^0.0.4
 
 dev_dependencies:
     flutter_test:
@@ -116,6 +117,7 @@ flutter:
         - assets/quiz.png
         - assets/spell_check.png
         - assets/girl.png
+        - assets/leaderboard.png
 
 flutter_icons:
     android: true

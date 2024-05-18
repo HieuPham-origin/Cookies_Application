@@ -14,6 +14,7 @@ import 'package:cookie_app/services/TopicService.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:wheel_picker/wheel_picker.dart';
 
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -50,6 +51,7 @@ class _QuizScreenState extends State<QuizScreen> {
   int currentQuiz = 1;
   int timeChoose = 20;
   int timeTaken = 0;
+  String language = "Tiếng Anh";
 
   //Controllers
   PageController _pageController = PageController();
@@ -113,6 +115,8 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void quizSettingBottomSheet(BuildContext context) {
+    final secondsWheel = WheelPickerController(itemCount: 60);
+    const textStyle = TextStyle(fontSize: 20.0, height: 1.5);
     var screenSize = MediaQuery.of(context).size;
     showModalBottomSheet(
       backgroundColor: AppColors.background,
@@ -120,55 +124,112 @@ class _QuizScreenState extends State<QuizScreen> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       context: context,
       builder: (BuildContext context) {
-        return SizedBox(
-          height: screenSize.height * 0.35,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: Dimensions.height(context, 40),
-              ),
-              Text(
-                "Cài đặt",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
-              SizedBox(
-                height: Dimensions.height(context, 10),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Đặt thời gian",
+        return StatefulBuilder(builder: (context, StateSetter setState) {
+          return SizedBox(
+            height: screenSize.height * 0.5,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: Dimensions.height(context, 10),
+                  ),
+                  Text(
+                    "Cài đặt",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Đặt thời gian",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                        ),
+                      ),
+                      WheelPicker(
+                        builder: (context, index) =>
+                            Text("$index", style: textStyle),
+                        controller: secondsWheel,
+                        selectedIndexColor: AppColors.cookie,
+                        onIndexChanged: (index) {
+                          print("On index $index");
+                        },
+                        style: WheelPickerStyle(
+                          itemExtent: textStyle.fontSize! *
+                              textStyle.height!, // Text height
+                          squeeze: 1.25,
+                          diameterRatio: .6,
+                          surroundingOpacity: .25,
+                          magnification: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Loại câu hỏi",
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                        ),
+                      ),
+                      DropdownButton(
+                        value: language,
+                        items: <String>['Tiếng Anh', 'Tiếng Việt']
+                            .map<DropdownMenuItem<String>>(
+                          (String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          },
+                        ).toList(),
+                        onChanged: (value) {
+                          //change language
+                          setState(() {
+                            language = value!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: Dimensions.height(context, 70),
+                  ),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(AppColors.coffee),
+                      fixedSize: MaterialStateProperty.all(
+                        Size(MediaQuery.sizeOf(context).width * 0.80, 40),
+                      ),
+                      elevation: MaterialStateProperty.all(4),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      restartTimer(timeChoose);
+                    },
+                    child: Text(
+                      "Xác nhận",
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        color: Colors.white,
                       ),
                     ),
-                    Flexible(
-                      child: SizedBox(
-                        width: 100,
-                        child: TextField(),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(
-                height: Dimensions.height(context, 10),
-              ),
-              SizedBox(
-                height: Dimensions.height(context, 10),
-              ),
-            ],
-          ),
-        );
+            ),
+          );
+        });
       },
     );
   }

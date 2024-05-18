@@ -93,12 +93,18 @@ class _CommunityPageState extends State<CommunityPage> {
       final topic = await topicService.getTopicById(id);
       listTopic.add(TopicCommunityCard(
         topicName: topic.topicName,
-        numOfVocab: 10,
+        numOfVocab: await countVocabInTopic(topic.topicId!),
         color: topic.color,
         topicId: topic.topicId,
       ));
     }
     return listTopic;
+  }
+
+  //count number of vocab in topic by topicId
+  Future<int> countVocabInTopic(String topicId) async {
+    final result = await topicService.countWordsInTopic(topicId);
+    return result;
   }
 
   Future<List<Topic>> loadTopicFromList(List<String> topicId) async {
