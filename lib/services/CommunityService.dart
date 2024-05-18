@@ -51,26 +51,6 @@ class CommunityService {
     });
   }
 
-  //compare point by topicId and userId in ranking collection
-  Future<void> comparePoint(String userId, String topicId, int point) async {
-    final querySnapshot = await community
-        .where('userId', isEqualTo: userId)
-        .where('topicId', isEqualTo: topicId)
-        .get();
-    if (querySnapshot.docs.isEmpty) {
-      await addRanking(userId, FirebaseAuth.instance.currentUser!.email!, point,
-          querySnapshot.docs[0].id, topicId);
-    } else {
-      for (var doc in querySnapshot.docs) {
-        if (doc['point'] < point) {
-          await community
-              .doc(doc.id)
-              .update({'point': point, 'userId': userId});
-        }
-      }
-    }
-  }
-
   //compare point by topicId and userId in ranking collection and add new document if not exist
   Future<void> comparePointAndAddNewDocument(
       String userId, String topicId, int point, String communityId) async {
@@ -98,6 +78,15 @@ class CommunityService {
 
   Future<QuerySnapshot> getCommunitySortByTimeSnapShot() {
     return community.orderBy('time', descending: false).get();
+  }
+
+  //get all ranking order by point
+  Future<QuerySnapshot> getAllRankingOrderByPoint(String communityId) {
+    return community
+        .doc(communityId)
+        .collection('ranking')
+        .orderBy('point', descending: true)
+        .get();
   }
 
   Future<QuerySnapshot> getAllCommunitiesToLoadImage() {

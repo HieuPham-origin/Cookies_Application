@@ -114,6 +114,7 @@ flutter:
         - assets/quiz.png
         - assets/spell_check.png
         - assets/girl.png
+        - assets/leaderboard.png
 
 flutter_icons:
     android: true
