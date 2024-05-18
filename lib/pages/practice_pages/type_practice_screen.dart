@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cookie_app/models/word.dart';
@@ -36,6 +37,9 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
   bool isCompleted = false;
   bool isChecked = false;
   int currentQuestion = 0;
+  int timeTaken = 0;
+
+  Timer? timerTotal;
 
   @override
   void initState() {
@@ -48,6 +52,16 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
     pinController.dispose();
     focusNode.dispose();
     super.dispose();
+  }
+
+  void totalTime() {
+    timerTotal = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          timeTaken++;
+        });
+      }
+    });
   }
 
   Future<void> fetchWord() async {

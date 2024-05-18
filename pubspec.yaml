@@ -74,6 +74,7 @@ dependencies:
     firebase_storage_web: ^3.8.0
     pinput: ^4.0.0
     bottom_picker: ^2.7.0
+    wheel_picker: ^0.0.4
 
 dev_dependencies:
     flutter_test:
