@@ -69,7 +69,7 @@ class _CommunityPageState extends State<CommunityPage> {
     final result = await communityService.getCommunitySortByTimeSnapShot();
     for (var doc in result.docs) {
       AppConstants.communities.add(Community(
-        // communityId: doc.id,
+        communityId: doc.id,
         userId: doc['userId'],
         avatar: await getAvatarUrl(doc['userId']),
         displayName: doc['displayName'],
@@ -167,6 +167,8 @@ class _CommunityPageState extends State<CommunityPage> {
                     numOfComment: e.numOfComment,
                     topicCommunityCard: e.topicCommunityCard,
                     isDetailPost: false,
+                    communityId: e.communityId,
+
                     // communityId: e.communityId,
                   );
                 },

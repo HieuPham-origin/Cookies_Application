@@ -11,7 +11,7 @@ import 'package:toasty_box/toasty_box.dart';
 
 void showPracticeptionModalBottomSheet(
     BuildContext contextDetailTopic, String topicId, Map<String, dynamic> data,
-    {int? type}) {
+    {int? type, String? communityId}) {
   var screenSize = MediaQuery.of(contextDetailTopic).size;
 
   Widget _buildOption(String title, String image, Function() onTap) {
@@ -100,8 +100,12 @@ void showPracticeptionModalBottomSheet(
 
               Navigator.of(contextDetailTopic).push(
                 MaterialPageRoute(
-                  builder: (contextDetailTopic) =>
-                      QuizScreen(data: data, topicId: topicId),
+                  builder: (contextDetailTopic) => QuizScreen(
+                    data: data,
+                    topicId: topicId,
+                    communityId: communityId,
+                    type: 1,
+                  ),
                 ),
               );
             }),

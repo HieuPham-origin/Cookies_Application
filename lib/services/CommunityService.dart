@@ -39,6 +39,60 @@ class CommunityService {
     return communityStream;
   }
 
+  //add collection ranking
+  Future<void> addRanking(String userId, String email, int point,
+      String communityId, String topicId) async {
+    await community.doc(communityId).collection('ranking').add({
+      'userId': userId,
+      'email': email,
+      'point': point,
+      'topicId': topicId,
+    });
+  }
+
+  //compare point by topicId and userId in ranking collection
+  Future<void> comparePoint(String userId, String topicId, int point) async {
+    final querySnapshot = await community
+        .where('userId', isEqualTo: userId)
+        .where('topicId', isEqualTo: topicId)
+        .get();
+    if (querySnapshot.docs.isEmpty) {
+      await addRanking(userId, FirebaseAuth.instance.currentUser!.email!, point,
+          querySnapshot.docs[0].id, topicId);
+    } else {
+      for (var doc in querySnapshot.docs) {
+        if (doc['point'] < point) {
+          await community
+              .doc(doc.id)
+              .update({'point': point, 'userId': userId});
+        }
+      }
+    }
+  }
+
+  //compare point by topicId and userId in ranking collection and add new document if not exist
+  Future<void> comparePointAndAddNewDocument(
+      String userId, String topicId, int point, String communityId) async {
+    final querySnapshot = await community
+        .doc(communityId)
+        .collection('ranking')
+        .where('userId', isEqualTo: userId)
+        .where('topicId', isEqualTo: topicId)
+        .get();
+    if (querySnapshot.docs.isEmpty) {
+      await addRanking(userId, FirebaseAuth.instance.currentUser!.email!, point,
+          querySnapshot.docs[0].id, topicId);
+    } else {
+      for (var doc in querySnapshot.docs) {
+        if (doc['point'] < point) {
+          await community
+              .doc(doc.id)
+              .update({'point': point, 'userId': userId});
+        }
+      }
+    }
+  }
+
   Future<QuerySnapshot> getCommunitySortByTimeSnapShot() {
     return community.orderBy('time', descending: false).get();
   }

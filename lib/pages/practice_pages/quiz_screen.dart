@@ -3,9 +3,11 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cookie_app/models/word.dart';
+import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/QuizService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cookie_app/services/TopicService.dart';
@@ -16,10 +18,14 @@ import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 class QuizScreen extends StatefulWidget {
   final Map<String, dynamic> data;
   final String topicId;
+  final int? type;
+  final String? communityId;
   const QuizScreen({
     Key? key,
     required this.data,
     required this.topicId,
+    this.type,
+    this.communityId,
   }) : super(key: key);
 
   @override
@@ -30,6 +36,7 @@ class _QuizScreenState extends State<QuizScreen> {
   //Service
   TopicService topicService = TopicService();
   QuizService quizService = QuizService();
+  CommunityService communityService = CommunityService();
 
   //Variables
   int questionTimerSeconds = 20;
@@ -40,7 +47,8 @@ class _QuizScreenState extends State<QuizScreen> {
   int point = 0;
   List optionsLetters = ["A.", "B.", "C.", "D."];
   int currentQuiz = 1;
-  int timeChoose = 10;
+  int timeChoose = 20;
+  int timeTaken = 0;
 
   //Controllers
   PageController _pageController = PageController();
@@ -58,6 +66,7 @@ class _QuizScreenState extends State<QuizScreen> {
         setState(() {
           if (questionTimerSeconds > 0) {
             questionTimerSeconds--;
+            timeTaken++;
           } else {
             _timer?.cancel();
             restartTimer(timeChoose);
@@ -71,6 +80,7 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       point = 0;
       currentQuiz = 1;
+      timeTaken = 0;
     });
     _pageController.jumpToPage(0);
     startTimerOnQuestions();
@@ -106,7 +116,6 @@ class _QuizScreenState extends State<QuizScreen> {
               SizedBox(
                 height: Dimensions.height(context, 40),
               ),
-
               Text(
                 "Cài đặt",
                 style: TextStyle(
@@ -114,7 +123,6 @@ class _QuizScreenState extends State<QuizScreen> {
                   fontSize: 24,
                 ),
               ),
-
               SizedBox(
                 height: Dimensions.height(context, 10),
               ),
@@ -139,11 +147,9 @@ class _QuizScreenState extends State<QuizScreen> {
                   ],
                 ),
               ),
-              
               SizedBox(
                 height: Dimensions.height(context, 10),
               ),
-
               SizedBox(
                 height: Dimensions.height(context, 10),
               ),
@@ -423,6 +429,20 @@ class _QuizScreenState extends State<QuizScreen> {
             actions: [
               IconsButton(
                 onPressed: () {
+                  if (widget.type == 1) {
+                    // communityService.addRanking(
+                    //     FirebaseAuth.instance.currentUser!.uid,
+                    //     FirebaseAuth.instance.currentUser!.email!,
+                    //     ((point / timeTaken) * 100).round(),
+                    //     widget.communityId!,
+                    //     widget.topicId);
+                    communityService.comparePointAndAddNewDocument(
+                      FirebaseAuth.instance.currentUser!.uid,
+                      widget.topicId,
+                      ((point / timeTaken) * 100).round(),
+                      widget.communityId!,
+                    );
+                  }
                   int count = 0;
                   Navigator.of(context).popUntil((_) => count++ >= 2);
                 },

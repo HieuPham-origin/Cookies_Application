@@ -12,8 +12,12 @@ import 'package:flutter/material.dart';
 class DetailTopicCommunity extends StatefulWidget {
   final TopicCommunityCard topicCommunityCard;
   final Map<String, dynamic>? data;
+  final String? communityId;
   DetailTopicCommunity(
-      {Key? key, required this.topicCommunityCard, required this.data})
+      {Key? key,
+      required this.topicCommunityCard,
+      required this.data,
+      this.communityId})
       : super(key: key);
 
   @override
@@ -74,9 +78,13 @@ class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
                     ),
                   ),
                   onPressed: () {
-                    showPracticeptionModalBottomSheet(context,
-                        widget.topicCommunityCard.topicId!, widget.data!,
-                        type: 1);
+                    showPracticeptionModalBottomSheet(
+                      context,
+                      widget.topicCommunityCard.topicId!,
+                      widget.data!,
+                      type: 1,
+                      communityId: widget.communityId,
+                    );
                   },
                   child: const Text("Luyện tập"),
                 ),

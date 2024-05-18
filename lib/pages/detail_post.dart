@@ -14,6 +14,7 @@ class DetailPost extends StatefulWidget {
   final int numOfLove;
   final int numOfComment;
   final List<TopicCommunityCard> topicCommunityCard;
+  final String? communityId;
   const DetailPost(
       {super.key,
       required this.user,
@@ -22,7 +23,8 @@ class DetailPost extends StatefulWidget {
       required this.time,
       required this.numOfLove,
       required this.numOfComment,
-      required this.topicCommunityCard});
+      required this.topicCommunityCard,
+      this.communityId});
 
   @override
   State<DetailPost> createState() => _DetailPostState();
@@ -69,6 +71,7 @@ class _DetailPostState extends State<DetailPost> {
             numOfComment: widget.numOfComment,
             topicCommunityCard: widget.topicCommunityCard,
             isDetailPost: true,
+            communityId: widget.communityId,
           ),
           const Divider(
             height: 1,
@@ -80,7 +83,7 @@ class _DetailPostState extends State<DetailPost> {
               itemCount: 10,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text('Item $index'),
+                  title: Text('Item ${widget.communityId}'),
                 );
               },
             ),

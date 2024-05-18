@@ -23,6 +23,7 @@ class CommunityCard extends StatefulWidget {
   final int numOfComment;
   final bool isDetailPost;
   List<TopicCommunityCard> topicCommunityCard;
+  String? communityId;
 
   CommunityCard({
     super.key,
@@ -34,6 +35,7 @@ class CommunityCard extends StatefulWidget {
     required this.numOfComment,
     required this.topicCommunityCard,
     required this.isDetailPost,
+    this.communityId,
   });
 
   @override
@@ -49,13 +51,15 @@ class _CommunityCardState extends State<CommunityCard> {
         if (!widget.isDetailPost) {
           Navigator.of(context, rootNavigator: true).push(PageTransition(
               child: DetailPost(
-                  user: widget.user,
-                  avatar: widget.avatar,
-                  content: widget.content,
-                  time: widget.time,
-                  numOfLove: widget.numOfLove,
-                  numOfComment: widget.numOfComment,
-                  topicCommunityCard: widget.topicCommunityCard),
+                user: widget.user,
+                avatar: widget.avatar,
+                content: widget.content,
+                time: widget.time,
+                numOfLove: widget.numOfLove,
+                numOfComment: widget.numOfComment,
+                topicCommunityCard: widget.topicCommunityCard,
+                communityId: widget.communityId,
+              ),
               type: PageTransitionType.rightToLeft));
         }
       },
@@ -180,22 +184,23 @@ class _CommunityCardState extends State<CommunityCard> {
                               onTap: () {
                                 Navigator.of(context, rootNavigator: true)
                                     .push(PageTransition(
-                                        child: DetailTopicCommunity(
-                                          topicCommunityCard:
-                                              widget.topicCommunityCard[i],
-                                          data: {
-                                            "topicName": widget
-                                                .topicCommunityCard[i]
-                                                .topicName,
-                                            "user": widget.user,
-                                            "avatar": widget.avatar,
-                                            "content": widget.content,
-                                            "time": widget.time,
-                                            "numOfLove": widget.numOfLove,
-                                            "numOfComment": widget.numOfComment
-                                          },
-                                        ),
-                                        type: PageTransitionType.rightToLeft));
+                                  child: DetailTopicCommunity(
+                                    topicCommunityCard:
+                                        widget.topicCommunityCard[i],
+                                    data: {
+                                      "topicName": widget
+                                          .topicCommunityCard[i].topicName,
+                                      "user": widget.user,
+                                      "avatar": widget.avatar,
+                                      "content": widget.content,
+                                      "time": widget.time,
+                                      "numOfLove": widget.numOfLove,
+                                      "numOfComment": widget.numOfComment
+                                    },
+                                    communityId: widget.communityId,
+                                  ),
+                                  type: PageTransitionType.rightToLeft,
+                                ));
                               },
                               child: Row(
                                 children: [
