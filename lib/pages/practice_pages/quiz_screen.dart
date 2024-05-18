@@ -44,6 +44,7 @@ class _QuizScreenState extends State<QuizScreen> {
   List<Word> words = [];
   var questions;
   Timer? _timer;
+  Timer? timerTotal;
   int point = 0;
   List optionsLetters = ["A.", "B.", "C.", "D."];
   int currentQuiz = 1;
@@ -66,11 +67,21 @@ class _QuizScreenState extends State<QuizScreen> {
         setState(() {
           if (questionTimerSeconds > 0) {
             questionTimerSeconds--;
-            timeTaken++;
           } else {
             _timer?.cancel();
+            timerTotal?.cancel();
             restartTimer(timeChoose);
           }
+        });
+      }
+    });
+  }
+
+  void totalTime() {
+    timerTotal = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          timeTaken++;
         });
       }
     });
@@ -84,6 +95,7 @@ class _QuizScreenState extends State<QuizScreen> {
     });
     _pageController.jumpToPage(0);
     startTimerOnQuestions();
+    totalTime();
   }
 
   void restartTimer(int time) {
@@ -93,6 +105,7 @@ class _QuizScreenState extends State<QuizScreen> {
         questionTimerSeconds = time;
         if (currentQuiz < words.length) {
           currentQuiz++;
+
           startTimerOnQuestions();
         }
       },
@@ -163,6 +176,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
+    totalTime();
     fetchWords().then((fetchedWords) {
       setState(() {
         words = fetchedWords;
@@ -188,7 +202,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "${widget.data['topicName']}",
+                    "${widget.data['topicName']} ${timeTaken}",
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Colors.black,
                         fontSize: 28,
@@ -416,6 +430,7 @@ class _QuizScreenState extends State<QuizScreen> {
             curve: Curves.easeInOut,
           );
         } else {
+          timerTotal!.cancel();
           Dialogs.materialDialog(
             color: Colors.white,
             msg: 'Bạn đã làm đúng $point/${words.length} câu',
@@ -430,12 +445,6 @@ class _QuizScreenState extends State<QuizScreen> {
               IconsButton(
                 onPressed: () {
                   if (widget.type == 1) {
-                    // communityService.addRanking(
-                    //     FirebaseAuth.instance.currentUser!.uid,
-                    //     FirebaseAuth.instance.currentUser!.email!,
-                    //     ((point / timeTaken) * 100).round(),
-                    //     widget.communityId!,
-                    //     widget.topicId);
                     communityService.comparePointAndAddNewDocument(
                       FirebaseAuth.instance.currentUser!.uid,
                       widget.topicId,
@@ -480,6 +489,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void dispose() {
     _timer!.cancel();
+    timerTotal!.cancel();
     super.dispose();
   }
 }

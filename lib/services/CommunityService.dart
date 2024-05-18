@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -81,13 +82,15 @@ class CommunityService {
         .get();
     if (querySnapshot.docs.isEmpty) {
       await addRanking(userId, FirebaseAuth.instance.currentUser!.email!, point,
-          querySnapshot.docs[0].id, topicId);
+          communityId, topicId);
     } else {
       for (var doc in querySnapshot.docs) {
         if (doc['point'] < point) {
           await community
+              .doc(communityId)
+              .collection('ranking')
               .doc(doc.id)
-              .update({'point': point, 'userId': userId});
+              .update({'point': point});
         }
       }
     }
