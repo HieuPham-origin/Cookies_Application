@@ -7,6 +7,7 @@ import 'package:cookie_app/pages/Home.dart';
 import 'package:cookie_app/pages/home_page.dart';
 import 'package:cookie_app/pages/sign_in.dart';
 import 'package:cookie_app/services/UserService.dart';
+import 'package:cookie_app/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -82,7 +83,14 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Verify Email'),
+          title: Center(
+            child: Text(
+              'Verify Email',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
         body: Padding(
           padding: EdgeInsets.all(16),
@@ -99,6 +107,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.coffee,
                   minimumSize: Size.fromHeight(50),
                 ),
                 icon: Icon(

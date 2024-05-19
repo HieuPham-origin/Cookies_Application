@@ -155,7 +155,7 @@ class _SettingPageState extends State<SettingPage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               width: double.infinity,
-              height: 500,
+              height: 350,
               child: Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -187,8 +187,8 @@ class _SettingPageState extends State<SettingPage> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: SettingOption(
-                          title: "Thông báo",
-                          icon: CupertinoIcons.app_badge_fill),
+                          title: "Xóa tài khoản",
+                          icon: CupertinoIcons.delete_simple),
                     ),
                     InkWell(
                       onTap: signUserOut,

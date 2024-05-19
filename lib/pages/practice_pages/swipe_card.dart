@@ -15,6 +15,8 @@ import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:toasty_box/toast_enums.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 class SwipeCard extends StatefulWidget {
   final String topidId;
@@ -115,12 +117,40 @@ class _SwipeCardState extends State<SwipeCard> {
           String wordId = words[previousIndex]['id'];
 
           updateWordStatus(wordId, 1);
+          ToastService.showToast(
+            context,
+            isClosable: true,
+            backgroundColor: Colors.teal.shade500,
+            shadowColor: Colors.teal.shade200,
+            length: ToastLength.short,
+            expandedHeight: 70,
+            message: "Đang học từ ${words[previousIndex]['word'].word}",
+            messageStyle: TextStyle(fontSize: 18),
+            leading: const Icon(Icons.messenger),
+            slideCurve: Curves.elasticInOut,
+            positionCurve: Curves.bounceOut,
+            dismissDirection: DismissDirection.none,
+          );
         }
 
         if (activity.direction.name == 'right') {
           String wordId = words[previousIndex]['id'];
 
           updateWordStatus(wordId, 2);
+          ToastService.showToast(
+            context,
+            isClosable: true,
+            backgroundColor: AppColors.coffee,
+            shadowColor: Colors.teal.shade200,
+            length: ToastLength.short,
+            expandedHeight: 70,
+            message: "Đã thuộc từ ${words[previousIndex]['word'].word}",
+            messageStyle: TextStyle(fontSize: 18, color: Colors.white),
+            leading: const Icon(Icons.messenger),
+            slideCurve: Curves.elasticInOut,
+            positionCurve: Curves.bounceOut,
+            dismissDirection: DismissDirection.none,
+          );
         }
 
         break;
