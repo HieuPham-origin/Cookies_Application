@@ -4,6 +4,7 @@ import 'package:cookie_app/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:like_button/like_button.dart';
 
@@ -170,6 +171,31 @@ class _VocabularyCardState extends State<VocabularyCard> {
                               ),
                             ],
                           )
+                        ],
+                      )
+                    : SizedBox(),
+                widget.type == 1
+                    ? Row(
+                        children: [
+                          Text(
+                            'Chưa học',
+                            style: GoogleFonts.inter(
+                              textStyle: TextStyle(
+                                  color: AppColors.cookie,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12),
+                            ),
+                          ),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: LinearProgressIndicator(
+                              value: 0.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.cookie),
+                              backgroundColor: AppColors.grey_light,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ],
                       )
                     : SizedBox(),

@@ -38,17 +38,6 @@ class _SignInState extends State<SignIn> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   void signInUser() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Center(
-          child: SpinKitSquareCircle(
-            color: Color(0xFFB99B6B),
-          ),
-        );
-      },
-    );
-
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
@@ -57,7 +46,6 @@ class _SignInState extends State<SignIn> {
 
       await UserService(FirebaseAuth.instance.currentUser!).loadAvatar();
       // pop the loading circle
-      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       if (e.code == 'invalid-credential') {

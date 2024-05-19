@@ -10,9 +10,13 @@ import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/pages/ranking_page.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:quickalert/models/quickalert_animtype.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class DetailTopicCommunity extends StatefulWidget {
   final TopicCommunityCard topicCommunityCard;
@@ -31,6 +35,8 @@ class DetailTopicCommunity extends StatefulWidget {
 }
 
 class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,6 +83,73 @@ class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
           centerTitle: true,
           title: Text(
             widget.topicCommunityCard.topicName,
+          ),
+        ),
+        floatingActionButton: Container(
+          width: 60,
+          height: 60,
+          child: FloatingActionButton(
+            onPressed: () async {
+              QuickAlert.show(
+                  context: context,
+                  title: "Lưu topic",
+                  text: "Bạn có muốn lưu topic này không?",
+                  type: QuickAlertType.confirm,
+                  showCancelBtn: true,
+                  confirmBtnText: "Có",
+                  cancelBtnText: "Không",
+                  confirmBtnColor: AppColors.green,
+                  onCancelBtnTap: () {
+                    Navigator.of(context, rootNavigator: true).pop('dialog');
+                  },
+                  onConfirmBtnTap: () async {
+                    var newTopic = {
+                      'topicName': widget.topicCommunityCard.topicName,
+                      'isPublic': false,
+                      'userId': FirebaseAuth.instance.currentUser!.uid,
+                      'userEmail': FirebaseAuth.instance.currentUser!.email!,
+                      'color': widget.topicCommunityCard
+                          .color, // Set the default or your desired color
+                    };
+                    DocumentReference topicRef =
+                        await _firestore.collection('topics').add(newTopic);
+
+                    // Get all words of the topic
+                    var words = await _firestore
+                        .collection('topics')
+                        .doc(widget.topicCommunityCard.topicId)
+                        .collection('words')
+                        .get();
+
+                    // Add all words to the new topic
+                    for (var word in words.docs) {
+                      await _firestore
+                          .collection('topics')
+                          .doc(topicRef.id)
+                          .collection('words')
+                          .add({
+                        'word': word['word'],
+                        'phonetic': word['phonetic'],
+                        'definition': word['definition'],
+                        'image': word['image'],
+                        'audio': word['audio'],
+                        'example': word['example'],
+                        'wordForm': word['wordForm'],
+                        'isFav': word['isFav'],
+                        'date': word['date'],
+                        'userId': FirebaseAuth.instance.currentUser!.uid,
+                        'topicId': topicRef.id,
+                        'status': 0,
+                      });
+                    }
+                  });
+            },
+            child: const Icon(Icons.download),
+            backgroundColor: AppColors.black_opacity,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100),
+            ),
           ),
         ),
         backgroundColor: AppColors.background,

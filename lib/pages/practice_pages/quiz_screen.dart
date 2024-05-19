@@ -271,13 +271,15 @@ class _QuizScreenState extends State<QuizScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    _timer?.cancel();
-                    quizSettingBottomSheet(context);
-                  },
-                  icon: Icon(Icons.settings),
-                )
+                widget.type != 1
+                    ? IconButton(
+                        onPressed: () {
+                          _timer?.cancel();
+                          quizSettingBottomSheet(context);
+                        },
+                        icon: Icon(Icons.settings),
+                      )
+                    : SizedBox.shrink(),
               ],
             ),
             const SizedBox(
