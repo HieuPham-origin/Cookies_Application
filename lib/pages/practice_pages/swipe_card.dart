@@ -15,6 +15,8 @@ import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:toasty_box/toast_enums.dart';
+import 'package:toasty_box/toasty_box.dart';
 
 class SwipeCard extends StatefulWidget {
   final String topidId;
@@ -30,7 +32,7 @@ class SwipeCard extends StatefulWidget {
 class _SwipeCardState extends State<SwipeCard> {
   TopicService topicService = TopicService();
   WordService wordService = WordService();
-  List<Word> words = [];
+  List<dynamic> words = [];
 
   final audioPlayer = AudioPlayer();
   int currentCard = 1;
@@ -58,7 +60,7 @@ class _SwipeCardState extends State<SwipeCard> {
     });
   }
 
-  Future<List<Word>> fetchWords() async {
+  Future<List<dynamic>> fetchWords() async {
     QuerySnapshot snapshot = await _firestore
         .collection('topics')
         .doc(widget.topidId)
@@ -87,28 +89,20 @@ class _SwipeCardState extends State<SwipeCard> {
           userId: wordData['userId'],
         );
 
-        words.add(word);
-      } else {
-      }
+        words.add({'word': word, 'id': wordSnapshot.id});
+      } else {}
     }
 
-
     return words;
-
   }
 
-  // Future<List<Word>> updateWordStatus(int index, int status) async {}
+  Future<void> updateWordStatus(String wordId, int status) async {
+    await wordService.updateStatus(widget.topidId, wordId, status);
+  }
 
   void _swipeEnd(int previousIndex, int targetIndex, SwiperActivity activity) {
     switch (activity) {
       case Swipe():
-        if (activity.direction.name == 'left') {
-          // updateWordStatus(1, 1);
-        }
-
-        if (activity.direction.name == 'right') {
-          log(words[currentCard - 1].word);
-        }
         setState(
           () {
             currentCard = currentCard + 1;
@@ -117,6 +111,46 @@ class _SwipeCardState extends State<SwipeCard> {
         if (isFlipped) {
           flipCardController.toggleCardWithoutAnimation();
           isFlipped = false;
+        }
+
+        if (activity.direction.name == 'left') {
+          String wordId = words[previousIndex]['id'];
+
+          updateWordStatus(wordId, 1);
+          ToastService.showToast(
+            context,
+            isClosable: true,
+            backgroundColor: Colors.teal.shade500,
+            shadowColor: Colors.teal.shade200,
+            length: ToastLength.short,
+            expandedHeight: 70,
+            message: "Đang học từ ${words[previousIndex]['word'].word}",
+            messageStyle: TextStyle(fontSize: 18),
+            leading: const Icon(Icons.messenger),
+            slideCurve: Curves.elasticInOut,
+            positionCurve: Curves.bounceOut,
+            dismissDirection: DismissDirection.none,
+          );
+        }
+
+        if (activity.direction.name == 'right') {
+          String wordId = words[previousIndex]['id'];
+
+          updateWordStatus(wordId, 2);
+          ToastService.showToast(
+            context,
+            isClosable: true,
+            backgroundColor: AppColors.coffee,
+            shadowColor: Colors.teal.shade200,
+            length: ToastLength.short,
+            expandedHeight: 70,
+            message: "Đã thuộc từ ${words[previousIndex]['word'].word}",
+            messageStyle: TextStyle(fontSize: 18, color: Colors.white),
+            leading: const Icon(Icons.messenger),
+            slideCurve: Curves.elasticInOut,
+            positionCurve: Curves.bounceOut,
+            dismissDirection: DismissDirection.none,
+          );
         }
 
         break;
@@ -150,7 +184,7 @@ class _SwipeCardState extends State<SwipeCard> {
 
     log(isAutoplay.toString());
     while (isAutoplay) {
-      await audioPlayer.play(UrlSource(words[index].audio));
+      await audioPlayer.play(UrlSource(words[index]['word'].audio));
 
       await Future.delayed(Duration(seconds: 2));
       flipCardController.toggleCard();
@@ -293,7 +327,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    words[index].word,
+                                    words[index]['word'].word,
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         fontSize: 32,
@@ -302,7 +336,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                     ),
                                   ),
                                   Text(
-                                    words[index].phonetic,
+                                    words[index]['word'].phonetic,
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         fontSize: 16,
@@ -314,7 +348,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                   IconButton(
                                     onPressed: () async {
                                       await audioPlayer.play(
-                                        UrlSource(words[index].audio),
+                                        UrlSource(words[index]['word'].audio),
                                       );
                                     },
                                     icon: Icon(Icons.volume_up),
@@ -336,7 +370,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    words[index].definition,
+                                    words[index]['word'].definition,
                                     style: GoogleFonts.inter(
                                       textStyle: TextStyle(
                                         fontSize: 32,

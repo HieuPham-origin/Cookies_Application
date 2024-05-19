@@ -123,6 +123,23 @@ class WordService {
     });
   }
 
+  Future<void> updateStatus(String topicId, String wordId, int status) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('topics') // Collection reference to 'topics'
+          .doc(topicId) // Document reference to the specific topic
+          .collection(
+              'words') // Subcollection reference to 'words' within the topic
+          .doc(wordId) // Document reference to the specific word
+          .update({
+        'status': status, // Update the 'status' field of the word
+      });
+    } catch (error) {
+      print('Error updating status: $error');
+      // Handle errors as needed
+    }
+  }
+
   Future<void> deleteWord(String id) async {
     await words.doc(id).delete();
   }
