@@ -104,7 +104,7 @@ void showPracticeptionModalBottomSheet(
                     data: data,
                     topicId: topicId,
                     communityId: communityId,
-                    type: 1,
+                    type: type ?? 0,
                   ),
                 ),
               );
