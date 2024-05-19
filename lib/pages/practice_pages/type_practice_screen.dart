@@ -237,7 +237,7 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
                                     Dialogs.materialDialog(
                                       color: Colors.white,
                                       msg:
-                                          'Bạn đã làm đúng $point/${words.length} ${timeTaken} + ${((point / timeTaken) * 100)}câu',
+                                          'Bạn đã làm đúng $point/${words.length} câu và điểm của bạn là ${((point / timeTaken) * 100).round()}',
                                       title: 'Chúc mừng',
                                       lottieBuilder: Lottie.asset(
                                         repeat: false,
