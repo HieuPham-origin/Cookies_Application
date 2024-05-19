@@ -40,7 +40,7 @@ class _QuizScreenState extends State<QuizScreen> {
   CommunityService communityService = CommunityService();
 
   //Variables
-  int questionTimerSeconds = 20;
+  int questionTimerSeconds = 15;
   bool isLocked = true;
   List<Word> words = [];
   var questions;
@@ -49,9 +49,10 @@ class _QuizScreenState extends State<QuizScreen> {
   int point = 0;
   List optionsLetters = ["A.", "B.", "C.", "D."];
   int currentQuiz = 1;
-  int timeChoose = 20;
+  int timeChoose = 15;
   int timeTaken = 0;
   String language = "Tiếng Anh";
+  bool isSettingApply = false;
 
   //Controllers
   PageController _pageController = PageController();
@@ -95,9 +96,16 @@ class _QuizScreenState extends State<QuizScreen> {
       currentQuiz = 1;
       timeTaken = 0;
     });
+    if (language == "Tiếng Việt") {
+      questions = quizService.generateQuizQuestions(words, true);
+    } else if (language == "Tiếng Anh") {
+      questions = quizService.generateQuizQuestions(words, false);
+    }
     _pageController.jumpToPage(0);
     startTimerOnQuestions();
-    totalTime();
+    if (widget.type != 1) {
+      totalTime();
+    }
   }
 
   void restartTimer(int time) {
@@ -115,7 +123,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void quizSettingBottomSheet(BuildContext context) {
-    final secondsWheel = WheelPickerController(itemCount: 60);
+    final secondsWheel = WheelPickerController(itemCount: 31);
     const textStyle = TextStyle(fontSize: 20.0, height: 1.5);
     var screenSize = MediaQuery.of(context).size;
     showModalBottomSheet(
@@ -124,120 +132,133 @@ class _QuizScreenState extends State<QuizScreen> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(builder: (context, StateSetter setState) {
-          return SizedBox(
-            height: screenSize.height * 0.5,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: Dimensions.height(context, 10),
-                  ),
-                  Text(
-                    "Cài đặt",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 20,
+        _timer?.cancel();
+
+        return StatefulBuilder(
+          builder: (context, StateSetter setState) {
+            return SizedBox(
+              height: screenSize.height * 0.5,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: Dimensions.height(context, 10),
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Đặt thời gian",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                      ),
-                      WheelPicker(
-                        builder: (context, index) =>
-                            Text("$index", style: textStyle),
-                        controller: secondsWheel,
-                        selectedIndexColor: AppColors.cookie,
-                        onIndexChanged: (index) {
-                          print("On index $index");
-                        },
-                        style: WheelPickerStyle(
-                          itemExtent: textStyle.fontSize! *
-                              textStyle.height!, // Text height
-                          squeeze: 1.25,
-                          diameterRatio: .6,
-                          surroundingOpacity: .25,
-                          magnification: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Loại câu hỏi",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                      ),
-                      DropdownButton(
-                        value: language,
-                        items: <String>['Tiếng Anh', 'Tiếng Việt']
-                            .map<DropdownMenuItem<String>>(
-                          (String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          },
-                        ).toList(),
-                        onChanged: (value) {
-                          //change language
-                          setState(() {
-                            language = value!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Dimensions.height(context, 70),
-                  ),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(AppColors.coffee),
-                      fixedSize: MaterialStateProperty.all(
-                        Size(MediaQuery.sizeOf(context).width * 0.80, 40),
-                      ),
-                      elevation: MaterialStateProperty.all(4),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      restartTimer(timeChoose);
-                    },
-                    child: Text(
-                      "Xác nhận",
+                    Text(
+                      "Cài đặt",
                       style: TextStyle(
-                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
                       ),
                     ),
-                  ),
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Đặt thời gian",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                          ),
+                        ),
+                        WheelPicker(
+                          builder: (context, index) =>
+                              Text("${index + 10}", style: textStyle),
+                          controller: secondsWheel,
+                          selectedIndexColor: AppColors.cookie,
+                          onIndexChanged: (index) {
+                            timeChoose = index + 10;
+                            questionTimerSeconds = index + 10;
+                          },
+                          style: WheelPickerStyle(
+                            itemExtent: textStyle.fontSize! *
+                                textStyle.height!, // Text height
+                            squeeze: 1.25,
+                            diameterRatio: .6,
+                            surroundingOpacity: .25,
+                            magnification: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Loại câu hỏi",
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                          ),
+                        ),
+                        DropdownButton(
+                          value: language,
+                          items: <String>['Tiếng Anh', 'Tiếng Việt']
+                              .map<DropdownMenuItem<String>>(
+                            (String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            },
+                          ).toList(),
+                          onChanged: (value) {
+                            //change language
+                            setState(() {
+                              language = value!;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimensions.height(context, 70),
+                    ),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(AppColors.coffee),
+                        fixedSize: MaterialStateProperty.all(
+                          Size(MediaQuery.sizeOf(context).width * 0.80, 40),
+                        ),
+                        elevation: MaterialStateProperty.all(4),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        isSettingApply = true;
+                      },
+                      child: Text(
+                        "Áp dụng",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
-    );
+    ).whenComplete(() {
+      if (isSettingApply) {
+        restartQuiz();
+      } else {
+        startTimerOnQuestions();
+      }
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    totalTime();
+    if (widget.type != 1) {
+      totalTime();
+    }
     fetchWords().then((fetchedWords) {
       setState(() {
         words = fetchedWords;
@@ -263,7 +284,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "${widget.data['topicName']} ${timeTaken}",
+                    "${widget.data['topicName'] + widget.type.toString()} ",
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Colors.black,
                         fontSize: 28,
@@ -274,7 +295,6 @@ class _QuizScreenState extends State<QuizScreen> {
                 widget.type != 1
                     ? IconButton(
                         onPressed: () {
-                          _timer?.cancel();
                           quizSettingBottomSheet(context);
                         },
                         icon: Icon(Icons.settings),
@@ -493,7 +513,6 @@ class _QuizScreenState extends State<QuizScreen> {
             curve: Curves.easeInOut,
           );
         } else {
-          timerTotal!.cancel();
           Dialogs.materialDialog(
             color: Colors.white,
             msg: 'Bạn đã làm đúng $point/${words.length} câu',
