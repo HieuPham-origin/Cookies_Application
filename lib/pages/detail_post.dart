@@ -73,21 +73,6 @@ class _DetailPostState extends State<DetailPost> {
             communityId: widget.communityId,
             likes: widget.likes,
           ),
-          const Divider(
-            height: 1,
-            thickness: 1,
-            color: AppColors.grey_heavy,
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text('Item ${widget.communityId}'),
-                );
-              },
-            ),
-          ),
         ],
       ),
     );
