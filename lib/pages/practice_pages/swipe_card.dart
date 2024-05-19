@@ -2,19 +2,19 @@
 import 'dart:developer';
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookie_app/models/word.dart';
 import 'package:cookie_app/services/TopicService.dart';
+import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flip_card/flip_card_controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:toasty_box/toast_service.dart';
 
 class SwipeCard extends StatefulWidget {
   final String topidId;
@@ -29,6 +29,7 @@ class SwipeCard extends StatefulWidget {
 
 class _SwipeCardState extends State<SwipeCard> {
   TopicService topicService = TopicService();
+  WordService wordService = WordService();
   List<Word> words = [];
 
   final audioPlayer = AudioPlayer();
@@ -38,6 +39,9 @@ class _SwipeCardState extends State<SwipeCard> {
   bool isShuffled = false;
   bool isAutoplay = false;
   bool isFlipped = false;
+  double swipeOpacity = 0.0;
+  String swipeText = "";
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Key swiperKey = ValueKey<int>(0);
 
@@ -55,17 +59,61 @@ class _SwipeCardState extends State<SwipeCard> {
   }
 
   Future<List<Word>> fetchWords() async {
-    words = await topicService.getWordsForTopic(widget.topidId);
+    QuerySnapshot snapshot = await _firestore
+        .collection('topics')
+        .doc(widget.topidId)
+        .collection('words')
+        .get();
+
+    List<DocumentSnapshot> wordDocs = snapshot.docs;
+
+    for (var i = 0; i < wordDocs.length; i++) {
+      DocumentSnapshot wordSnapshot = wordDocs[i];
+      Map<String, dynamic>? wordData =
+          wordSnapshot.data() as Map<String, dynamic>?;
+      if (wordData != null) {
+        Word word = Word(
+          word: wordData['word'],
+          definition: wordData['definition'],
+          phonetic: wordData['phonetic'],
+          date: wordData['date'],
+          image: wordData['image'],
+          wordForm: wordData['wordForm'],
+          example: wordData['example'],
+          audio: wordData['audio'],
+          isFav: wordData['isFav'],
+          topicId: wordData['topicId'],
+          status: wordData['status'],
+          userId: wordData['userId'],
+        );
+
+        words.add(word);
+      } else {
+      }
+    }
+
 
     return words;
+
   }
+
+  // Future<List<Word>> updateWordStatus(int index, int status) async {}
 
   void _swipeEnd(int previousIndex, int targetIndex, SwiperActivity activity) {
     switch (activity) {
       case Swipe():
-        setState(() {
-          currentCard = currentCard + 1;
-        });
+        if (activity.direction.name == 'left') {
+          // updateWordStatus(1, 1);
+        }
+
+        if (activity.direction.name == 'right') {
+          log(words[currentCard - 1].word);
+        }
+        setState(
+          () {
+            currentCard = currentCard + 1;
+          },
+        );
         if (isFlipped) {
           flipCardController.toggleCardWithoutAnimation();
           isFlipped = false;
@@ -145,7 +193,7 @@ class _SwipeCardState extends State<SwipeCard> {
   @override
   Widget build(BuildContext context) {
     double progressPercentage =
-        (currentCard / (words.length == 0 ? 100 : words.length));
+        (currentCard / (words.isEmpty ? 100 : words.length));
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -236,7 +284,6 @@ class _SwipeCardState extends State<SwipeCard> {
                             elevation: 4,
                             shadowColor: Colors.black,
                             surfaceTintColor: Colors.white,
-                            
                             child: Container(
                               alignment: Alignment.center,
                               width: double.infinity,

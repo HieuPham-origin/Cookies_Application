@@ -1,15 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cookie_app/components/topic_community_card.dart';
-import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/detail_post.dart';
 import 'package:cookie_app/pages/detail_topic_for_community.dart';
-import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -102,7 +99,7 @@ class _CommunityCardState extends State<CommunityCard> {
                           memCacheWidth: 150, // memory cache width
                           memCacheHeight: 200, // memory cache height
                           imageUrl: widget.avatar,
-                          placeholder: (context, url) => SizedBox(
+                          placeholder: (context, url) => const SizedBox(
                             width:
                                 20, // Adjust the width as per your requirement
                             height:
@@ -116,7 +113,7 @@ class _CommunityCardState extends State<CommunityCard> {
                             ),
                           ),
                           errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                              const Icon(Icons.error),
                           fit: BoxFit.cover,
                         ),
                       ),
