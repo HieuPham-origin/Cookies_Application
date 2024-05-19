@@ -97,7 +97,6 @@ void showPracticeptionModalBottomSheet(
             ),
             _buildOption("Trắc nghiệm", "assets/quiz.png", () {
               Navigator.pop(context);
-
               Navigator.of(contextDetailTopic).push(
                 MaterialPageRoute(
                   builder: (contextDetailTopic) => QuizScreen(

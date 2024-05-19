@@ -284,7 +284,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "${widget.data['topicName'] + widget.type.toString()} ",
+                    "${widget.data['topicName']} ",
                     style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         color: Colors.black,
                         fontSize: 28,
@@ -292,14 +292,13 @@ class _QuizScreenState extends State<QuizScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                widget.type != 1
-                    ? IconButton(
-                        onPressed: () {
-                          quizSettingBottomSheet(context);
-                        },
-                        icon: Icon(Icons.settings),
-                      )
-                    : SizedBox.shrink(),
+                IconButton(
+                  onPressed: () {
+                    _timer?.cancel();
+                    quizSettingBottomSheet(context);
+                  },
+                  icon: Icon(Icons.settings),
+                )
               ],
             ),
             const SizedBox(
@@ -513,6 +512,9 @@ class _QuizScreenState extends State<QuizScreen> {
             curve: Curves.easeInOut,
           );
         } else {
+          if (widget.type == 1) {
+            timerTotal! .cancel();
+          }
           Dialogs.materialDialog(
             color: Colors.white,
             msg: 'Bạn đã làm đúng $point/${words.length} câu',
