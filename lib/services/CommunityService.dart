@@ -14,7 +14,7 @@ class CommunityService {
       String displayName,
       String content,
       String time,
-      int numOfLove,
+      List<String> likes,
       int numOfComment,
       List<String> topicCommunityCard) async {
     await community.add({
@@ -22,7 +22,7 @@ class CommunityService {
       'displayName': displayName,
       'content': content,
       'time': time,
-      'numOfLove': numOfLove,
+      'likes': likes,
       'numOfComment': numOfComment,
       'topicCommunityCard': topicCommunityCard,
     });
@@ -84,7 +84,7 @@ class CommunityService {
   }
 
   Future<QuerySnapshot> getCommunitySortByTimeSnapShot() {
-    return community.orderBy('time', descending: false).get();
+    return community.orderBy('time', descending: true).get();
   }
 
   //get all ranking order by point
@@ -124,5 +124,10 @@ class CommunityService {
     for (var doc in querySnapshot.docs) {
       await doc.reference.update({'image': newImage});
     }
+  }
+
+  //delete community by communityId
+  Future<void> deleteCommunity(String communityId) async {
+    await community.doc(communityId).delete();
   }
 }

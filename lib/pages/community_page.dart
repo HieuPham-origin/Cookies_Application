@@ -68,6 +68,11 @@ class _CommunityPageState extends State<CommunityPage> {
         await getAvatarUrl(FirebaseAuth.instance.currentUser!.uid);
     final result = await communityService.getCommunitySortByTimeSnapShot();
     for (var doc in result.docs) {
+      List<TopicCommunityCard> listTopic =
+          await loadTopic((doc['topicCommunityCard']).cast<String>(), doc.id);
+      if (listTopic.isEmpty) {
+        continue;
+      }
       AppConstants.communities.add(Community(
         communityId: doc.id,
         userId: doc['userId'],
@@ -75,30 +80,38 @@ class _CommunityPageState extends State<CommunityPage> {
         displayName: doc['displayName'],
         content: doc['content'],
         time: doc['time'],
-        numOfLove: doc['numOfLove'],
+        likes: List<String>.from(doc['likes'] ?? []),
         numOfComment: doc['numOfComment'],
-        topicCommunityCard:
-            await loadTopic((doc['topicCommunityCard']).cast<String>()),
+        topicCommunityCard: listTopic,
       ));
     }
+
     setState(() {
       flag = true;
     });
   }
 
   //load topic from topicId
-  Future<List<TopicCommunityCard>> loadTopic(List<String> topicId) async {
-    List<TopicCommunityCard> listTopic = [];
-    for (var id in topicId) {
-      final topic = await topicService.getTopicById(id);
-      listTopic.add(TopicCommunityCard(
-        topicName: topic.topicName,
-        numOfVocab: await countVocabInTopic(topic.topicId!),
-        color: topic.color,
-        topicId: topic.topicId,
-      ));
+  Future<List<TopicCommunityCard>> loadTopic(
+      List<String> topicId, String communityId) async {
+    try {
+      List<TopicCommunityCard> listTopic = [];
+      for (var id in topicId) {
+        final topic = await topicService.getTopicById(id);
+
+        listTopic.add(TopicCommunityCard(
+          topicName: topic.topicName,
+          numOfVocab: await countVocabInTopic(topic.topicId!),
+          color: topic.color,
+          topicId: topic.topicId,
+        ));
+      }
+      return listTopic;
+    } catch (e) {
+      log(e.toString());
+      communityService.deleteCommunity(communityId);
+      return [];
     }
-    return listTopic;
   }
 
   //count number of vocab in topic by topicId
@@ -169,12 +182,11 @@ class _CommunityPageState extends State<CommunityPage> {
                     avatar: e.avatar,
                     content: e.content,
                     time: timeSince,
-                    numOfLove: e.numOfLove,
                     numOfComment: e.numOfComment,
                     topicCommunityCard: e.topicCommunityCard,
                     isDetailPost: false,
                     communityId: e.communityId,
-
+                    likes: e.likes,
                     // communityId: e.communityId,
                   );
                 },

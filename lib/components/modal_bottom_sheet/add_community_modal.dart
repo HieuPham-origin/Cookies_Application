@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,15 +8,12 @@ import 'package:cookie_app/models/community.dart';
 import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/TopicService.dart';
-import 'package:cookie_app/services/UserService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/constants.dart';
 import 'package:cookie_app/utils/demension.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
 
 void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
   TextEditingController communityController = TextEditingController();
@@ -29,6 +24,7 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
   String userId = user.uid;
   String displayName = user.displayName ?? 'cookieuser';
   List<Topic> listTopic = [];
+  Map<String, int> numOfVocab = {};
 
   showModalBottomSheet(
     context: context,
@@ -121,29 +117,33 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
                                 displayName,
                                 communityController.text,
                                 DateTime.now().toString(),
-                                0,
+                                [],
                                 0,
                                 listTopic
                                     .map((topic) => topic.topicId!)
                                     .toList());
 
-                            AppConstants.communities.add(Community(
-                              userId: userId,
-                              avatar: avatarUrl,
-                              displayName: displayName,
-                              content: communityController.text,
-                              time: DateTime.now().toString(),
-                              numOfLove: 0,
-                              numOfComment: 0,
-                              topicCommunityCard: listTopic
-                                  .map<TopicCommunityCard>(
-                                      (topic) => TopicCommunityCard(
+                            AppConstants.communities.insert(
+                                0,
+                                Community(
+                                  userId: userId,
+                                  avatar: avatarUrl,
+                                  displayName: displayName,
+                                  content: communityController.text,
+                                  time: DateTime.now().toString(),
+                                  numOfComment: 0,
+                                  topicCommunityCard: listTopic
+                                      .map<TopicCommunityCard>((topic) =>
+                                          TopicCommunityCard(
+                                            topicId: topic.topicId!,
                                             topicName: topic.topicName,
-                                            numOfVocab: 10,
+                                            numOfVocab:
+                                                numOfVocab[topic.topicId!] ?? 0,
                                             color: topic.color,
                                           ))
-                                  .toList(),
-                            ));
+                                      .toList(),
+                                  likes: [],
+                                ));
 
                             Navigator.of(context).pop();
                           } catch (e) {
@@ -319,6 +319,8 @@ void showPostTopicModalBottomSheet(BuildContext context, String avatarUrl) {
                                   }
                                   int numOfVocabInTopicLibrary =
                                       snapshot.data ?? 0;
+
+                                  numOfVocab[docID] = numOfVocabInTopicLibrary;
 
                                   return TopicCard(
                                     topicId: docID,

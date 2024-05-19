@@ -11,20 +11,20 @@ class DetailPost extends StatefulWidget {
   final String avatar;
   final String content;
   final String time;
-  final int numOfLove;
   final int numOfComment;
   final List<TopicCommunityCard> topicCommunityCard;
   final String? communityId;
+  final List<String> likes;
   const DetailPost(
       {super.key,
       required this.user,
       required this.avatar,
       required this.content,
       required this.time,
-      required this.numOfLove,
       required this.numOfComment,
       required this.topicCommunityCard,
-      this.communityId});
+      this.communityId,
+      required this.likes});
 
   @override
   State<DetailPost> createState() => _DetailPostState();
@@ -67,11 +67,11 @@ class _DetailPostState extends State<DetailPost> {
             avatar: widget.avatar,
             content: widget.content,
             time: widget.time,
-            numOfLove: widget.numOfLove,
             numOfComment: widget.numOfComment,
             topicCommunityCard: widget.topicCommunityCard,
             isDetailPost: true,
             communityId: widget.communityId,
+            likes: widget.likes,
           ),
           const Divider(
             height: 1,

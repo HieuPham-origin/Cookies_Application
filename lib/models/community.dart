@@ -7,7 +7,7 @@ class Community {
   final String displayName;
   final String content;
   final String time;
-  final int numOfLove;
+  List<String> likes = [];
   final int numOfComment;
   List<TopicCommunityCard> topicCommunityCard = [];
 
@@ -18,7 +18,7 @@ class Community {
     required this.displayName,
     required this.content,
     required this.time,
-    required this.numOfLove,
+    required this.likes,
     required this.numOfComment,
     required this.topicCommunityCard,
   });
