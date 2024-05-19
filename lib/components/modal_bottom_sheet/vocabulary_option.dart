@@ -186,6 +186,7 @@ void showVocabulariesModalBottomSheet(
                                       date: date,
                                       isFav: isFav,
                                       topicId: topicId,
+                                      status: status,
                                       type: 2,
                                       onSpeakerPressed: () async {
                                         await audioPlayer.stop();

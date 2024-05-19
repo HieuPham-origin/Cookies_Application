@@ -520,6 +520,7 @@ class _DetailTopicState extends State<DetailTopic> {
                                     isFav: isFav,
                                     topicId: topicId,
                                     type: 1,
+                                    status: status,
                                     onSpeakerPressed: () async {
                                       await audioPlayer.stop();
                                       await audioPlayer.play(UrlSource(audio));

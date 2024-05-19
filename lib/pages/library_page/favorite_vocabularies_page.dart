@@ -85,6 +85,7 @@ class _FavoriteVocabPageState extends State<FavoriteVocabPage> {
                         wordForm: words[index]['wordForm'],
                         isFav: words[index]['isFav'],
                         topicId: words[index]['topicId'],
+                        status: words[index]['status'],
                         onFavoritePressed: (bool isFav) {
                           if (words[index]['topicId'] == "") {
                             wordService.updateFavorite(wordId, isFav);
