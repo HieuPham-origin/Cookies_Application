@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cookie_app/models/word.dart';
+import 'package:cookie_app/services/CommunityService.dart';
 import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/utils/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,8 +17,15 @@ import 'package:pinput/pinput.dart';
 class TypePracticeScreen extends StatefulWidget {
   final Map<String, dynamic> data;
   final String topicId;
+  final int? type;
+  final String? communityId;
+
   const TypePracticeScreen(
-      {super.key, required this.data, required this.topicId});
+      {super.key,
+      required this.data,
+      required this.topicId,
+      this.type,
+      this.communityId});
 
   @override
   State<TypePracticeScreen> createState() => _TypePracticeScreenState();
@@ -38,12 +47,13 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
   bool isChecked = false;
   int currentQuestion = 0;
   int timeTaken = 0;
-
   Timer? timerTotal;
+  CommunityService communityService = CommunityService();
 
   @override
   void initState() {
     fetchWord();
+    totalTime();
     super.initState();
   }
 
@@ -115,6 +125,9 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
+                    Text(
+                      timeTaken.toString(),
+                    ),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
@@ -217,12 +230,14 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
                                           const Duration(milliseconds: 200),
                                       curve: Curves.easeInOut,
                                     );
+
                                     currentQuestion++;
                                   } else {
+                                    timerTotal!.cancel();
                                     Dialogs.materialDialog(
                                       color: Colors.white,
                                       msg:
-                                          'Bạn đã làm đúng $point/${words.length} câu',
+                                          'Bạn đã làm đúng $point/${words.length} ${timeTaken} + ${((point / timeTaken) * 100)}câu',
                                       title: 'Chúc mừng',
                                       lottieBuilder: Lottie.asset(
                                         repeat: false,
@@ -233,6 +248,18 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
                                       actions: [
                                         IconsButton(
                                           onPressed: () {
+                                            if (widget.type == 1) {
+                                              communityService
+                                                  .comparePointAndAddNewDocument(
+                                                FirebaseAuth
+                                                    .instance.currentUser!.uid,
+                                                widget.topicId,
+                                                0,
+                                                ((point / timeTaken) * 100)
+                                                    .round(),
+                                                widget.communityId!,
+                                              );
+                                            }
                                             int count = 0;
                                             Navigator.of(context)
                                                 .popUntil((_) => count++ >= 2);
@@ -260,6 +287,11 @@ class _TypePracticeScreenState extends State<TypePracticeScreen> {
                                     );
                                   }
                                 } else {
+                                  if (isCorrect) {
+                                    setState(() {
+                                      point++;
+                                    });
+                                  }
                                   setState(
                                     () {
                                       isChecked = true;
