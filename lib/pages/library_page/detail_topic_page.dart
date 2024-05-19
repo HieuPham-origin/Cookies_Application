@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -24,8 +25,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio hide Column, Row;
 
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -65,6 +69,8 @@ final audioPlayer = AudioPlayer();
 String userId = FirebaseAuth.instance.currentUser!.uid;
 
 class _DetailTopicState extends State<DetailTopic> {
+  List wordsData = [];
+
   @override
   void initState() {
     super.initState();
@@ -75,6 +81,74 @@ class _DetailTopicState extends State<DetailTopic> {
         numOfWord = value;
       });
     });
+  }
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> exportTopic() async {
+    try {
+      // Fetch words data from Firestore
+      String topicName = widget.data['topicName'];
+      QuerySnapshot snapshot = await _firestore
+          .collection('topics')
+          .doc(widget.docID)
+          .collection('words')
+          .get();
+
+      List<DocumentSnapshot> words = snapshot.docs;
+
+      if (words.isEmpty) {
+        print("No words found for this topic.");
+        return;
+      }
+
+      final xlsio.Workbook workbook = xlsio.Workbook();
+      final xlsio.Worksheet sheet = workbook.worksheets[0];
+
+      // Set the headers for the columns.
+      sheet.getRangeByName("A1").setText("Word");
+      sheet.getRangeByName("B1").setText("Definition");
+      sheet.getRangeByName("C1").setText("Phonetic");
+      sheet.getRangeByName("D1").setText("Date");
+      sheet.getRangeByName("E1").setText("Word Form");
+      sheet.getRangeByName("F1").setText("Example");
+
+      // Fill in the data.
+      for (int i = 0; i < words.length; i++) {
+        DocumentSnapshot document = words[i];
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+        String word = data['word'] ?? '';
+        String definition = data['definition'] ?? '';
+        String phonetic = data['phonetic'] ?? '';
+        String date = data['date'] ?? '';
+        String wordForm = data['wordForm'] ?? '';
+        String example = data['example'] ?? '';
+
+        sheet.getRangeByName('A${i + 2}').setText(word);
+        sheet.getRangeByName('B${i + 2}').setText(definition);
+        sheet.getRangeByName('C${i + 2}').setText(phonetic);
+        sheet.getRangeByName('D${i + 2}').setText(date);
+        sheet.getRangeByName('E${i + 2}').setText(wordForm);
+        sheet.getRangeByName('F${i + 2}').setText(example);
+      }
+
+      final List<int> bytes = workbook.saveAsStream();
+      workbook.dispose();
+
+      final Directory directory = await getApplicationSupportDirectory();
+      final String path = directory.path;
+      final String fileName = '$path/$topicName.xlsx';
+
+      final File file = File(fileName);
+      await file.writeAsBytes(bytes, flush: true);
+
+      await OpenFile.open(fileName);
+
+      print('Excel file created and opened at $fileName');
+    } catch (e) {
+      print('Error creating or opening Excel file: $e');
+    }
   }
 
   @override
@@ -213,6 +287,7 @@ class _DetailTopicState extends State<DetailTopic> {
               onPressed: () {
                 // Add your onPressed action here
                 HapticFeedback.vibrate();
+                exportTopic();
               },
             ),
           ],
@@ -329,11 +404,11 @@ class _DetailTopicState extends State<DetailTopic> {
                       stream: topicService.getWordsForTopicStream(widget.docID),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          // print(snapshot.error);
                           return Center(
                               child: Text('Error: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
                           List words = snapshot.data!.docs;
+
                           if (words.isEmpty) {
                             return Center(
                                 child: Column(

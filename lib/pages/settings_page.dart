@@ -78,13 +78,17 @@ class _SettingPageState extends State<SettingPage> {
                   onTap: () async {
                     final roolback =
                         await Navigator.of(context, rootNavigator: true).push(
-                            PageTransition(
-                                child: InformationPage(),
-                                type: PageTransitionType.rightToLeft));
+                      PageTransition(
+                          child: InformationPage(),
+                          type: PageTransitionType.rightToLeft),
+                    );
+                    log(roolback[0].toString());
                     setState(() {
-                      AppConstants.avatarUrl = roolback;
+                      displayName = roolback[0];
                     });
-                    print("roolback" + roolback);
+                    // setState(() {
+                    //   AppConstants.avatarUrl = roolback;
+                    // });
                   },
                   customBorder: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

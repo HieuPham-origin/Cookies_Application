@@ -107,12 +107,14 @@ class _InformationPageState extends State<InformationPage> {
       appBar: AppBar(
         leadingWidth: 24,
         leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context, [displayName, AppConstants.image]);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-            )),
+          onPressed: () {
+            log(displayName);
+            Navigator.pop(context, [displayName, AppConstants.image]);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+          ),
+        ),
         title: Text(
           "Thông tin",
           style: GoogleFonts.inter(
@@ -227,8 +229,10 @@ class _InformationPageState extends State<InformationPage> {
                                       setState(() {
                                         AppConstants.avatarUrl = url;
                                       });
-                                      Navigator.pop(
-                                          context, AppConstants.avatarUrl);
+                                      // Navigator.pop(context, [
+                                      //   displayName,
+                                      //   AppConstants.avatarUrl
+                                      // ]);
                                     } catch (e) {
                                       log(e.toString());
                                     }
