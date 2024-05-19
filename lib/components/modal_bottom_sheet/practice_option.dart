@@ -119,6 +119,8 @@ void showPracticeptionModalBottomSheet(
                   builder: (contextDetailTopic) => TypePracticeScreen(
                     data: data,
                     topicId: topicId,
+                    communityId: communityId,
+                    type: 1,
                   ),
                 ),
               );

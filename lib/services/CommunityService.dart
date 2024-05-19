@@ -41,19 +41,20 @@ class CommunityService {
   }
 
   //add collection ranking
-  Future<void> addRanking(String userId, String email, int point,
-      String communityId, String topicId) async {
+  Future<void> addRanking(String userId, String email, int pointQuiz,
+      int pointType, String communityId, String topicId) async {
     await community.doc(communityId).collection('ranking').add({
       'userId': userId,
       'email': email,
-      'point': point,
+      'pointQuiz': pointQuiz,
+      'pointType': pointType,
       'topicId': topicId,
     });
   }
 
   //compare point by topicId and userId in ranking collection and add new document if not exist
-  Future<void> comparePointAndAddNewDocument(
-      String userId, String topicId, int point, String communityId) async {
+  Future<void> comparePointAndAddNewDocument(String userId, String topicId,
+      int pointQuiz, int pointType, String communityId) async {
     final querySnapshot = await community
         .doc(communityId)
         .collection('ranking')
@@ -61,16 +62,22 @@ class CommunityService {
         .where('topicId', isEqualTo: topicId)
         .get();
     if (querySnapshot.docs.isEmpty) {
-      await addRanking(userId, FirebaseAuth.instance.currentUser!.email!, point,
-          communityId, topicId);
+      await addRanking(userId, FirebaseAuth.instance.currentUser!.email!,
+          pointQuiz, pointType, communityId, topicId);
     } else {
       for (var doc in querySnapshot.docs) {
-        if (doc['point'] < point) {
+        if (doc['pointQuiz'] < pointQuiz) {
           await community
               .doc(communityId)
               .collection('ranking')
               .doc(doc.id)
-              .update({'point': point});
+              .update({'pointQuiz': pointQuiz});
+        } else if (doc['pointType'] < pointType) {
+          await community
+              .doc(communityId)
+              .collection('ranking')
+              .doc(doc.id)
+              .update({'pointType': pointType});
         }
       }
     }
@@ -85,7 +92,16 @@ class CommunityService {
     return community
         .doc(communityId)
         .collection('ranking')
-        .orderBy('point', descending: true)
+        .orderBy('pointQuiz', descending: true)
+        .get();
+  }
+
+  //get all ranking order by pointTyoe
+  Future<QuerySnapshot> getAllRankingOrderByPointType(String communityId) {
+    return community
+        .doc(communityId)
+        .collection('ranking')
+        .orderBy('pointType', descending: true)
         .get();
   }
 

@@ -531,6 +531,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       FirebaseAuth.instance.currentUser!.uid,
                       widget.topicId,
                       ((point / timeTaken) * 100).round(),
+                      0,
                       widget.communityId!,
                     );
                   }
