@@ -63,6 +63,28 @@ class _FavoriteVocabPageState extends State<FavoriteVocabPage> {
                 if (snapshot.hasData) {
                   List words = snapshot.data!.docs;
 
+                  if (words.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/logo.png',
+                            width: 200,
+                            height: 200,
+                          ),
+                          const Text(
+                            "Chưa có từ vựng nào được yêu thích",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.icon_grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
                     itemCount: words.length,
                     itemBuilder: (context, index) {

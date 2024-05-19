@@ -1,15 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cookie_app/components/like_button.dart';
 import 'package:cookie_app/components/topic_community_card.dart';
-import 'package:cookie_app/models/topic.dart';
 import 'package:cookie_app/pages/detail_post.dart';
 import 'package:cookie_app/pages/detail_topic_for_community.dart';
-import 'package:cookie_app/pages/library_page/detail_topic_page.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -19,11 +19,11 @@ class CommunityCard extends StatefulWidget {
   final String avatar;
   final String content;
   final String time;
-  final int numOfLove;
   final int numOfComment;
   final bool isDetailPost;
   List<TopicCommunityCard> topicCommunityCard;
   String? communityId;
+  List<String> likes;
 
   CommunityCard({
     super.key,
@@ -31,11 +31,11 @@ class CommunityCard extends StatefulWidget {
     required this.avatar,
     required this.content,
     required this.time,
-    required this.numOfLove,
     required this.numOfComment,
     required this.topicCommunityCard,
     required this.isDetailPost,
     this.communityId,
+    required this.likes,
   });
 
   @override
@@ -43,6 +43,42 @@ class CommunityCard extends StatefulWidget {
 }
 
 class _CommunityCardState extends State<CommunityCard> {
+  final currentUser = FirebaseAuth.instance.currentUser;
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    isLiked = widget.likes.contains(currentUser!.email);
+  }
+
+  void toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+
+    if (isLiked) {
+      widget.likes.add(currentUser!.email!);
+    } else {
+      widget.likes.remove(currentUser!.email);
+    }
+
+    DocumentReference communityRef = FirebaseFirestore.instance
+        .collection('communities')
+        .doc(widget.communityId);
+
+    if (isLiked) {
+      communityRef.update({
+        'likes': FieldValue.arrayUnion([currentUser?.email])
+      });
+    } else {
+      communityRef.update({
+        'likes': FieldValue.arrayRemove([currentUser?.email])
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -55,10 +91,10 @@ class _CommunityCardState extends State<CommunityCard> {
                 avatar: widget.avatar,
                 content: widget.content,
                 time: widget.time,
-                numOfLove: widget.numOfLove,
                 numOfComment: widget.numOfComment,
                 topicCommunityCard: widget.topicCommunityCard,
                 communityId: widget.communityId,
+                likes: widget.likes,
               ),
               type: PageTransitionType.rightToLeft));
         }
@@ -194,7 +230,6 @@ class _CommunityCardState extends State<CommunityCard> {
                                       "avatar": widget.avatar,
                                       "content": widget.content,
                                       "time": widget.time,
-                                      "numOfLove": widget.numOfLove,
                                       "numOfComment": widget.numOfComment
                                     },
                                     communityId: widget.communityId,
@@ -238,15 +273,18 @@ class _CommunityCardState extends State<CommunityCard> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(
-                              CupertinoIcons.heart,
-                              color: AppColors.grey_light,
+                            LikeButtonCustom(
+                              isLiked: isLiked,
+                              onTap: () {
+                                toggleLike();
+                                print(widget.likes.length.toString());
+                              },
                             ),
                             SizedBox(
                               width: Dimensions.width(context, 5),
                             ),
                             Text(
-                              widget.numOfLove.toString(),
+                              widget.likes.length.toString(),
                               style: GoogleFonts.inter(
                                 textStyle: const TextStyle(
                                   fontSize: 12,
