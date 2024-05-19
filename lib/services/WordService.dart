@@ -202,20 +202,46 @@ class WordService {
   }
 
   Future<String> getRandomWord() async {
-    final url = Uri.parse('https://random-words5.p.rapidapi.com/getRandom');
+    final url = Uri.parse('https://random-word-api.herokuapp.com/word');
 
     final res = await http.get(
       url,
-      headers: {
-        'X-RapidAPI-Key': '0f8e9ff84emsh710091ba6d52f30p1fb565jsn4fc5e1a5a9d0',
-        'X-RapidAPI-Host': 'random-words5.p.rapidapi.com'
-      },
     );
 
     if (res.statusCode == 200) {
       return res.body;
     } else {
       throw Exception("Failed to get random word");
+    }
+  }
+
+  Future<String> getDefinition(String word) async {
+    final url = 'https://api.dictionaryapi.dev/api/v2/entries/en/$word';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+
+      for (var item in jsonResponse) {
+        // Assuming each item might have a 'meanings' list.
+        if (item.containsKey('meanings') && item['meanings'].isNotEmpty) {
+          for (var meaning in item['meanings']) {
+            // Check if 'definitions' exists in meaning
+            if (meaning.containsKey('definitions') &&
+                meaning['definitions'].isNotEmpty) {
+              for (var definition in meaning['definitions']) {
+                if (definition.containsKey('definition')) {
+                  // Print the definition
+                  return definition['definition'];
+                }
+              }
+            }
+          }
+        }
+      }
+      throw Exception('Definition not found');
+    } else {
+      throw Exception('Failed to load definition');
     }
   }
 }

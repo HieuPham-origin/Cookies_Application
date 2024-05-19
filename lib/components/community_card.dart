@@ -297,27 +297,6 @@ class _CommunityCardState extends State<CommunityCard> {
                         SizedBox(
                           width: Dimensions.width(context, 30),
                         ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              CupertinoIcons.chat_bubble,
-                              color: AppColors.grey_light,
-                            ),
-                            SizedBox(
-                              width: Dimensions.width(context, 5),
-                            ),
-                            Text(
-                              widget.numOfComment.toString(),
-                              style: GoogleFonts.inter(
-                                textStyle: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.grey_light,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
