@@ -47,7 +47,6 @@ class _SignInState extends State<SignIn> {
       await UserService(FirebaseAuth.instance.currentUser!).loadAvatar();
       // pop the loading circle
     } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
       if (e.code == 'invalid-credential') {
         // show error to user
         showErrorMessage("Email hoặc mật khẩu không chính xác !");
