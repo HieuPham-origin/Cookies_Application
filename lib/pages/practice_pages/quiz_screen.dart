@@ -256,7 +256,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.type != 1) {
+    if (widget.type == 1) {
       totalTime();
     }
     fetchWords().then((fetchedWords) {
@@ -292,13 +292,15 @@ class _QuizScreenState extends State<QuizScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    _timer?.cancel();
-                    quizSettingBottomSheet(context);
-                  },
-                  icon: Icon(Icons.settings),
-                )
+                widget.type == 1
+                    ? SizedBox.shrink()
+                    : IconButton(
+                        onPressed: () {
+                          _timer?.cancel();
+                          quizSettingBottomSheet(context);
+                        },
+                        icon: Icon(Icons.settings),
+                      )
               ],
             ),
             const SizedBox(
@@ -513,7 +515,7 @@ class _QuizScreenState extends State<QuizScreen> {
           );
         } else {
           if (widget.type == 1) {
-            timerTotal! .cancel();
+            timerTotal!.cancel();
           }
           Dialogs.materialDialog(
             color: Colors.white,

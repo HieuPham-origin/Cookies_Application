@@ -17,6 +17,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:quickalert/models/quickalert_animtype.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:toasty_box/toast_service.dart';
 
 class DetailTopicCommunity extends StatefulWidget {
   final TopicCommunityCard topicCommunityCard;
@@ -64,11 +65,19 @@ class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
             GestureDetector(
               onTap: () {
                 //bottom sheet
-                Navigator.push(
+                if (widget.communityId != null) {
+                  Navigator.push(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeft,
+                          child:
+                              RankingPage(communityId: widget.communityId!)));
+                } else {
+                  ToastService.showWarningToast(
                     context,
-                    PageTransition(
-                        type: PageTransitionType.rightToLeft,
-                        child: RankingPage(communityId: widget.communityId!)));
+                    message: "Vui lòng reload trang cộng đồng để xem xếp hạng",
+                  );
+                }
               },
               child: Text(
                 "Xếp hạng",
@@ -177,13 +186,20 @@ class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
                     ),
                   ),
                   onPressed: () {
-                    showPracticeptionModalBottomSheet(
-                      context,
-                      widget.topicCommunityCard.topicId!,
-                      widget.data!,
-                      type: 1,
-                      communityId: widget.communityId,
-                    );
+                    if (widget.communityId != null) {
+                      showPracticeptionModalBottomSheet(
+                        context,
+                        widget.topicCommunityCard.topicId!,
+                        widget.data!,
+                        type: 1,
+                        communityId: widget.communityId,
+                      );
+                    } else {
+                      ToastService.showWarningToast(
+                        context,
+                        message: "Vui lòng reload trang cộng đồng để tham gia",
+                      );
+                    }
                   },
                   child: const Text("Thi ngay"),
                 ),
