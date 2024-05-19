@@ -292,7 +292,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                widget.type == 1
+                widget.type != 1
                     ? IconButton(
                         onPressed: () {
                           quizSettingBottomSheet(context);
