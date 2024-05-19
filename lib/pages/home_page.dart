@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                 height: 18,
               ),
               Text(
-                "definition",
+                "ví dụ",
                 style: TextStyle(
                   fontSize: 16,
                   fontStyle: FontStyle.italic,
@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                 height: 18,
               ),
               Text(
-                "synonyms",
+                "từ đồng nghĩa",
                 style: TextStyle(
                   fontSize: 16,
                   fontStyle: FontStyle.italic,
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                 height: 18,
               ),
               Text(
-                "translation",
+                "dịch nghĩa",
                 style: TextStyle(
                   fontSize: 16,
                   fontStyle: FontStyle.italic,

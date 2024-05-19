@@ -29,7 +29,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:syncfusion_flutter_xlsio/xlsio.dart' hide Column, Row;
+import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xlsio hide Column, Row;
 
 class DetailTopic extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -69,6 +69,8 @@ final audioPlayer = AudioPlayer();
 String userId = FirebaseAuth.instance.currentUser!.uid;
 
 class _DetailTopicState extends State<DetailTopic> {
+  List wordsData = [];
+
   @override
   void initState() {
     super.initState();
@@ -81,21 +83,72 @@ class _DetailTopicState extends State<DetailTopic> {
     });
   }
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<void> exportTopic() async {
-    final topicName = widget.data['topicName'];
+    try {
+      // Fetch words data from Firestore
+      String topicName = widget.data['topicName'];
+      QuerySnapshot snapshot = await _firestore
+          .collection('topics')
+          .doc(widget.docID)
+          .collection('words')
+          .get();
 
-    final Workbook workbook = Workbook();
-    final Worksheet sheet = workbook.worksheets[0];
-    sheet.getRangeByName("A1").setText("Yoooooo");
-    final List<int> bytes = workbook.saveAsStream();
+      List<DocumentSnapshot> words = snapshot.docs;
 
-    workbook.dispose();
+      if (words.isEmpty) {
+        print("No words found for this topic.");
+        return;
+      }
 
-    final String path = (await getApplicationSupportDirectory()).path;
-    final String fileName = '$path/$topicName.xlsx';
-    final File file = File(fileName);
-    await file.writeAsBytes(bytes, flush: true); 
-    OpenFile.open(fileName);
+      final xlsio.Workbook workbook = xlsio.Workbook();
+      final xlsio.Worksheet sheet = workbook.worksheets[0];
+
+      // Set the headers for the columns.
+      sheet.getRangeByName("A1").setText("Word");
+      sheet.getRangeByName("B1").setText("Definition");
+      sheet.getRangeByName("C1").setText("Phonetic");
+      sheet.getRangeByName("D1").setText("Date");
+      sheet.getRangeByName("E1").setText("Word Form");
+      sheet.getRangeByName("F1").setText("Example");
+
+      // Fill in the data.
+      for (int i = 0; i < words.length; i++) {
+        DocumentSnapshot document = words[i];
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+        String word = data['word'] ?? '';
+        String definition = data['definition'] ?? '';
+        String phonetic = data['phonetic'] ?? '';
+        String date = data['date'] ?? '';
+        String wordForm = data['wordForm'] ?? '';
+        String example = data['example'] ?? '';
+
+        sheet.getRangeByName('A${i + 2}').setText(word);
+        sheet.getRangeByName('B${i + 2}').setText(definition);
+        sheet.getRangeByName('C${i + 2}').setText(phonetic);
+        sheet.getRangeByName('D${i + 2}').setText(date);
+        sheet.getRangeByName('E${i + 2}').setText(wordForm);
+        sheet.getRangeByName('F${i + 2}').setText(example);
+      }
+
+      final List<int> bytes = workbook.saveAsStream();
+      workbook.dispose();
+
+      final Directory directory = await getApplicationSupportDirectory();
+      final String path = directory.path;
+      final String fileName = '$path/$topicName.xlsx';
+
+      final File file = File(fileName);
+      await file.writeAsBytes(bytes, flush: true);
+
+      await OpenFile.open(fileName);
+
+      print('Excel file created and opened at $fileName');
+    } catch (e) {
+      print('Error creating or opening Excel file: $e');
+    }
   }
 
   @override
@@ -351,11 +404,11 @@ class _DetailTopicState extends State<DetailTopic> {
                       stream: topicService.getWordsForTopicStream(widget.docID),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          // print(snapshot.error);
                           return Center(
                               child: Text('Error: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
                           List words = snapshot.data!.docs;
+
                           if (words.isEmpty) {
                             return Center(
                                 child: Column(

@@ -82,6 +82,11 @@ class _LibraryPageState extends State<LibraryPage> {
     });
   }
 
+
+  Future<void> importExcel() async{
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
@@ -122,6 +127,72 @@ class _LibraryPageState extends State<LibraryPage> {
         direction: SpeedDialDirection.up,
         animationCurve: Curves.elasticInOut,
         children: [
+          SpeedDialChild(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: Ink(
+                child: Icon(Icons.import_export_rounded,
+                    color: AppColors.black_opacity)),
+            labelWidget: Container(
+              margin: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 4), // Adjust padding as needed
+              decoration: BoxDecoration(
+                color: Colors.white, // Background color of the label
+                borderRadius: BorderRadius.circular(30),
+
+                // Optionally, add a border or shadow
+              ),
+              child: Text(
+                "Nhập topic từ file",
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: AppColors.black_opacity,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () => {},
+          ),
+          SpeedDialChild(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: Ink(
+                child: Icon(CupertinoIcons.heart_fill, color: AppColors.red)),
+            labelWidget: Container(
+              margin: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 4), // Adjust padding as needed
+              decoration: BoxDecoration(
+                color: Colors.white, // Background color of the label
+                borderRadius: BorderRadius.circular(30),
+
+                // Optionally, add a border or shadow
+              ),
+              child: Text(
+                "Từ yêu thích",
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: AppColors.red,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () => {
+              Navigator.of(context, rootNavigator: true).push(
+                PageTransition(
+                  type: PageTransitionType.rightToLeft,
+                  child: FavoriteVocabPage(),
+                ),
+              )
+            },
+          ),
           SpeedDialChild(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(40),
@@ -200,94 +271,59 @@ class _LibraryPageState extends State<LibraryPage> {
             }, numOfTopic, "", 1),
           ),
           SpeedDialChild(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Ink(
-                  child:
-                      Icon(CupertinoIcons.folder_fill, color: AppColors.blue)),
-              labelWidget: Container(
-                margin: EdgeInsets.only(right: 10),
-                padding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4), // Adjust padding as needed
-                decoration: BoxDecoration(
-                  color: Colors.white, // Background color of the label
-                  borderRadius: BorderRadius.circular(30),
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: Ink(
+                child: Icon(CupertinoIcons.folder_fill, color: AppColors.blue)),
+            labelWidget: Container(
+              margin: EdgeInsets.only(right: 10),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 4), // Adjust padding as needed
+              decoration: BoxDecoration(
+                color: Colors.white, // Background color of the label
+                borderRadius: BorderRadius.circular(30),
 
-                  // Optionally, add a border or shadow
-                ),
-                child: Text(
-                  "Thư mục",
-                  style: GoogleFonts.inter(
-                    textStyle: TextStyle(
-                      color: AppColors.blue,
-                      fontWeight: FontWeight.w500,
-                    ),
+                // Optionally, add a border or shadow
+              ),
+              child: Text(
+                "Thư mục",
+                style: GoogleFonts.inter(
+                  textStyle: TextStyle(
+                    color: AppColors.blue,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              onTap: () => {
-                    Navigator.of(context, rootNavigator: true).push(
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          child: FolderPage(
-                            numOfVocabInTopic: numOfVocabInTopic,
-                            numOfVocab: numOfVocab,
-                            numOfTopic: numOfTopic,
-                            setNumOfTopic: (int numOfTopic) {
-                              setState(() {
-                                this.numOfTopic = numOfTopic;
-                              });
-                            },
-                            setNumOfVocabInTopicFromLibrary:
-                                (int numOfVocabInTopic) {
-                              setState(() {
-                                this.numOfVocabInTopic = numOfVocabInTopic;
-                              });
-                            },
-                            setNumOfVocab: (int numOfVocab) {
-                              setState(() {
-                                this.numOfVocab = numOfVocab;
-                              });
-                            },
-                          )),
-                    )
-                  }),
-          SpeedDialChild(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: Ink(
-                  child: Icon(CupertinoIcons.heart_fill, color: AppColors.red)),
-              labelWidget: Container(
-                margin: EdgeInsets.only(right: 10),
-                padding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4), // Adjust padding as needed
-                decoration: BoxDecoration(
-                  color: Colors.white, // Background color of the label
-                  borderRadius: BorderRadius.circular(30),
-
-                  // Optionally, add a border or shadow
-                ),
-                child: Text(
-                  "Từ yêu thích",
-                  style: GoogleFonts.inter(
-                    textStyle: TextStyle(
-                      color: AppColors.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-              onTap: () => {
-                    Navigator.of(context, rootNavigator: true).push(
-                      PageTransition(
-                          type: PageTransitionType.rightToLeft,
-                          child: FavoriteVocabPage()),
-                    )
-                  }),
+            ),
+            onTap: () => {
+              Navigator.of(context, rootNavigator: true).push(
+                PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: FolderPage(
+                      numOfVocabInTopic: numOfVocabInTopic,
+                      numOfVocab: numOfVocab,
+                      numOfTopic: numOfTopic,
+                      setNumOfTopic: (int numOfTopic) {
+                        setState(() {
+                          this.numOfTopic = numOfTopic;
+                        });
+                      },
+                      setNumOfVocabInTopicFromLibrary: (int numOfVocabInTopic) {
+                        setState(() {
+                          this.numOfVocabInTopic = numOfVocabInTopic;
+                        });
+                      },
+                      setNumOfVocab: (int numOfVocab) {
+                        setState(() {
+                          this.numOfVocab = numOfVocab;
+                        });
+                      },
+                    )),
+              )
+            },
+          ),
         ],
       ),
       backgroundColor: AppColors.background,
