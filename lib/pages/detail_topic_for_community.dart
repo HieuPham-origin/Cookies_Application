@@ -224,6 +224,7 @@ class _DetailTopicCommunityState extends State<DetailTopicCommunity> {
                         date: words[index]['date'],
                         isFav: words[index]['isFav'],
                         topicId: words[index]['topicId'],
+                        status: words[index]['status'],
                         type: 2,
                         onSpeakerPressed: () async {
                           await audioPlayer.stop();

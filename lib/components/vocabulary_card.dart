@@ -22,6 +22,7 @@ class VocabularyCard extends StatefulWidget {
   final Function()? onSharePressed;
   final Function()? onTap;
   final int type;
+  final int? status;
 
   const VocabularyCard(
       {super.key,
@@ -37,7 +38,8 @@ class VocabularyCard extends StatefulWidget {
       this.onTap,
       required this.isFav,
       required this.topicId,
-      required this.type});
+      required this.type,
+      this.status});
 
   @override
   State<VocabularyCard> createState() => _VocabularyCardState();
@@ -178,7 +180,11 @@ class _VocabularyCardState extends State<VocabularyCard> {
                     ? Row(
                         children: [
                           Text(
-                            'Chưa học',
+                            widget.status == 0
+                                ? "Chưa học"
+                                : widget.status == 1
+                                    ? "Đang học"
+                                    : "Đã học",
                             style: GoogleFonts.inter(
                               textStyle: TextStyle(
                                   color: AppColors.cookie,
@@ -189,7 +195,11 @@ class _VocabularyCardState extends State<VocabularyCard> {
                           SizedBox(width: 5),
                           Expanded(
                             child: LinearProgressIndicator(
-                              value: 0.5,
+                              value: widget.status == 0
+                                  ? 0
+                                  : widget.status == 1
+                                      ? 0.5
+                                      : 1,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                   AppColors.cookie),
                               backgroundColor: AppColors.grey_light,

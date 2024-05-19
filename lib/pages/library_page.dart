@@ -853,6 +853,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                   numOfVocabInTopic: numOfVocabInTopic,
                                 );
                               },
+                              status: 0,
                             ),
                           );
                         });
