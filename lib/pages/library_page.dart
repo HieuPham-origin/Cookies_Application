@@ -19,6 +19,8 @@ import 'package:cookie_app/services/TopicService.dart';
 import 'package:cookie_app/services/WordService.dart';
 import 'package:cookie_app/utils/colors.dart';
 import 'package:cookie_app/utils/demension.dart';
+import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -82,9 +84,89 @@ class _LibraryPageState extends State<LibraryPage> {
     });
   }
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> importExcel() async{
-    
+  Future<void> importExcel() async {
+    try {
+      // Pick an Excel file.
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
+      );
+
+      if (result == null) {
+        // User canceled the picker.
+        return;
+      }
+
+      // Get the selected file.
+      File file = File(result.files.single.path!);
+      final List<int> bytes = await file.readAsBytes();
+
+      // Decode the Excel file.
+      var excel = Excel.decodeBytes(bytes);
+
+      // Extract the topic name from the file name.
+      String topicName = result.files.single.name.split('.').first;
+
+      // Get the current user.
+      var user = FirebaseAuth.instance.currentUser;
+
+      // Add the new topic to Firestore.
+      var newTopic = {
+        'topicName': topicName,
+        'isPublic': false,
+        'userId': user!.uid,
+        'userEmail': user.email,
+        'color': "default", // Set the default or your desired color
+      };
+
+      DocumentReference topicRef =
+          await _firestore.collection('topics').add(newTopic);
+
+      for (var table in excel.tables.keys) {
+        var sheet = excel.tables[table]!;
+        for (int rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+          List<Data?> row = sheet.rows[rowIndex];
+
+          String word = row[0]?.value?.toString() ?? '';
+          String definition = row[1]?.value?.toString() ?? '';
+          String phonetic = row[2]?.value?.toString() ?? '';
+          String date = row[3]?.value?.toString() ?? '';
+          String wordForm = row[4]?.value?.toString() ?? '';
+          String example = row[5]?.value?.toString() ?? '';
+
+          var newWord = {
+            'word': word,
+            'definition': definition,
+            'phonetic': phonetic,
+            'date': date,
+            'wordForm': wordForm,
+            'example': example,
+            'topicId': topicRef.id,
+            'isFav': false,
+            'audio':
+                'https://translate.google.com/translate_tts?ie=UTF-8&q=%22"$word"&tl=en&client=tw-ob',
+            'status': 0,
+            'image': '',
+            'userId': user.uid,
+          };
+
+          await _firestore
+              .collection('topics')
+              .doc(topicRef.id)
+              .collection('words')
+              .add(newWord);
+        }
+      }
+
+      log('Excel file imported successfully');
+      setState(() {
+        numOfTopic++;
+      });
+    } catch (e) {
+      print('Error importing Excel file: $e');
+    }
   }
 
   @override
@@ -155,7 +237,9 @@ class _LibraryPageState extends State<LibraryPage> {
                 ),
               ),
             ),
-            onTap: () => {},
+            onTap: () async {
+              await importExcel();
+            },
           ),
           SpeedDialChild(
             backgroundColor: Colors.white,
